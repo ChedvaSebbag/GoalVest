@@ -1,0 +1,36 @@
+@use '@angular/material' as mat;
+
+// ---- Design tokens (docs/05-screens-and-ux.md §5.5) ----
+:root {
+  --gv-primary: #0f4c5c;
+  --gv-accent: #e3a33b;
+  --gv-success: #2e7d32;
+  --gv-error: #c62828;
+  --gv-warning: #ed6c02;
+  --gv-bg: #f7f9fa;
+  --gv-surface: #ffffff;
+  --gv-text: #1c2a2f;
+  --gv-text-muted: #5b6b70;
+  --gv-radius: 12px;
+  --gv-space: 8px;
+  --gv-shadow: 0 1px 3px rgba(15, 76, 92, 0.12);
+}
+
+html {
+  color-scheme: light;
+  @include mat.theme((
+    color: (primary: mat.$cyan-palette, tertiary: mat.$orange-palette),
+    typography: Heebo,
+    density: 0,
+  ));
+}
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: Heebo, Arial, sans-serif;
+  background: var(--gv-bg);
+  color: var(--gv-text);
+}
+
+.material-symbols-rounded { font-family: 'Material Symbols Rounded'; }

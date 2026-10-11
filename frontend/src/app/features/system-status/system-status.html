@@ -1,0 +1,38 @@
+<section class="page">
+  <header class="page-head">
+    <h1>מצב המערכת</h1>
+    <p class="muted">בדיקה שכל רכיבי התשתית מחוברים: שרת Flask, מסד הנתונים בענן, Ollama ו-ChromaDB.</p>
+  </header>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" aria-label="טוען" />
+  }
+
+  <mat-card class="row api" appearance="outlined">
+    <span class="dot" [class.ok]="!apiError() && !loading()" [class.err]="apiError()" aria-hidden="true"></span>
+    <div class="txt">
+      <strong>שרת האפליקציה (Flask)</strong>
+      <span class="muted">
+        @if (apiError()) { אין תשובה מ-<bdi>/api/health</bdi>. האם השרת רץ על פורט 5000? }
+        @else { מחובר }
+      </span>
+    </div>
+    <span class="label">{{ apiError() ? '✗ לא זמין' : '✓ תקין' }}</span>
+  </mat-card>
+
+  @for (r of rows; track r.key) {
+    @let check = health()?.checks?.[r.key];
+    <mat-card class="row" appearance="outlined">
+      <span class="dot" [class.ok]="check?.status === 'ok'" [class.err]="check?.status === 'error'" aria-hidden="true"></span>
+      <div class="txt">
+        <strong>{{ r.label }}</strong>
+        <span class="muted">{{ check?.detail || r.hint }}</span>
+      </div>
+      <span class="label">
+        @if (!check) { – } @else if (check.status === 'ok') { ✓ תקין } @else { ✗ שגיאה }
+      </span>
+    </mat-card>
+  }
+
+  <button mat-flat-button (click)="refresh()" [disabled]="loading()">בדוק שוב</button>
+</section>
