@@ -1,0 +1,25 @@
+# Secrets
+.env
+secrets/
+*.pem
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+
+# App data
+uploads/
+chroma_data/
+
+# OS / IDE
+.DS_Store
+.idea/

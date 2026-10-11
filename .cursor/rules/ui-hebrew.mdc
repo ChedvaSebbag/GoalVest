@@ -1,0 +1,14 @@
+---
+description: R2 - Hebrew RTL UI rules for the Angular frontend
+alwaysApply: true
+---
+
+# Rule R2 – ממשק בעברית
+
+- `dir="rtl"` ו-`lang="he"` ברמת האפליקציה. שימוש ב-margin-inline/padding-inline במקום left/right.
+- כל טקסט למשתמש בעברית. מספרים, סימולים ו-URLs בתוך `<bdi>`.
+- כסף דרך `MoneyPipe` בפורמט `₪ 1,234`. אחוזים עם ספרה אחת. תאריכים `dd/MM/yyyy`.
+- לכל רשימה או טבלה: מצב טעינה (Skeleton), מצב ריק עם פעולה, מצב שגיאה עם "נסה שוב".
+- כפתור אייקון חייב `aria-label`. צבע לעולם לא הנושא היחיד של מידע (תשואה: גם סימן +/−).
+- שימוש ב-Design Tokens (CSS Variables) בלבד, בלי צבעים קשיחים ברכיבים.
+- כל מסך שמציג הערכה או המלצה כולל את רכיב `<gv-disclaimer>`.
