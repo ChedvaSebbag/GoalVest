@@ -6,9 +6,11 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 import sqlalchemy as sa
+from goalvest_core import EmailAlreadyExists
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.infrastructure.conflicts import is_email_unique_violation
 from app.infrastructure.event_store import EventStoreRepository
 from app.infrastructure.serialization import dumps, loads, to_naive_utc
 from app.infrastructure.tables import processed_commands
@@ -72,6 +74,11 @@ class CommandBus:
                 if stored is None:
                     raise
                 return stored
+        except IntegrityError as exc:
+            self._session.rollback()
+            if is_email_unique_violation(exc):
+                raise EmailAlreadyExists() from exc
+            raise
         except Exception:
             self._session.rollback()
             raise

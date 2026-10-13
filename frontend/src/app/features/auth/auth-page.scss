@@ -1,0 +1,62 @@
+.auth-page {
+  display: grid;
+  place-items: center;
+  padding: calc(var(--gv-space) * 4) calc(var(--gv-space) * 2);
+}
+
+.auth-card {
+  width: min(480px, 100%);
+  padding: calc(var(--gv-space) * 3);
+  border-radius: var(--gv-radius);
+  background: var(--gv-surface);
+  box-shadow: var(--gv-shadow);
+}
+
+h1 {
+  margin: 0;
+  color: var(--gv-primary);
+  font-weight: 700;
+}
+
+.muted { color: var(--gv-text-muted); }
+
+.form {
+  display: grid;
+  gap: calc(var(--gv-space) * 1.5);
+  padding-block-start: calc(var(--gv-space) * 2);
+}
+
+.roles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(var(--gv-space) * 1.5);
+}
+
+.role-card {
+  text-align: start;
+  padding: calc(var(--gv-space) * 2);
+  border-radius: var(--gv-radius);
+  border: 1px solid var(--gv-text-muted);
+  background: var(--gv-surface);
+  color: var(--gv-text);
+  display: grid;
+  gap: calc(var(--gv-space) * 0.5);
+  cursor: pointer;
+}
+
+.role-card.selected {
+  border-color: var(--gv-primary);
+  box-shadow: inset 0 0 0 1px var(--gv-primary);
+}
+
+.form-error { color: var(--gv-error); margin: 0; }
+.success { color: var(--gv-success); margin: 0; }
+
+button[mat-flat-button] {
+  background: var(--gv-primary);
+  color: var(--gv-on-primary);
+}
+
+@media (max-width: 520px) {
+  .roles { grid-template-columns: 1fr; }
+}

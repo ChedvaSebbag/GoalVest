@@ -109,7 +109,7 @@ CREATE TABLE ConsumerCheckpoints (       -- למעקב של ה-Worker וה-Agent
 
 | טבלה | עמודות עיקריות | משמשת את |
 |---|---|---|
-| `rm_users` | user_id, email (unique), full_name, phone, role, institution_id, status, password_hash | התחברות, הרשאות |
+| `rm_users` | user_id, email (unique, אחרי `strip().lower()`), full_name, phone, role, institution_id, status, password_hash | התחברות, הרשאות |
 | `rm_investor_profiles` | user_id, risk_score, risk_label, birth_year, … | שאלון, דשבורד |
 | `rm_goals` | goal_id, investor_id, type, title, amounts, target_date, active_request_id, status | S7, S8 |
 | `rm_requests` | request_id, goal_id, investor_id, status, overall_score, claimed_by, institution_id, assessment_review (approved/rejected/null), created_at, updated_at | תור הסוכן, S8 |
@@ -123,6 +123,14 @@ CREATE TABLE ConsumerCheckpoints (       -- למעקב של ה-Worker וה-Agent
 | `rm_holdings` | user_id, symbol, quantity, buy_price | S13 |
 | `rm_notifications` | notification_id, user_id, title, body, link, is_read, created_at | S18 |
 | `rm_request_timeline` | request_id, global_position, event_type, actor, display_text, occurred_at | S8, S15 |
+
+`license_no` נשמר ב-payload של `UserRegistered` ואינו עמודה ב-`rm_users`.
+
+### טבלת תפעול (אינה Read Model)
+
+| טבלה | עמודות | תפקיד |
+|---|---|---|
+| `RevokedTokens` | jti, expires_at, revoked_at | פסילת Refresh Token ב-logout וב-rotation. לפי docs/12 §12.1. לא נגזרת מאירוע, ואין עליה `UPDATE`/`DELETE` של `EventStore` |
 
 **דוגמת Projector:**
 

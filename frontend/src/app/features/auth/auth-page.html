@@ -1,0 +1,129 @@
+<section class="auth-page">
+  <mat-card class="auth-card" appearance="outlined">
+    <h1>GoalVest</h1>
+    <p class="muted">השקעות מבוססות-מטרות</p>
+
+    <mat-tab-group [selectedIndex]="tabIndex()" (selectedIndexChange)="onTab($event)">
+      <mat-tab label="התחברות">
+        <form class="form" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
+          @if (justRegistered()) {
+            <p class="success" role="status">נרשמת בהצלחה. אפשר להתחבר.</p>
+          }
+          <mat-form-field appearance="outline">
+            <mat-label>אימייל</mat-label>
+            <input matInput type="email" formControlName="email" autocomplete="username" />
+            @if (loginForm.controls.email.touched && loginForm.controls.email.invalid) {
+              <mat-error>יש להזין אימייל תקין</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>סיסמה</mat-label>
+            <input matInput [type]="showLoginPassword() ? 'text' : 'password'" formControlName="password" autocomplete="current-password" />
+            <button mat-icon-button matSuffix type="button" (click)="showLoginPassword.set(!showLoginPassword())" [attr.aria-label]="showLoginPassword() ? 'הסתר סיסמה' : 'הצג סיסמה'">
+              <span class="material-symbols-rounded" aria-hidden="true">{{ showLoginPassword() ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+            @if (loginForm.controls.password.touched && loginForm.controls.password.invalid) {
+              <mat-error>יש להזין סיסמה</mat-error>
+            }
+          </mat-form-field>
+
+          @if (loginError()) {
+            <p class="form-error" role="alert">{{ loginError() }}</p>
+          }
+          <button mat-flat-button type="submit" [disabled]="submitting()">
+            {{ submitting() ? 'מתחבר…' : 'התחברות' }}
+          </button>
+        </form>
+      </mat-tab>
+
+      <mat-tab label="הרשמה">
+        <form class="form" [formGroup]="registerForm" (ngSubmit)="submitRegister()">
+          <div class="roles">
+            <button type="button" class="role-card" [class.selected]="role() === 'INVESTOR'" [attr.aria-pressed]="role() === 'INVESTOR'" (click)="selectRole('INVESTOR')">
+              <strong>אני משקיע</strong>
+              @if (role() === 'INVESTOR') { <span>נבחר</span> }
+            </button>
+            <button type="button" class="role-card" [class.selected]="role() === 'AGENT'" [attr.aria-pressed]="role() === 'AGENT'" (click)="selectRole('AGENT')">
+              <strong>אני סוכן או נציג גוף פיננסי</strong>
+              @if (role() === 'AGENT') { <span>נבחר</span> }
+            </button>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>שם מלא</mat-label>
+            <input matInput formControlName="fullName" autocomplete="name" />
+            @if (registerForm.controls.fullName.touched && registerForm.controls.fullName.invalid) {
+              <mat-error>יש להזין שם מלא</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>אימייל</mat-label>
+            <input matInput type="email" formControlName="email" autocomplete="email" />
+            @if (registerForm.controls.email.touched && registerForm.controls.email.invalid) {
+              <mat-error>יש להזין אימייל תקין</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>טלפון</mat-label>
+            <input matInput type="tel" formControlName="phone" autocomplete="tel" />
+            <mat-hint>לדוגמה <bdi>050-0000000</bdi></mat-hint>
+            @if (registerForm.controls.phone.touched && registerForm.controls.phone.invalid) {
+              <mat-error>יש להזין מספר טלפון</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>סיסמה</mat-label>
+            <input matInput [type]="showRegisterPassword() ? 'text' : 'password'" formControlName="password" autocomplete="new-password" />
+            <button mat-icon-button matSuffix type="button" (click)="showRegisterPassword.set(!showRegisterPassword())" [attr.aria-label]="showRegisterPassword() ? 'הסתר סיסמה' : 'הצג סיסמה'">
+              <span class="material-symbols-rounded" aria-hidden="true">{{ showRegisterPassword() ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+            <mat-hint>לפחות 8 תווים, אות ומספר. חוזק: {{ strengthLabel() }}</mat-hint>
+            @if (registerForm.controls.password.touched && registerForm.controls.password.invalid) {
+              <mat-error>הסיסמה חייבת להכיל לפחות 8 תווים</mat-error>
+            }
+          </mat-form-field>
+
+          @if (role() === 'AGENT') {
+            @if (institutionsState() === 'loading') {
+              <mat-progress-bar mode="indeterminate" aria-label="טוען גופים פיננסיים" />
+            } @else if (institutionsState() === 'error') {
+              <p class="form-error" role="alert">לא הצלחנו לטעון את רשימת הגופים.</p>
+              <button mat-button type="button" (click)="loadInstitutions()">נסה שוב</button>
+            } @else if (institutions().length === 0) {
+              <p class="muted">אין גופים פיננסיים ברשימה.</p>
+            } @else {
+              <mat-form-field appearance="outline">
+                <mat-label>גוף פיננסי</mat-label>
+                <input matInput [formControl]="institutionSearch" [matAutocomplete]="auto" (input)="onInstitutionInput(institutionSearch.value)" />
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="institutionName" (optionSelected)="onInstitutionSelected($event.option.value)">
+                  @for (item of filteredInstitutions(); track item.id) {
+                    <mat-option [value]="item.id">{{ item.name }}</mat-option>
+                  }
+                </mat-autocomplete>
+                @if (filteredInstitutions().length === 0) {
+                  <mat-hint>לא נמצאו גופים תואמים</mat-hint>
+                }
+              </mat-form-field>
+            }
+
+            <mat-form-field appearance="outline">
+              <mat-label>מספר רישיון</mat-label>
+              <input matInput formControlName="licenseNo" />
+            </mat-form-field>
+          }
+
+          @if (registerError()) {
+            <p class="form-error" role="alert">{{ registerError() }}</p>
+          }
+          <button mat-flat-button type="submit" [disabled]="submitting()">
+            {{ submitting() ? 'נרשם…' : 'הרשמה' }}
+          </button>
+        </form>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card>
+</section>

@@ -9,6 +9,8 @@ class TestConfig(Config):
     OLLAMA_BASE_URL = "http://127.0.0.1:9"   # פורט סגור – נכשל מהר
     CHROMA_URL = "http://127.0.0.1:9"
     HEALTH_TIMEOUT_SECONDS = 0.5
+    JWT_SECRET = "unit-test-jwt-secret-0123456789abcd"
+    RATELIMIT_ENABLED = False
 
 
 def test_health_returns_503_with_details_when_services_down():

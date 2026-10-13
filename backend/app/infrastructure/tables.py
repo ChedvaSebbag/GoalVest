@@ -38,3 +38,25 @@ processed_commands = sa.Table(
     sa.Column("result_json", sa.UnicodeText),
     sa.Column("processed_at", sa.DateTime(timezone=False), nullable=False),
 )
+
+rm_users = sa.Table(
+    "rm_users",
+    metadata,
+    sa.Column("user_id", sa.Uuid, primary_key=True),
+    sa.Column("email", sa.Unicode(320), nullable=False),
+    sa.Column("full_name", sa.Unicode(200), nullable=False),
+    sa.Column("phone", sa.Unicode(30), nullable=False),
+    sa.Column("role", sa.Unicode(20), nullable=False),
+    sa.Column("institution_id", sa.Uuid, nullable=True),
+    sa.Column("status", sa.Unicode(20), nullable=False),
+    sa.Column("password_hash", sa.Unicode(200), nullable=False),
+    sa.UniqueConstraint("email", name="UQ_rm_users_email"),
+)
+
+revoked_tokens = sa.Table(
+    "RevokedTokens",
+    metadata,
+    sa.Column("jti", sa.Uuid, primary_key=True),
+    sa.Column("expires_at", sa.DateTime(timezone=False), nullable=False),
+    sa.Column("revoked_at", sa.DateTime(timezone=False), nullable=False),
+)

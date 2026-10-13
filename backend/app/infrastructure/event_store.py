@@ -18,6 +18,10 @@ class EventStoreRepository:
         self._session = session
         self._dispatcher = dispatcher if dispatcher is not None else ProjectionDispatcher()
 
+    @property
+    def session(self) -> Session:
+        return self._session
+
     def append(self, aggregate_id: UUID, expected_version: int, events: Sequence[Event]) -> None:
         """כותב אירועים ומריץ projectors באותה טרנזקציה. ה-commit נשאר אצל הקורא.
 

@@ -29,7 +29,12 @@ def _build_db_url() -> str:
 
 class Config:
     DB_CONNECTION_STRING = _build_db_url()
+    DB_ENGINE = None
     FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:4200")
+    JWT_SECRET = os.getenv("JWT_SECRET", "")
+    JWT_ACCESS_MINUTES = 30
+    JWT_REFRESH_DAYS = 7
+    RATELIMIT_ENABLED = True
     OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
     OLLAMA_CHAT_MODEL = os.getenv("OLLAMA_CHAT_MODEL", "qwen2.5:7b-instruct")
     OLLAMA_EMBED_MODEL = os.getenv("OLLAMA_EMBED_MODEL", "bge-m3")

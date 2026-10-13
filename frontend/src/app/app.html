@@ -1,6 +1,11 @@
 <mat-toolbar class="topbar">
   <span class="brand">GoalVest</span>
   <span class="tagline">השקעות מבוססות-מטרות</span>
+  <span class="spacer"></span>
+  <a routerLink="/system">מצב המערכת</a>
+  @if (user()) {
+    <button type="button" (click)="logout()">התנתקות</button>
+  }
 </mat-toolbar>
 <main>
   <router-outlet />

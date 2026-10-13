@@ -1,6 +1,21 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
-  { path: '', loadComponent: () => import('./features/system-status/system-status').then(m => m.SystemStatus) },
-  { path: '**', redirectTo: '' },
+  { path: '', pathMatch: 'full', redirectTo: 'auth/login' },
+  { path: 'system', loadComponent: () => import('./features/system-status/system-status').then(m => m.SystemStatus) },
+  { path: 'auth/login', loadComponent: () => import('./features/auth/auth-page').then(m => m.AuthPage), data: { tab: 'login' } },
+  { path: 'auth/register', loadComponent: () => import('./features/auth/auth-page').then(m => m.AuthPage), data: { tab: 'register' } },
+  {
+    path: 'investor',
+    canActivate: [authGuard, roleGuard('INVESTOR')],
+    loadComponent: () => import('./features/investor/investor-home').then(m => m.InvestorHome),
+  },
+  {
+    path: 'agent',
+    canActivate: [authGuard, roleGuard('AGENT')],
+    loadComponent: () => import('./features/agent/agent-home').then(m => m.AgentHome),
+  },
+  { path: '**', redirectTo: 'auth/login' },
 ];

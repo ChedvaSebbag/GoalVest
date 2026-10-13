@@ -6,6 +6,17 @@ from uuid import UUID
 class BusinessRuleViolation(Exception):
     """הפרת חוק עסקי בתוך Aggregate. במקרה כזה לא נרשם אירוע."""
 
+    def __init__(self, message: str = "", *, code: str = "BUSINESS_RULE") -> None:
+        self.code = code
+        super().__init__(message)
+
+
+class EmailAlreadyExists(BusinessRuleViolation):
+    """אימייל שכבר שמור ב-rm_users, כולל התנגשות מקבילית על האינדקס הייחודי."""
+
+    def __init__(self) -> None:
+        super().__init__("כתובת האימייל כבר רשומה", code="EMAIL_EXISTS")
+
 
 class ConcurrencyError(Exception):
     """שני כותבים ניסו לתפוס את אותה גרסה (UQ_Aggregate_Version)."""

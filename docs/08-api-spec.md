@@ -32,6 +32,11 @@
 | POST | `/api/auth/forgot-password` | תמיד 202 (לא חושף אם האימייל קיים) | ציבורי |
 | POST | `/api/auth/reset-password` | `{ token, newPassword }` | ציבורי |
 | GET | `/api/auth/me` | פרטי המשתמש המחובר | מחובר |
+| GET | `/api/institutions` | רשימת גופים פיננסיים ל-Autocomplete בהרשמת סוכן (Query, קטלוג קבוע בשרת) | ציבורי |
+
+הרשמה (`POST /api/auth/register`) מקבלת `Idempotency-Key` ומחזירה `201` עם `{ id, version }` בלבד. האימייל נשמר אחרי `strip().lower()`. אימייל קיים, גם בהתנגשות מקבילית על האינדקס הייחודי, מחזיר `409` עם `EMAIL_EXISTS`. סוכן חייב `institutionId` מתוך `GET /api/institutions` ו-`licenseNo`, אחרת `400`.
+
+התחברות מחזירה `accessToken` (30 דקות), `refreshToken` (7 ימים) ו-`user {id, role, fullName}`. ה-claims בטוקן: `sub`, `role`, `institution_id`. סיסמה שגויה או אימייל לא קיים מחזירים אותו `401` ("אימייל או סיסמה שגויים"). 5 ניסיונות כושלים לאימייל ב-15 דקות מחזירים `429`.
 
 ## 8.3 משקיע
 

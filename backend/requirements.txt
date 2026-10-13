@@ -1,6 +1,10 @@
 -e ../core
 flask>=3.1,<4
 flask-cors>=5.0
+flask-jwt-extended>=4.7,<5
+flask-limiter>=3.8,<4
+bcrypt>=4.2,<5
+pydantic>=2.10,<3
 python-dotenv>=1.0
 sqlalchemy>=2.0,<3
 pyodbc>=5.2
