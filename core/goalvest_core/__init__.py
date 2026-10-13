@@ -1,1 +1,12 @@
-"""GoalVest domain core – Aggregates, Events, Event Store repository (משותף ל-API, Agent ו-Worker)."""
+"""GoalVest domain core – Aggregates, Events ושגיאות דומיין (משותף ל-API, Agent ו-Worker)."""
+
+from goalvest_core.aggregate import AggregateRoot
+from goalvest_core.errors import BusinessRuleViolation, ConcurrencyError
+from goalvest_core.event import Event
+
+__all__ = [
+    "AggregateRoot",
+    "BusinessRuleViolation",
+    "ConcurrencyError",
+    "Event",
+]
