@@ -1,15 +1,12 @@
-# תשתית מקומית: Ollama (LLM + Embeddings) ו-ChromaDB (מסד וקטורי)
-# הרצה: docker compose up -d
+# תשתית מקומית ל-GoalVest
+#
+# ברירת מחדל: רק ChromaDB (מסד וקטורי).
+#   docker compose up -d
+#
+# Ollama רץ ישירות על ה-Mac (מהיר יותר – משתמש ב-GPU של Apple) ומאזין ל-localhost:11434.
+# מי שרוצה בכל זאת להריץ את Ollama בתוך Docker (למשל על Windows/Linux):
+#   docker compose --profile docker-ollama up -d
 services:
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-    restart: unless-stopped
-
   chromadb:
     image: chromadb/chroma:latest
     container_name: chromadb
@@ -17,6 +14,16 @@ services:
       - "8000:8000"
     volumes:
       - chroma_data:/data
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    profiles: ["docker-ollama"]
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
     restart: unless-stopped
 
 volumes:

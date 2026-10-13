@@ -29,9 +29,10 @@ db/         מיגרציות SQL ל-Somee
 **פעם ראשונה**
 ```bash
 cp .env.example .env                       # ולמלא את DB_CONNECTION_STRING
-docker compose up -d                       # Ollama + ChromaDB
-docker exec ollama ollama pull qwen2.5:7b-instruct
-docker exec ollama ollama pull bge-m3
+docker compose up -d                       # ChromaDB
+# Ollama מותקן ישירות על ה-Mac (https://ollama.com/download)
+ollama pull qwen2.5:7b-instruct
+ollama pull bge-m3
 
 cd backend
 python3.12 -m venv .venv && source .venv/bin/activate
