@@ -36,7 +36,7 @@ ollama pull bge-m3
 
 cd backend
 python3.12 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.txt            # כולל goalvest_core בעריכה חיה (-e ../core)
 cd ../frontend && npm install              # אם נכשל: npx npm@11 install
 ```
 
@@ -48,6 +48,6 @@ cd frontend && npm start                                       # http://localhos
 
 **בדיקות**
 ```bash
-cd backend && pytest
+cd backend && source .venv/bin/activate && pytest   # SQLite בזיכרון, בלי Somee
 cd frontend && npx ng test --watch=false
 ```
