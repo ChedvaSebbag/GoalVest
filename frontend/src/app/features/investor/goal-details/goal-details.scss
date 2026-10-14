@@ -1,0 +1,9 @@
+.head { display: flex; justify-content: space-between; gap: calc(var(--gv-space) * 2); align-items: flex-start; }
+h1, h2 { margin: 0 0 calc(var(--gv-space) * 2); color: var(--gv-primary); }
+.gv-card + .gv-card { margin-block-start: calc(var(--gv-space) * 2); }
+dl { display: grid; gap: calc(var(--gv-space) * 1.5); margin: 0; }
+dl div { display: flex; justify-content: space-between; gap: calc(var(--gv-space) * 2); }
+dt { color: var(--gv-text-muted); }
+dd { margin: 0; }
+ol { list-style: none; margin: 0; padding: 0; display: grid; gap: calc(var(--gv-space) * 2); }
+li { display: grid; gap: 4px; padding-inline-start: calc(var(--gv-space) * 2); border-inline-start: 3px solid var(--gv-accent); }

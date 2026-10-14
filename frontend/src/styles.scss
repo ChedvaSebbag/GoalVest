@@ -15,6 +15,14 @@
   --gv-space: 8px;
   --gv-shadow: 0 1px 3px rgba(15, 76, 92, 0.12);
   --gv-on-primary: #ffffff;
+  --gv-status-submitted: #5b6b70;
+  --gv-status-processing: #1565c0;
+  --gv-status-evaluated: #6a1b9a;
+  --gv-status-review: #ed6c02;
+  --gv-status-offer: #0277bd;
+  --gv-status-accepted: #2e7d32;
+  --gv-status-cancelled: #c62828;
+  --gv-skeleton: #e6eef0;
 }
 
 html {
@@ -35,3 +43,37 @@ body {
 }
 
 .material-symbols-rounded { font-family: 'Material Symbols Rounded'; }
+
+.gv-page {
+  max-width: 880px;
+  margin-inline: auto;
+  padding: calc(var(--gv-space) * 3) calc(var(--gv-space) * 2);
+}
+
+.gv-card {
+  background: var(--gv-surface);
+  border-radius: var(--gv-radius);
+  box-shadow: var(--gv-shadow);
+  padding: calc(var(--gv-space) * 3);
+}
+
+.gv-muted { color: var(--gv-text-muted); }
+
+.gv-error {
+  color: var(--gv-error);
+  margin: 0;
+}
+
+.gv-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--gv-space) * 1.5);
+  margin-block-start: calc(var(--gv-space) * 2);
+}
+
+.gv-skeleton {
+  height: calc(var(--gv-space) * 8);
+  border-radius: var(--gv-radius);
+  background: var(--gv-skeleton);
+  margin-block-end: calc(var(--gv-space) * 2);
+}

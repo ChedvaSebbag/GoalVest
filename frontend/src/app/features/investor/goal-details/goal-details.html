@@ -1,0 +1,73 @@
+<section class="gv-page">
+  @if (goal() === null && !failed()) {
+    <div class="gv-skeleton"></div>
+    <div class="gv-skeleton"></div>
+  } @else if (failed()) {
+    <article class="gv-card">
+      <p class="gv-error" role="alert">לא הצלחנו לטעון את היעד.</p>
+      <button type="button" mat-stroked-button (click)="load()">נסה שוב</button>
+    </article>
+  } @else if (goal(); as item) {
+    <header class="head">
+      <div>
+        <p class="gv-muted">{{ goalTypeLabel(item.type) }}</p>
+        <h1>{{ item.title }}</h1>
+      </div>
+      <gv-status-chip [status]="item.requestStatus ?? 'NO_REQUEST'" />
+    </header>
+
+    <article class="gv-card">
+      <h2>פרטי היעד</h2>
+      <dl>
+        <div><dt>סכום התחלתי</dt><dd><bdi>{{ item.initialAmount | money }}</bdi></dd></div>
+        <div><dt>הפקדה חודשית</dt><dd><bdi>{{ item.monthlyDeposit | money }}</bdi></dd></div>
+        <div><dt>סכום יעד</dt><dd><bdi>{{ item.targetAmount | money }}</bdi></dd></div>
+        <div><dt>מועד יעד</dt><dd><bdi>{{ formatDate(item.targetDate) }}</bdi></dd></div>
+        <div><dt>גמישות</dt><dd>{{ flexibility(item.flexibility) }}</dd></div>
+        <div><dt>נזילות</dt><dd>{{ liquidity(item.liquidityNeed) }}</dd></div>
+        <div><dt>אפיקים מועדפים</dt><dd>{{ channels(item.preferredChannels) }}</dd></div>
+        <div><dt>אפיקים לא רצויים</dt><dd>{{ channels(item.excludedChannels) }}</dd></div>
+      </dl>
+    </article>
+
+    <article class="gv-card">
+      <h2>סטטוס הבקשה</h2>
+      @if (!item.activeRequestId) {
+        <p>אין בקשה פעילה ליעד הזה.</p>
+      } @else {
+        <gv-status-chip [status]="item.requestStatus ?? 'SUBMITTED'" />
+        @if (item.requestStatus === 'AI_PROCESSING') {
+          <p>הבקשה בעיבוד, ואי אפשר לבטל אותה כרגע.</p>
+        }
+      }
+      @if (error()) {
+        <p class="gv-error" role="alert">{{ error() }}</p>
+      }
+      <div class="gv-actions">
+        @if (item.activeRequestId && cancellable.has(item.requestStatus ?? '')) {
+          <button type="button" mat-stroked-button (click)="cancel()" [disabled]="busy()">בטל בקשה</button>
+        }
+        <a mat-stroked-button [routerLink]="['/investor/goals', item.goalId, 'edit']">עריכת יעד</a>
+        <button type="button" mat-button (click)="archive()" [disabled]="busy()">ארכב יעד</button>
+      </div>
+    </article>
+
+    <article class="gv-card">
+      <h2>ציר זמן</h2>
+      @if (!item.activeRequestId) {
+        <p class="gv-muted">האירועים יופיעו כאן אחרי הגשת בקשה.</p>
+      } @else if (timeline().length === 0) {
+        <p class="gv-muted">אין אירועים להצגה.</p>
+      } @else {
+        <ol>
+          @for (event of timeline(); track event.occurredAt + event.eventType) {
+            <li>
+              <strong>{{ event.displayText }}</strong>
+              <span class="gv-muted"><bdi>{{ formatDate(event.occurredAt) }}</bdi> · {{ event.actor }}</span>
+            </li>
+          }
+        </ol>
+      }
+    </article>
+  }
+</section>

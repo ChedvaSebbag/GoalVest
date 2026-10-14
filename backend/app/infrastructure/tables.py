@@ -26,7 +26,7 @@ event_store = sa.Table(
     sa.Column("payload", sa.UnicodeText, nullable=False),
     sa.Column("metadata", sa.UnicodeText, nullable=False),
     sa.Column("occurred_at", sa.DateTime(timezone=False), nullable=False),
-    sa.UniqueConstraint("aggregate_id", "version", name="UQ_Aggregate_Version"),
+    sa.UniqueConstraint("aggregate_type", "aggregate_id", "version", name="UQ_Aggregate_Version"),
 )
 
 sa.Index("IX_EventStore_Type", event_store.c.event_type, event_store.c.global_position)
@@ -59,4 +59,72 @@ revoked_tokens = sa.Table(
     sa.Column("jti", sa.Uuid, primary_key=True),
     sa.Column("expires_at", sa.DateTime(timezone=False), nullable=False),
     sa.Column("revoked_at", sa.DateTime(timezone=False), nullable=False),
+)
+
+rm_investor_profiles = sa.Table(
+    "rm_investor_profiles",
+    metadata,
+    sa.Column("user_id", sa.Uuid, primary_key=True),
+    sa.Column("birth_year", sa.Integer),
+    sa.Column("marital_status", sa.Unicode(30)),
+    sa.Column("monthly_income_range", sa.Unicode(40)),
+    sa.Column("has_emergency_fund", sa.Boolean),
+    sa.Column("existing_products", sa.UnicodeText),
+    sa.Column("risk_score", sa.SmallInteger),
+    sa.Column("risk_label", sa.Unicode(40)),
+    sa.Column("answers", sa.UnicodeText),
+    sa.Column("assessed_at", sa.DateTime(timezone=False)),
+)
+
+rm_goals = sa.Table(
+    "rm_goals",
+    metadata,
+    sa.Column("goal_id", sa.Uuid, primary_key=True),
+    sa.Column("investor_id", sa.Uuid, nullable=False),
+    sa.Column("type", sa.Unicode(30), nullable=False),
+    sa.Column("title", sa.Unicode(200), nullable=False),
+    sa.Column("initial_amount", sa.Numeric(18, 2), nullable=False),
+    sa.Column("monthly_deposit", sa.Numeric(18, 2), nullable=False),
+    sa.Column("target_amount", sa.Numeric(18, 2), nullable=False),
+    sa.Column("target_date", sa.Date, nullable=False),
+    sa.Column("flexibility", sa.Unicode(30), nullable=False),
+    sa.Column("liquidity_need", sa.Unicode(30), nullable=False),
+    sa.Column("excluded_channels", sa.UnicodeText, nullable=False),
+    sa.Column("preferred_channels", sa.UnicodeText, nullable=False),
+    sa.Column("preferred_institutions", sa.UnicodeText, nullable=False),
+    sa.Column("active_request_id", sa.Uuid),
+    sa.Column("status", sa.Unicode(20), nullable=False),
+    sa.Column("updated_at", sa.DateTime(timezone=False), nullable=False),
+)
+
+sa.Index("IX_rm_goals_investor", rm_goals.c.investor_id)
+
+rm_requests = sa.Table(
+    "rm_requests",
+    metadata,
+    sa.Column("request_id", sa.Uuid, primary_key=True),
+    sa.Column("goal_id", sa.Uuid, nullable=False),
+    sa.Column("investor_id", sa.Uuid, nullable=False),
+    sa.Column("status", sa.Unicode(30), nullable=False),
+    sa.Column("consent_share_contact", sa.Boolean, nullable=False),
+    sa.Column("snapshot", sa.UnicodeText, nullable=False),
+    sa.Column("overall_score", sa.Integer),
+    sa.Column("claimed_by", sa.Uuid),
+    sa.Column("institution_id", sa.Uuid),
+    sa.Column("assessment_review", sa.Unicode(20)),
+    sa.Column("created_at", sa.DateTime(timezone=False), nullable=False),
+    sa.Column("updated_at", sa.DateTime(timezone=False), nullable=False),
+)
+
+sa.Index("IX_rm_requests_goal", rm_requests.c.goal_id)
+
+rm_request_timeline = sa.Table(
+    "rm_request_timeline",
+    metadata,
+    sa.Column("request_id", sa.Uuid, primary_key=True),
+    sa.Column("global_position", sa.BigInteger, primary_key=True),
+    sa.Column("event_type", sa.Unicode(100), nullable=False),
+    sa.Column("actor", sa.Unicode(100), nullable=False),
+    sa.Column("display_text", sa.Unicode(300), nullable=False),
+    sa.Column("occurred_at", sa.DateTime(timezone=False), nullable=False),
 )

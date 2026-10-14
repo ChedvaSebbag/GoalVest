@@ -6,8 +6,15 @@ from uuid import UUID
 class BusinessRuleViolation(Exception):
     """הפרת חוק עסקי בתוך Aggregate. במקרה כזה לא נרשם אירוע."""
 
-    def __init__(self, message: str = "", *, code: str = "BUSINESS_RULE") -> None:
+    def __init__(
+        self,
+        message: str = "",
+        *,
+        code: str = "BUSINESS_RULE",
+        fields: dict[str, str] | None = None,
+    ) -> None:
         self.code = code
+        self.fields = dict(fields or {})
         super().__init__(message)
 
 
@@ -16,6 +23,14 @@ class EmailAlreadyExists(BusinessRuleViolation):
 
     def __init__(self) -> None:
         super().__init__("כתובת האימייל כבר רשומה", code="EMAIL_EXISTS")
+
+
+class NotFound(Exception):
+    """משאב חסר, או שייך למשתמש אחר. התשובה לא חושפת אם הוא קיים."""
+
+    def __init__(self, message: str = "הפריט לא נמצא") -> None:
+        self.code = "NOT_FOUND"
+        super().__init__(message)
 
 
 class ConcurrencyError(Exception):

@@ -1,0 +1,116 @@
+<section class="gv-page">
+  <h1>{{ goalId ? 'עריכת יעד' : 'יעד חדש' }}</h1>
+  <p class="gv-muted">שלב <bdi>{{ step() }}</bdi> מתוך <bdi>4</bdi></p>
+  <ol class="steps">
+    @for (label of ['סוג היעד', 'סכומים', 'מועד', 'העדפות']; track label; let i = $index) {
+      <li [class.on]="step() === i + 1">{{ label }}</li>
+    }
+  </ol>
+
+  @if (requestStatus() && requestStatus() !== 'CANCELLED' && requestStatus() !== 'NO_REQUEST') {
+    <p class="notice">שמירה תסגור את הבקשה הפעילה ותפתח בקשה חדשה.</p>
+  }
+  @if (requestStatus() === 'AI_PROCESSING') {
+    <p class="gv-error" role="alert">הבקשה בעיבוד, ואי אפשר לערוך את היעד כרגע.</p>
+  }
+
+  <form class="gv-card" [formGroup]="form" (ngSubmit)="save()">
+    @if (step() === 1) {
+      <h2>סוג היעד</h2>
+      <div class="types">
+        @for (type of types; track type.value) {
+          <button type="button" class="choice" [class.on]="form.controls.type.value === type.value" [attr.aria-pressed]="form.controls.type.value === type.value" (click)="pickType(type.value)">
+            <span class="material-symbols-rounded" aria-hidden="true">{{ type.icon }}</span>
+            {{ type.label }}
+          </button>
+        }
+      </div>
+      <label>
+        שם היעד
+        <input type="text" formControlName="title" />
+      </label>
+    }
+
+    @if (step() === 2) {
+      <h2>סכומים</h2>
+      <label>סכום התחלתי <bdi><input type="number" formControlName="initialAmount" min="0" /></bdi></label>
+      <label>הפקדה חודשית <bdi><input type="number" formControlName="monthlyDeposit" min="0" /></bdi></label>
+      <label>סכום יעד <bdi><input type="number" formControlName="targetAmount" min="1" /></bdi></label>
+      @if (form.controls.targetAmount.value > 0 && form.controls.initialAmount.value <= 0 && form.controls.monthlyDeposit.value <= 0) {
+        <p class="gv-error">צריך סכום התחלתי או הפקדה חודשית.</p>
+      }
+    }
+
+    @if (step() === 3) {
+      <h2>מועד יעד</h2>
+      <label>
+        תאריך יעד
+        <bdi dir="ltr"><input type="date" formControlName="targetDate" [min]="minDate" /></bdi>
+      </label>
+      <div class="choices">
+        @for (option of flexibilityOptions; track option.value) {
+          <button type="button" class="choice" [class.on]="form.controls.flexibility.value === option.value" [attr.aria-pressed]="form.controls.flexibility.value === option.value" (click)="form.controls.flexibility.setValue(option.value)">
+            {{ option.label }}
+          </button>
+        }
+      </div>
+    }
+
+    @if (step() === 4) {
+      <h2>העדפות</h2>
+      <p>צורך בנזילות</p>
+      <div class="choices">
+        @for (option of liquidityOptions; track option.value) {
+          <button type="button" class="choice" [class.on]="form.controls.liquidityNeed.value === option.value" [attr.aria-pressed]="form.controls.liquidityNeed.value === option.value" (click)="form.controls.liquidityNeed.setValue(option.value)">
+            {{ option.label }}
+          </button>
+        }
+      </div>
+      <p>אפיקים מועדפים</p>
+      <div class="choices inline">
+        @for (option of channels; track option.value) {
+          <button type="button" class="choice" [class.on]="on('preferredChannels', option.value)" [attr.aria-pressed]="on('preferredChannels', option.value)" (click)="toggle('preferredChannels', option.value)">{{ option.label }}</button>
+        }
+      </div>
+      <p>אפיקים לא רצויים</p>
+      <div class="choices inline">
+        @for (option of channels; track option.value) {
+          <button type="button" class="choice" [class.on]="on('excludedChannels', option.value)" [attr.aria-pressed]="on('excludedChannels', option.value)" (click)="toggle('excludedChannels', option.value)">{{ option.label }}</button>
+        }
+      </div>
+      <p>גופים מועדפים</p>
+      @if (institutionsFailed()) {
+        <p class="gv-error" role="alert">לא הצלחנו לטעון את רשימת הגופים.</p>
+        <button type="button" mat-stroked-button (click)="loadInstitutions()">נסה שוב</button>
+      } @else if (institutions().length === 0) {
+        <div class="gv-skeleton"></div>
+      } @else {
+        <div class="choices inline">
+          @for (item of institutions(); track item.id) {
+            <button type="button" class="choice" [class.on]="form.controls.preferredInstitutions.value.includes(item.id)" [attr.aria-pressed]="form.controls.preferredInstitutions.value.includes(item.id)" (click)="toggleInstitution(item.id)">{{ item.name }}</button>
+          }
+        </div>
+      }
+      <label class="check"><input type="checkbox" formControlName="consent" /> אני מסכים/ה לשתף את פרטי הקשר עם סוכן</label>
+      <label class="check"><input type="checkbox" formControlName="legal" /> אני מבין/ה שההערכה נוצרת אוטומטית ואינה ייעוץ השקעות</label>
+    }
+
+    @if (error()) {
+      <p class="gv-error" role="alert">{{ error() }}</p>
+    }
+    @if (savedWithoutRequest(); as savedId) {
+      <a [routerLink]="['/investor/goals', savedId]">מעבר ליעד שנשמר</a>
+    }
+
+    <div class="gv-actions">
+      @if (step() > 1) {
+        <button type="button" mat-stroked-button (click)="go(step() - 1)">חזרה</button>
+      }
+      @if (step() < 4) {
+        <button type="button" mat-flat-button (click)="go(step() + 1)" [disabled]="!stepReady(step())">המשך</button>
+      } @else {
+        <button type="submit" mat-flat-button [disabled]="!stepReady(4) || saving()">שמור והגש להערכה</button>
+      }
+    </div>
+  </form>
+</section>

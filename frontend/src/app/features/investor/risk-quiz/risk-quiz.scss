@@ -1,0 +1,20 @@
+h1, h2 { margin: 0 0 calc(var(--gv-space) * 2); color: var(--gv-primary); }
+.step-count { margin-block: calc(var(--gv-space) * 1.5); }
+.result h2 { font-size: 2rem; }
+.kicker { margin: 0; color: var(--gv-text-muted); }
+.choices { display: grid; gap: calc(var(--gv-space) * 1.5); }
+.choice {
+  text-align: start;
+  padding: calc(var(--gv-space) * 2);
+  border-radius: var(--gv-radius);
+  border: 1px solid var(--gv-text-muted);
+  background: var(--gv-surface);
+  color: var(--gv-text);
+  font: inherit;
+  cursor: pointer;
+}
+.choice.on { border-color: var(--gv-primary); background: color-mix(in srgb, var(--gv-primary) 8%, white); }
+.year { display: grid; gap: calc(var(--gv-space)); }
+input { font: inherit; padding: calc(var(--gv-space)); border-radius: var(--gv-radius); border: 1px solid var(--gv-text-muted); }
+fieldset { border: 0; margin: 0 0 calc(var(--gv-space) * 2); padding: 0; }
+legend { margin-block-end: calc(var(--gv-space)); font-weight: 500; }

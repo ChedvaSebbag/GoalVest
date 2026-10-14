@@ -28,7 +28,11 @@ def create_app(config: type[Config] = Config) -> Flask:
     # Controllers (MVC) – Blueprint לכל אזור. נוספים לפי docs/08-api-spec.md
     from .controllers.auth import auth_bp
     from .controllers.health import health_bp
+    from .controllers.investor import investor_bp
+    from .controllers.requests import requests_bp
 
     app.register_blueprint(health_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/api")
+    app.register_blueprint(investor_bp, url_prefix="/api")
+    app.register_blueprint(requests_bp, url_prefix="/api")
     return app

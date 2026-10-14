@@ -1,0 +1,80 @@
+<section class="gv-page">
+  <h1>שאלון סיכון</h1>
+  <mat-progress-bar mode="determinate" [value]="progress()" aria-label="התקדמות השאלון" />
+  <p class="gv-muted step-count">
+    @if (result()) {
+      הסיום
+    } @else {
+      שאלה <bdi>{{ index() + 1 }}</bdi> מתוך <bdi>{{ questions.length }}</bdi>
+    }
+  </p>
+
+  @if (result(); as card) {
+    <article class="gv-card result">
+      <p class="kicker">פרופיל הסיכון שלך</p>
+      <h2>{{ card.label }}</h2>
+      <p>{{ card.lines[0] }}</p>
+      <p>{{ card.lines[1] }}</p>
+      <gv-disclaimer />
+      <div class="gv-actions">
+        <button type="button" mat-stroked-button (click)="restart()">חזרה לשאלון</button>
+        <a mat-flat-button routerLink="/investor">המשך ליעדים</a>
+      </div>
+    </article>
+  } @else {
+    <article class="gv-card">
+      <h2>{{ question().title }}</h2>
+
+      @if (question().kind === 'year') {
+        <label class="year">
+          שנת לידה
+          <bdi><input type="number" name="birthYear" [ngModel]="birthYear()" (ngModelChange)="setYear($event)" min="1920" max="2010" /></bdi>
+        </label>
+      } @else if (question().kind === 'single') {
+        <div class="choices">
+          @for (option of question().options; track option.value) {
+            <button
+              type="button"
+              class="choice"
+              [class.on]="selected(question().key) === option.value"
+              [attr.aria-pressed]="selected(question().key) === option.value"
+              (click)="choose(question().key, option.value)">
+              {{ option.label }}
+            </button>
+          }
+        </div>
+      } @else {
+        <fieldset>
+          <legend>טווח הכנסה חודשית</legend>
+          <div class="choices">
+            @for (option of incomeRanges; track option.value) {
+              <button type="button" class="choice" [class.on]="income() === option.value" [attr.aria-pressed]="income() === option.value" (click)="income.set(option.value)">
+                <bdi>{{ option.label }}</bdi>
+              </button>
+            }
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>מוצרים קיימים</legend>
+          <div class="choices">
+            @for (option of products; track option.value) {
+              <button type="button" class="choice" [class.on]="productOn(option.value)" [attr.aria-pressed]="productOn(option.value)" (click)="toggleProduct(option.value)">
+                {{ option.label }}
+              </button>
+            }
+          </div>
+        </fieldset>
+      }
+
+      @if (error()) {
+        <p class="gv-error" role="alert">{{ error() }}</p>
+      }
+      <div class="gv-actions">
+        <button type="button" mat-stroked-button (click)="back()" [disabled]="index() === 0">חזרה</button>
+        <button type="button" mat-flat-button (click)="next()" [disabled]="!canContinue() || saving()">
+          {{ index() === questions.length - 1 ? 'סיום' : 'המשך' }}
+        </button>
+      </div>
+    </article>
+  }
+</section>

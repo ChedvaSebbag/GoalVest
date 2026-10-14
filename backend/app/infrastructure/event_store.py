@@ -57,12 +57,11 @@ class EventStoreRepository:
             self._session.rollback()
             raise
 
-    def load(self, aggregate_id: UUID) -> list[Event]:
-        rows = self._session.execute(
-            sa.select(event_store)
-            .where(event_store.c.aggregate_id == aggregate_id)
-            .order_by(event_store.c.version)
-        ).mappings()
+    def load(self, aggregate_id: UUID, aggregate_type: str | None = None) -> list[Event]:
+        query = sa.select(event_store).where(event_store.c.aggregate_id == aggregate_id)
+        if aggregate_type is not None:
+            query = query.where(event_store.c.aggregate_type == aggregate_type)
+        rows = self._session.execute(query.order_by(event_store.c.version)).mappings()
         return [_to_event(row) for row in rows]
 
     @staticmethod

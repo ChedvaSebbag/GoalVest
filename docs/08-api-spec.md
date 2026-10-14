@@ -54,6 +54,21 @@
 | POST | `/api/requests` | Command | `{ goalId, consentShareContact }` → הגשת בקשה |
 | POST | `/api/requests/{id}/cancel` | Command | ביטול |
 | GET | `/api/requests/{id}/timeline` | Query | ציר זמן מאירועים (FR-65) |
+
+כל הנתיבים בטבלה למעט `POST /api/investor/goals/projection` (FR-13, לא בשלב הזה) דורשים `INVESTOR`. משקיע שניגש ליעד או לבקשה של משקיע אחר מקבל 404.
+
+| קוד | מתי |
+|---|---|
+| 400 `VALIDATION_ERROR` | סכום, תאריך (פחות מ-6 חודשים, כולל עבר), שדה חסר. `targetDate` בתאריך לא חוקי |
+| 403 `FORBIDDEN` | תפקיד שאינו `INVESTOR` |
+| 404 `NOT_FOUND` | אין יעד/בקשה, או שהם של משקיע אחר |
+| 409 `PROFILE_EXISTS` | `PUT /profile` אחרי שכבר נוצר פרופיל |
+| 422 `RISK_PROFILE_REQUIRED` | הגשת בקשה בלי ציון סיכון |
+| 422 `ACTIVE_REQUEST_EXISTS` | בקשה פעילה שנייה לאותו יעד |
+| 422 `REQUEST_IN_PROCESSING` | עריכה, ארכוב או ביטול כשהבקשה ב-`AI_PROCESSING` |
+| 422 `CONSENT_REQUIRED` | הגשה בלי אישור שיתוף פרטים |
+
+`PUT /api/investor/goals/{id}` עם `consentShareContact: true` ושינוי בשדות, כשיש בקשה פעילה שאינה בעיבוד: `GoalUpdated`, `RequestCancelled` על הישנה, ו-`InvestmentRequestSubmitted` חדשה. ארכוב סוגר בקשה פעילה ולא פותח חדשה.
 | GET | `/api/investor/dashboard` | Query | KPI, יעדים, תמהיל, מסלולים מומלצים |
 | GET | `/api/investor/offers` | Query | הצעות שהתקבלו |
 | POST | `/api/investor/offers/{offerId}/accept` | Command | קבלה |

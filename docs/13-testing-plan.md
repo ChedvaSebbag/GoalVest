@@ -52,6 +52,11 @@ def test_cannot_send_offer_with_allocation_not_100():
 | TC-21 | `GET /api/auth/me` עם Access Token | 200 ופרטי המשתמש, בלי `password_hash` | FR-02 |
 | TC-22 | הרשמה עם `Noa@Mail.com` והתחברות עם `noa@mail.com` | אותו משתמש; הרשמה שנייה 409 | FR-01 |
 | TC-23 | שתי הרשמות לאותו אימייל כשבדיקת הקיום מדלגת וה-projector נתקל באינדקס הייחודי | 409 `EMAIL_EXISTS`, שורה אחת ב-`rm_users` | FR-01 |
+| TC-24 | ביטול בקשה ב-`SUBMITTED`, `AI_EVALUATED` או `IN_REVIEW` | הביטול נשמר | FR-16, 03 §3.9 |
+| TC-25 | עריכה או ארכוב כשהבקשה ב-`AI_PROCESSING` | 422 `REQUEST_IN_PROCESSING`, היעד לא משתנה | FR-15 |
+| TC-26 | משקיע אחר קורא, מעדכן, מוחק, מבטל או צופה בציר הזמן | 404 | 02 |
+| TC-27 | הגשת בקשה בלי שאלון סיכון | 422 `RISK_PROFILE_REQUIRED` | FR-10, 07 §7.1 |
+| TC-28 | סוכן קורא `GET /api/investor/goals` | 403 | 02 |
 
 ## 13.4 תרחישי E2E (הדגמה)
 

@@ -1,4 +1,10 @@
-.topbar { background: var(--gv-primary); color: var(--gv-on-primary); gap: calc(var(--gv-space) * 2); }
+.topbar.mat-toolbar {
+  background: var(--gv-primary);
+  color: var(--gv-on-primary);
+  gap: calc(var(--gv-space) * 2);
+  padding-inline: calc(var(--gv-space) * 3);
+}
+.topbar button, .topbar a { flex-shrink: 0; }
 .brand { font-weight: 700; letter-spacing: 0.5px; }
 .tagline { font-size: 0.9rem; opacity: 0.8; font-weight: 400; }
 .spacer { flex: 1; }

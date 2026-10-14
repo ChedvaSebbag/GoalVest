@@ -26,7 +26,7 @@ CREATE TABLE EventStore (
     payload          NVARCHAR(MAX) NOT NULL,   -- JSON
     metadata         NVARCHAR(MAX) NOT NULL,   -- JSON: user_id, role, correlation_id, command_id
     occurred_at      DATETIME2(3)  NOT NULL DEFAULT SYSUTCDATETIME(),
-    CONSTRAINT UQ_Aggregate_Version UNIQUE (aggregate_id, version),
+    CONSTRAINT UQ_Aggregate_Version UNIQUE (aggregate_type, aggregate_id, version),
     CONSTRAINT CK_Payload_Json CHECK (ISJSON(payload) = 1)
 );
 CREATE INDEX IX_EventStore_Type ON EventStore(event_type, global_position);
@@ -44,6 +44,7 @@ CREATE TABLE ConsumerCheckpoints (       -- למעקב של ה-Worker וה-Agent
 ```
 
 - הוספת אירוע: `INSERT` עם `version = expected_version + 1`. הפרת `UQ_Aggregate_Version` → `ConcurrencyError` → HTTP 409.
+- האילוץ כולל `aggregate_type`, כדי ש-`UserAccount` ו-`InvestorProfile` יחלקו את אותו `user_id` ועדיין לכל אחד תהיה גרסה 1. מיגרציה 003 מעדכנת מסד שנוצר עם האילוץ הישן.
 - הקוד לעולם לא מריץ `UPDATE`/`DELETE` על `EventStore`. בדיקת יחידה סורקת את הקוד ומוודאת זאת.
 - שינוי מבנה אירוע: מעלים `schema_version` ומוסיפים Upcaster בקוד הטעינה.
 
@@ -57,7 +58,7 @@ CREATE TABLE ConsumerCheckpoints (       -- למעקב של ה-Worker וה-Agent
 | `PasswordChanged` | UserAccount | password_hash | API |
 | `InvestorProfileCreated` | InvestorProfile | birth_year, marital_status, monthly_income_range, has_emergency_fund, existing_products[] | API |
 | `RiskProfileAssessed` | InvestorProfile | answers{}, score (1–5), label | API |
-| `GoalCreated` | Goal | type, title, initial_amount, monthly_deposit, target_amount, target_date, flexibility, liquidity_need, excluded_channels[], preferred_institutions[] | API |
+| `GoalCreated` | Goal | investor_id, type, title, initial_amount, monthly_deposit, target_amount, target_date, flexibility, liquidity_need, excluded_channels[], preferred_channels[], preferred_institutions[] | API |
 | `GoalUpdated` | Goal | שדות שהשתנו בלבד | API |
 | `GoalArchived` | Goal | reason | API |
 | `InvestmentRequestSubmitted` | InvestmentRequest | goal_id, investor_id, snapshot של יעד ופרופיל סיכון, consent_share_contact | API |
@@ -80,6 +81,8 @@ CREATE TABLE ConsumerCheckpoints (       -- למעקב של ה-Worker וה-Agent
 | `AlertThresholdChanged` | Portfolio | percent | API |
 | `PriceAlertTriggered` | Portfolio | symbol, change_pct, price, trading_date | Worker |
 | `NotificationSent` | (לפי הקשר) | channel (email / in_app), template, recipient_user_id, related_event_id | Worker |
+
+סטטוסי `InvestmentRequest` שקיימים בקוד גם לפני אירועי הסוכן: `SUBMITTED`, `AI_PROCESSING`, `AI_EVALUATED`, `IN_REVIEW`, `CANCELLED`. ביטול מותר מ-`SUBMITTED`, `AI_EVALUATED` ו-`IN_REVIEW` (03 §3.9). עריכה או ארכוב כשהבקשה ב-`AI_PROCESSING` נדחים בקוד `REQUEST_IN_PROCESSING`. אירועי `AssessmentStarted`, `AIAssessmentCompleted` ו-`LeadClaimed` עדיין לא נכתבים כאן; הסוכן יחבר אותם לסטטוסים הקיימים.
 
 דוגמת payload:
 
