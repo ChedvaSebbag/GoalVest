@@ -72,9 +72,10 @@ CREATE TABLE ConsumerCheckpoints (       -- למעקב של ה-Worker וה-Agent
 | `OfferSent` | InvestmentRequest | offer_id, agent_id, items[{product_id, percent}], message | API |
 | `OfferAccepted` / `OfferDeclined` | InvestmentRequest | offer_id, reason? | API |
 | `RequestCancelled` | InvestmentRequest | by, reason | API |
-| `ProductCreated` / `ProductUpdated` | Product | כל שדות המוצר / שדות שהשתנו | API / Seed |
+| `ProductCreated` | Product | type, name, institution_id, track, symbol?, fee_deposit, fee_assets, return_1y/3y/5y, std_dev, risk_level (1–7), liquidity, liquidity_terms, tax_notes, min_deposit, description | API / Seed |
+| `ProductUpdated` | Product | רק השדות שהשתנו מתוך הרשימה של `ProductCreated` (בלי `institution_id`) | API |
 | `ProductDeactivated` | Product | reason | API |
-| `ProductDocumentUploaded` | Product | document_id, file_name, doc_type, storage_path, sha256 | API |
+| `ProductDocumentUploaded` | Product | document_id, file_name, stored_name, doc_type, storage_path (שם יחסי `{uuid}.pdf\|docx`), sha256, size_bytes | API |
 | `ProductDocumentIndexed` | Product | document_id, chunks_count, embedding_model | Worker |
 | `ProductDocumentIndexFailed` | Product | document_id, error | Worker |
 | `HoldingAdded` / `HoldingRemoved` | Portfolio | symbol, quantity, buy_price, buy_date | API |
@@ -120,14 +121,18 @@ CREATE TABLE ConsumerCheckpoints (       -- למעקב של ה-Worker וה-Agent
 | `rm_leads` | request_id, institution_id (שורה לכל גוף רלוונטי), investor_display_name, goal_type, amount, horizon_years, risk_label, ai_score, status, is_new | S14 טבלת לידים |
 | `rm_agent_kpis` | institution_id, count_by_status (עמודה לכל סטטוס), offers_sent, offers_accepted, avg_ai_score | S14 KPI |
 | `rm_agent_product_interest` | product_id, institution_id, recommended_count, offers_count, accepted_count | S14 גרף "מתעניינים לפי מוצר" (FR-42) |
-| `rm_products` | product_id, type, name, institution_id, track, fee_deposit, fee_assets, return_1y/3y/5y, std_dev, risk_level, liquidity, min_deposit, is_active, search_text | S9, S10 |
-| `rm_product_documents` | document_id, product_id, file_name, doc_type, index_status, chunks_count | S10, S17 |
+| `rm_products` | product_id, type, name, institution_id, institution_name, track, symbol, fee_deposit, fee_assets, return_1y/3y/5y, std_dev, risk_level, liquidity, liquidity_terms, tax_notes, min_deposit, description, is_active, search_text, updated_at | S9, S10, S16 |
+| `rm_product_documents` | document_id, product_id, file_name, stored_name, doc_type, storage_path, sha256, size_bytes, index_status, chunks_count, uploaded_at | S10, S17 |
 | `rm_offers` | offer_id, request_id, investor_id, agent_id, items_json, message, status | S12 |
 | `rm_holdings` | user_id, symbol, quantity, buy_price | S13 |
 | `rm_notifications` | notification_id, user_id, title, body, link, is_read, created_at | S18 |
 | `rm_request_timeline` | request_id, global_position, event_type, actor, display_text, occurred_at | S8, S15 |
 
 `license_no` נשמר ב-payload של `UserRegistered` ואינו עמודה ב-`rm_users`.
+
+`storage_path` של מסמך הוא שם קובץ יחסי (`{document_id}.pdf` או `.docx`) תחת `DOCUMENT_STORAGE_DIR`, מחוץ לתיקיית הקוד. `index_status` נפתח ב-`PENDING_INDEX`. אירועי `ProductDocumentIndexed` ו-`ProductDocumentIndexFailed` נשארים ל-Worker ואינם נכתבים בהעלאה.
+
+סוגי מוצר (`type`): `HISHTALMUT`, `GEMEL_INVESTMENT`, `SAVINGS_POLICY`, `STOCK`, `ETF`. סינון "סוג אפיק" משתמש בשלושת האפיקים `CAPITAL_MARKET` (מניה ותעודת סל), `HISHTALMUT`, `GEMEL_POLICY` (גמל להשקעה ופוליסת חיסכון). נזילות: `NONE`, `PARTIAL`, `HIGH`. סוגי מסמך: `POLICY_TERMS`, `QUARTERLY_REPORT`, `TAX_RULES`, `MARKET_REPORT`.
 
 ### טבלת תפעול (אינה Read Model)
 

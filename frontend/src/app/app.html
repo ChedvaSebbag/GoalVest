@@ -4,6 +4,7 @@
   <span class="spacer"></span>
   <a routerLink="/system">מצב המערכת</a>
   @if (user()) {
+    <a routerLink="/products">השוואת מוצרים</a>
     <button type="button" (click)="logout()">התנתקות</button>
   }
 </mat-toolbar>

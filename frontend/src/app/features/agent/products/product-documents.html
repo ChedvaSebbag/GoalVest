@@ -1,0 +1,54 @@
+<section class="gv-page">
+  <a routerLink="/agent/products">חזרה למוצרים שלי</a>
+  <header class="head">
+    <h1>מסמכי מוצר</h1>
+    <button type="button" mat-stroked-button (click)="load()">רענון</button>
+  </header>
+  <p class="gv-muted">PDF או DOCX עד 10MB. אחרי ההעלאה המסמך ממתין להטמעה.</p>
+
+  <form class="drop gv-card" (dragover)="$event.preventDefault()" (drop)="onDrop($event)" (ngSubmit)="upload()">
+    <label for="document-file">גרירה לכאן או בחירת קובץ</label>
+    <input id="document-file" type="file" accept=".pdf,.docx,application/pdf" (change)="onFile($event)" />
+    @if (file) {
+      <p>{{ file.name }}</p>
+    }
+    <label>
+      סוג מסמך
+      <select name="docType" [(ngModel)]="docType">
+        @for (item of docTypes; track item.id) {
+          <option [value]="item.id">{{ item.label }}</option>
+        }
+      </select>
+    </label>
+    @if (message()) {
+      <p role="status">{{ message() }}</p>
+    }
+    <button mat-flat-button type="submit" [disabled]="uploading()">{{ uploading() ? 'מעלה…' : 'העלאה' }}</button>
+  </form>
+
+  @if (items() === null) {
+    <div class="gv-skeleton"></div>
+  } @else if (failed()) {
+    <article class="gv-card">
+      <p class="gv-error" role="alert">לא הצלחנו לטעון את המסמכים.</p>
+      <button type="button" mat-stroked-button (click)="load()">נסה שוב</button>
+    </article>
+  } @else if (items()?.length === 0) {
+    <article class="gv-card">
+      <h2>אין מסמכים</h2>
+      <p class="gv-muted">אפשר להעלות תנאי פוליסה, דוח או כללי מס.</p>
+    </article>
+  } @else {
+    <ul>
+      @for (item of items(); track item.documentId) {
+        <li class="gv-card">
+          <div>
+            <strong>{{ item.fileName }}</strong>
+            <p class="gv-muted">{{ docTypeLabel(item.docType) }}</p>
+          </div>
+          <gv-status-chip [status]="item.indexStatus" />
+        </li>
+      }
+    </ul>
+  }
+</section>

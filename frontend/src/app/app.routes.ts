@@ -21,9 +21,24 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'products',
+    canActivate: [authGuard],
+    children: [
+      { path: '', loadComponent: () => import('./features/products/catalog/catalog').then(m => m.Catalog) },
+      { path: ':id', loadComponent: () => import('./features/products/product-details/product-details').then(m => m.ProductDetailsPage) },
+    ],
+  },
+  {
     path: 'agent',
     canActivate: [authGuard, roleGuard('AGENT')],
     loadComponent: () => import('./features/agent/agent-home').then(m => m.AgentHome),
+    children: [
+      { path: '', loadComponent: () => import('./features/agent/agent-dashboard').then(m => m.AgentDashboard) },
+      { path: 'products/new', loadComponent: () => import('./features/agent/products/product-form').then(m => m.ProductForm) },
+      { path: 'products/:id/edit', loadComponent: () => import('./features/agent/products/product-form').then(m => m.ProductForm) },
+      { path: 'products/:id/documents', loadComponent: () => import('./features/agent/products/product-documents').then(m => m.ProductDocuments) },
+      { path: 'products', loadComponent: () => import('./features/agent/products/agent-products').then(m => m.AgentProducts) },
+    ],
   },
   { path: '**', redirectTo: 'auth/login' },
 ];

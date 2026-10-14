@@ -111,6 +111,10 @@ export const STATUS_LABELS: Record<string, string> = {
   FAILED: 'נכשלה',
   NO_REQUEST: 'ללא בקשה',
   ARCHIVED: 'בארכיון',
+  PENDING_INDEX: 'ממתין',
+  INDEXED: 'מוטמע',
+  ACTIVE: 'פעיל',
+  INACTIVE: 'מושבת',
 };
 
 export const CANCELLABLE = new Set(['SUBMITTED', 'AI_EVALUATED', 'IN_REVIEW']);

@@ -40,3 +40,4 @@ class Config:
     OLLAMA_EMBED_MODEL = os.getenv("OLLAMA_EMBED_MODEL", "bge-m3")
     CHROMA_URL = f"http://{os.getenv('CHROMA_HOST', 'localhost')}:{os.getenv('CHROMA_PORT', '8000')}"
     HEALTH_TIMEOUT_SECONDS = float(os.getenv("HEALTH_TIMEOUT_SECONDS", "3"))
+    DOCUMENT_STORAGE_DIR = os.getenv("DOCUMENT_STORAGE_DIR", str(Path.home() / "goalvest-documents"))

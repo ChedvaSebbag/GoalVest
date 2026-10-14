@@ -1,0 +1,92 @@
+<section class="gv-page details">
+  @if (product() === null && !failed()) {
+    <div class="gv-skeleton"></div>
+    <div class="gv-skeleton"></div>
+  } @else if (failed()) {
+    <article class="gv-card">
+      <p class="gv-error" role="alert">לא הצלחנו לטעון את המוצר.</p>
+      <button type="button" mat-stroked-button (click)="load()">נסה שוב</button>
+    </article>
+  } @else if (product(); as item) {
+    <a routerLink="/products">חזרה לקטלוג</a>
+    <header class="head">
+      <div>
+        <p class="gv-muted">{{ item.institutionName }}</p>
+        <h1>{{ item.name }}</h1>
+        @if (item.symbol) {
+          <p><bdi>{{ item.symbol }}</bdi></p>
+        }
+      </div>
+      <div class="tags">
+        <span class="tag">{{ productTypeLabel(item.type) }}</span>
+        <span class="tag" [attr.data-level]="item.riskLevel"><bdi>{{ item.riskLevel }}</bdi> {{ riskLabel(item.riskLevel) }}</span>
+      </div>
+    </header>
+
+    <mat-tab-group>
+      <mat-tab label="סקירה">
+        <article class="gv-card">
+          <p>{{ item.description }}</p>
+          <p>מסלול: {{ item.track }}</p>
+          <h2>תשואות</h2>
+          @for (bar of bars(item); track bar.label) {
+            <div class="bar">
+              <span>{{ bar.label }}</span>
+              <span class="track"><span class="fill" [class.neg]="bar.negative" [style.inline-size.%]="bar.width"></span></span>
+              <bdi [class]="signedClass(bar.value)">{{ formatPercent(bar.value, true) }}</bdi>
+            </div>
+          }
+          <p>סטיית תקן <bdi>{{ formatPercent(item.stdDev) }}</bdi></p>
+        </article>
+      </mat-tab>
+      <mat-tab label="תנאים">
+        <article class="gv-card">
+          <dl>
+            <div><dt>נזילות</dt><dd>{{ liquidityLabel(item.liquidity) }}</dd></div>
+            <div><dt>תנאי נזילות</dt><dd>{{ item.liquidityTerms }}</dd></div>
+            <div><dt>מיסוי</dt><dd>{{ item.taxNotes }}</dd></div>
+            <div><dt>דמי ניהול מצבירה</dt><dd><bdi>{{ formatPercent(item.feeAssets) }}</bdi></dd></div>
+            <div><dt>דמי ניהול מהפקדה</dt><dd><bdi>{{ formatPercent(item.feeDeposit) }}</bdi></dd></div>
+            <div><dt>הפקדה מינימלית</dt><dd><bdi>{{ item.minDeposit | money }}</bdi></dd></div>
+          </dl>
+        </article>
+      </mat-tab>
+      <mat-tab label="מסמכים">
+        <article class="gv-card">
+          @if (item.documents.length === 0) {
+            <p>אין מסמכים להורדה.</p>
+          } @else {
+            <ul>
+              @for (document of item.documents; track document.documentId) {
+                <li>
+                  <span>{{ docTypeLabel(document.docType) }} · {{ document.fileName }}</span>
+                  <button type="button" mat-stroked-button (click)="download(document.documentId, document.fileName)">הורדה</button>
+                </li>
+              }
+            </ul>
+          }
+        </article>
+      </mat-tab>
+      <mat-tab label="התאמה אליך">
+        <article class="gv-card">
+          <p>אין עדיין הערכת התאמה ליעדים שלך.</p>
+          <gv-disclaimer />
+        </article>
+      </mat-tab>
+      <mat-tab label="סוכנים">
+        <article class="gv-card">
+          @if (item.agents.length === 0) {
+            <p>אין סוכנים פעילים בגוף הזה.</p>
+          } @else {
+            <ul>
+              @for (agent of item.agents; track agent.id) {
+                <li>{{ agent.fullName }}</li>
+              }
+            </ul>
+          }
+        </article>
+      </mat-tab>
+    </mat-tab-group>
+    <gv-disclaimer />
+  }
+</section>

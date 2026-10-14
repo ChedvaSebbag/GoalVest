@@ -34,6 +34,17 @@ def validation_response(exc: ValidationError):
         "preferred_institutions": "preferredInstitutions",
         "goal_id": "goalId",
         "consent_share_contact": "consentShareContact",
+        "fee_deposit": "feeDeposit",
+        "fee_assets": "feeAssets",
+        "return_1y": "return1y",
+        "return_3y": "return3y",
+        "return_5y": "return5y",
+        "std_dev": "stdDev",
+        "risk_level": "riskLevel",
+        "liquidity_terms": "liquidityTerms",
+        "tax_notes": "taxNotes",
+        "min_deposit": "minDeposit",
+        "doc_type": "docType",
     }
     fields: dict[str, str] = {}
     for err in exc.errors():

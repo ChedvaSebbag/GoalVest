@@ -118,6 +118,53 @@ rm_requests = sa.Table(
 
 sa.Index("IX_rm_requests_goal", rm_requests.c.goal_id)
 
+rm_products = sa.Table(
+    "rm_products",
+    metadata,
+    sa.Column("product_id", sa.Uuid, primary_key=True),
+    sa.Column("type", sa.Unicode(30), nullable=False),
+    sa.Column("name", sa.Unicode(120), nullable=False),
+    sa.Column("institution_id", sa.Uuid, nullable=False),
+    sa.Column("institution_name", sa.Unicode(200), nullable=False),
+    sa.Column("track", sa.Unicode(120), nullable=False),
+    sa.Column("symbol", sa.Unicode(20)),
+    sa.Column("fee_deposit", sa.Numeric(18, 2), nullable=False),
+    sa.Column("fee_assets", sa.Numeric(18, 2), nullable=False),
+    sa.Column("return_1y", sa.Numeric(18, 2), nullable=False),
+    sa.Column("return_3y", sa.Numeric(18, 2), nullable=False),
+    sa.Column("return_5y", sa.Numeric(18, 2), nullable=False),
+    sa.Column("std_dev", sa.Numeric(18, 2), nullable=False),
+    sa.Column("risk_level", sa.SmallInteger, nullable=False),
+    sa.Column("liquidity", sa.Unicode(30), nullable=False),
+    sa.Column("liquidity_terms", sa.Unicode(500), nullable=False),
+    sa.Column("tax_notes", sa.Unicode(500), nullable=False),
+    sa.Column("min_deposit", sa.Numeric(18, 2), nullable=False),
+    sa.Column("description", sa.UnicodeText, nullable=False),
+    sa.Column("is_active", sa.Boolean, nullable=False),
+    sa.Column("search_text", sa.UnicodeText, nullable=False),
+    sa.Column("updated_at", sa.DateTime(timezone=False), nullable=False),
+)
+
+sa.Index("IX_rm_products_institution", rm_products.c.institution_id)
+
+rm_product_documents = sa.Table(
+    "rm_product_documents",
+    metadata,
+    sa.Column("document_id", sa.Uuid, primary_key=True),
+    sa.Column("product_id", sa.Uuid, nullable=False),
+    sa.Column("file_name", sa.Unicode(200), nullable=False),
+    sa.Column("stored_name", sa.Unicode(80), nullable=False),
+    sa.Column("doc_type", sa.Unicode(40), nullable=False),
+    sa.Column("storage_path", sa.Unicode(80), nullable=False),
+    sa.Column("sha256", sa.Unicode(64), nullable=False),
+    sa.Column("size_bytes", sa.Integer, nullable=False),
+    sa.Column("index_status", sa.Unicode(20), nullable=False),
+    sa.Column("chunks_count", sa.Integer),
+    sa.Column("uploaded_at", sa.DateTime(timezone=False), nullable=False),
+)
+
+sa.Index("IX_rm_product_documents_product", rm_product_documents.c.product_id)
+
 rm_request_timeline = sa.Table(
     "rm_request_timeline",
     metadata,

@@ -94,6 +94,16 @@
 | GET | `/api/agent/products/{id}/documents` | Query | סטטוס הטמעה | AGENT |
 | GET | `/api/documents/{docId}/download` | Query | הורדת קובץ | מחובר |
 
+`GET /api/products` מחזיר `{ items, page, pageSize, total }`. `pageSize` הוא 20. `sort` בפורמט `field,asc|desc` על `name`, `type`, `track`, `institution`, `return1y`, `return3y`, `return5y`, `feeAssets`, `feeDeposit`, `stdDev`, `riskLevel`, `liquidity`. `type` חוזר על עצמו ומקבל אפיק (`CAPITAL_MARKET`, `HISHTALMUT`, `GEMEL_POLICY`) או סוג מוצר. `q` מחפש בשם, בגוף, במסלול ובסימול. מוצר מושבת לא מופיע בקטלוג. `includeInactive=true` מחזיר לסוכן רק את מוצרי הגוף שלו, כולל מושבתים.
+
+`GET /api/products/{id}` מחזיר את שדות המוצר, `documents[]` (`documentId`, `fileName`, `docType`, `indexStatus`, `chunksCount`) ו-`agents[]` (`id`, `fullName`). `fit` הוא `null` כל עוד אין הערכת AI למוצר.
+
+יצירה ועדכון (`POST`/`PUT /api/agent/products`) לא מקבלים `institutionId`: הגוף נלקח מהסוכן המחובר. מוצר של גוף אחר מחזיר `403`. גוף הפקודה: `type`, `name`, `track`, `symbol?`, `feeDeposit`, `feeAssets`, `return1y`, `return3y`, `return5y`, `stdDev`, `riskLevel`, `liquidity`, `liquidityTerms`, `taxNotes`, `minDeposit`, `description`.
+
+העלאה: `multipart/form-data` עם `file` ו-`docType`. רק PDF או DOCX לפי magic bytes, עד 10MB. שם הקובץ על הדיסק הוא UUID. אחרי שמירה `indexStatus` הוא `PENDING_INDEX`; אין כאן הטמעה. הורדה זמינה למשתמש מחובר. חיפוש סמנטי, `compare` ומחיר שוק (`market`) עדיין לא ממומשים.
+
+`python -m scripts.seed` (מתוך `backend`) יוצר דרך פקודות 25 מוצרים ו-6 משתמשי דמו (3 משקיעים ו-3 סוכנים, סיסמה `Demo1234`). הרצה נוספת לא מוסיפה אירועים.
+
 ## 8.5 סוכן – לידים ודשבורד
 
 | Method | Path | סוג | תיאור |

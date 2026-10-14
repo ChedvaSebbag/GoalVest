@@ -34,9 +34,19 @@ import { STATUS_LABELS } from '../core/investor/investor.models';
       color: var(--gv-status-accepted);
     }
     .chip[data-status='CANCELLED'],
-    .chip[data-status='FAILED'] {
+    .chip[data-status='FAILED'],
+    .chip[data-status='INACTIVE'] {
       background: color-mix(in srgb, var(--gv-status-cancelled) 16%, white);
       color: var(--gv-status-cancelled);
+    }
+    .chip[data-status='PENDING_INDEX'] {
+      background: color-mix(in srgb, var(--gv-status-review) 16%, white);
+      color: var(--gv-status-review);
+    }
+    .chip[data-status='INDEXED'],
+    .chip[data-status='ACTIVE'] {
+      background: color-mix(in srgb, var(--gv-status-accepted) 16%, white);
+      color: var(--gv-status-accepted);
     }
   `,
 })

@@ -1,0 +1,7 @@
+.head { display: flex; justify-content: space-between; align-items: center; gap: calc(var(--gv-space) * 2); }
+h1, h2 { margin: 0; color: var(--gv-primary); }
+.drop { display: flex; flex-direction: column; gap: calc(var(--gv-space) * 1.5); margin-block: calc(var(--gv-space) * 2); border: 1px dashed var(--gv-primary); }
+.drop select { font: inherit; margin-inline-start: var(--gv-space); }
+ul { list-style: none; padding: 0; display: grid; gap: calc(var(--gv-space) * 2); }
+li { display: flex; justify-content: space-between; align-items: center; gap: var(--gv-space); }
+li p { margin: 0; }

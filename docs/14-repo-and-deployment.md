@@ -54,7 +54,7 @@ CHROMA_HOST=localhost
 CHROMA_PORT=8000
 TAVILY_API_KEY=
 GMAIL_MCP_CREDENTIALS_PATH=./secrets/gmail.json
-UPLOAD_DIR=./uploads
+# DOCUMENT_STORAGE_DIR=~/goalvest-documents   ברירת מחדל אם לא הוגדר: תיקייה מחוץ לקוד
 AGENT_POLL_SECONDS=20
 PRICE_ALERT_DEFAULT_PCT=5
 ```
@@ -64,7 +64,7 @@ PRICE_ALERT_DEFAULT_PCT=5
 ```bash
 docker compose up -d ollama chromadb
 docker exec ollama ollama pull qwen2.5:7b-instruct && docker exec ollama ollama pull bge-m3
-cd backend && pip install -e ../core -r requirements.txt && flask goalvest migrate && flask goalvest seed && flask run
+cd backend && pip install -e ../core -r requirements.txt && python -m scripts.migrate && python -m scripts.seed && flask run
 cd agent && python -m agent
 cd worker && python -m worker
 cd frontend && npm i && ng serve

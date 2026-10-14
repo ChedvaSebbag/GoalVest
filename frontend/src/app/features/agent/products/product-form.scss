@@ -1,0 +1,3 @@
+h1 { color: var(--gv-primary); }
+.form { display: flex; flex-direction: column; margin-block-start: calc(var(--gv-space) * 2); }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: calc(var(--gv-space) * 2); }

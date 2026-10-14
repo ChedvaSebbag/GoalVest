@@ -1,0 +1,38 @@
+<section class="gv-page">
+  <header class="head">
+    <h1>המוצרים שלי</h1>
+    <a mat-flat-button routerLink="/agent/products/new">מוצר חדש</a>
+  </header>
+
+  @if (items() === null) {
+    <div class="gv-skeleton"></div>
+    <div class="gv-skeleton"></div>
+  } @else if (failed()) {
+    <article class="gv-card">
+      <p class="gv-error" role="alert">לא הצלחנו לטעון את המוצרים.</p>
+      <button type="button" mat-stroked-button (click)="load()">נסה שוב</button>
+    </article>
+  } @else if (items()?.length === 0) {
+    <article class="gv-card">
+      <h2>עדיין אין מוצרים</h2>
+      <p class="gv-muted">אפשר להוסיף מוצר של הגוף שלך.</p>
+      <a mat-flat-button routerLink="/agent/products/new">מוצר חדש</a>
+    </article>
+  } @else {
+    <div class="list">
+      @for (item of items(); track item.productId) {
+        <article class="gv-card row">
+          <div>
+            <h2>{{ item.name }}</h2>
+            <p class="gv-muted">{{ productTypeLabel(item.type) }} · {{ item.track }}</p>
+          </div>
+          <gv-status-chip [status]="item.isActive ? 'ACTIVE' : 'INACTIVE'" />
+          <div class="gv-actions">
+            <a mat-stroked-button [routerLink]="['/agent/products', item.productId, 'edit']">עריכה</a>
+            <a mat-stroked-button [routerLink]="['/agent/products', item.productId, 'documents']">מסמכים</a>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

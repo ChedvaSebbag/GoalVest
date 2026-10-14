@@ -1,0 +1,192 @@
+<section class="catalog">
+  <header class="head">
+    <h1>השוואת מוצרים</h1>
+    <p class="gv-muted">חיפוש לפי שם, גוף, מסלול או סימול. אפשר לבחור עד 4 מוצרים להשוואה צמודה.</p>
+  </header>
+
+  <div class="layout">
+    <form class="filters gv-card" (ngSubmit)="apply()">
+      <h2>סינון</h2>
+      <label>
+        חיפוש
+        <input name="q" [(ngModel)]="q" placeholder="שם, גוף, מסלול או סימול" />
+      </label>
+      <div class="chips" role="group" aria-label="סוג אפיק">
+        @for (channel of channels; track channel.id) {
+          <button type="button" class="chip" [attr.aria-pressed]="selectedTypes.has(channel.id)" (click)="toggleType(channel.id)">
+            {{ channel.label }}
+          </button>
+        }
+      </div>
+      <div class="pair">
+        <label>
+          סיכון מ-
+          <select name="riskMin" [(ngModel)]="riskMin">
+            <option [ngValue]="null">הכל</option>
+            @for (level of [1, 2, 3, 4, 5, 6, 7]; track level) {
+              <option [ngValue]="level">{{ level }} {{ riskLabel(level) }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          עד
+          <select name="riskMax" [(ngModel)]="riskMax">
+            <option [ngValue]="null">הכל</option>
+            @for (level of [1, 2, 3, 4, 5, 6, 7]; track level) {
+              <option [ngValue]="level">{{ level }} {{ riskLabel(level) }}</option>
+            }
+          </select>
+        </label>
+      </div>
+      <label>
+        דמי ניהול מצבירה עד
+        <input name="maxFee" [(ngModel)]="maxFee" inputmode="decimal" />
+      </label>
+      <label>
+        תשואה מינימלית ל-3 שנים
+        <input name="minReturn3y" [(ngModel)]="minReturn3y" inputmode="decimal" />
+      </label>
+      <label>
+        נזילות
+        <select name="liquidity" [(ngModel)]="liquidity">
+          <option value="">הכל</option>
+          @for (item of liquidityOptions; track item.id) {
+            <option [value]="item.id">{{ item.label }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        גוף מנהל
+        <select name="institutionId" [(ngModel)]="institutionId">
+          <option value="">הכל</option>
+          @for (item of institutions(); track item.id) {
+            <option [value]="item.id">{{ item.name }}</option>
+          }
+        </select>
+      </label>
+      <div class="gv-actions">
+        <button mat-flat-button type="submit">הצג תוצאות</button>
+        <button mat-stroked-button type="button" (click)="clear()">נקה סינון</button>
+      </div>
+    </form>
+
+    <div class="results">
+      @if (items() === null) {
+        <div class="gv-skeleton"></div>
+        <div class="gv-skeleton"></div>
+      } @else if (failed()) {
+        <article class="gv-card">
+          <p class="gv-error" role="alert">לא הצלחנו לטעון את הקטלוג.</p>
+          <button type="button" mat-stroked-button (click)="load()">נסה שוב</button>
+        </article>
+      } @else if (items()?.length === 0) {
+        <article class="gv-card">
+          <h2>לא נמצאו מוצרים</h2>
+          <p class="gv-muted">אפשר לשנות את החיפוש או לנקות את הסינון.</p>
+          <button type="button" mat-stroked-button (click)="clear()">נקה סינון</button>
+        </article>
+      } @else {
+        <div class="table-wrap gv-card">
+          <table mat-table [dataSource]="items()!" matSort matSortDisableClear matSortActive="name" matSortDirection="asc" (matSortChange)="onSort($event)">
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef>בחירה</th>
+              <td mat-cell *matCellDef="let row">
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(row)"
+                  [disabled]="selectionFull(row)"
+                  [attr.aria-label]="'בחר את ' + row.name"
+                  (change)="toggle(row, $any($event.target).checked)"
+                />
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="type">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header="type">סוג</th>
+              <td mat-cell *matCellDef="let row">{{ productTypeLabel(row.type) }}</td>
+            </ng-container>
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header="name">שם</th>
+              <td mat-cell *matCellDef="let row">
+                <a [routerLink]="['/products', row.productId]">{{ row.name }}</a>
+                @if (row.symbol) {
+                  <span class="symbol"><bdi>{{ row.symbol }}</bdi></span>
+                }
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="institution">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header="institution">גוף</th>
+              <td mat-cell *matCellDef="let row">{{ row.institutionName }}</td>
+            </ng-container>
+            <ng-container matColumnDef="track">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header="track">מסלול</th>
+              <td mat-cell *matCellDef="let row">{{ row.track }}</td>
+            </ng-container>
+            <ng-container matColumnDef="return1y">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header="return1y">שנה</th>
+              <td mat-cell *matCellDef="let row"><bdi [class]="signedClass(row.return1y)">{{ formatPercent(row.return1y, true) }}</bdi></td>
+            </ng-container>
+            <ng-container matColumnDef="return3y">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header="return3y">3 שנים</th>
+              <td mat-cell *matCellDef="let row"><bdi [class]="signedClass(row.return3y)">{{ formatPercent(row.return3y, true) }}</bdi></td>
+            </ng-container>
+            <ng-container matColumnDef="return5y">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header="return5y">5 שנים</th>
+              <td mat-cell *matCellDef="let row"><bdi [class]="signedClass(row.return5y)">{{ formatPercent(row.return5y, true) }}</bdi></td>
+            </ng-container>
+            <ng-container matColumnDef="feeAssets">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header="feeAssets">דמי מצבירה</th>
+              <td mat-cell *matCellDef="let row"><bdi>{{ formatPercent(row.feeAssets) }}</bdi></td>
+            </ng-container>
+            <ng-container matColumnDef="feeDeposit">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header="feeDeposit">דמי הפקדה</th>
+              <td mat-cell *matCellDef="let row"><bdi>{{ formatPercent(row.feeDeposit) }}</bdi></td>
+            </ng-container>
+            <ng-container matColumnDef="stdDev">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header="stdDev">סטיית תקן</th>
+              <td mat-cell *matCellDef="let row"><bdi>{{ formatPercent(row.stdDev) }}</bdi></td>
+            </ng-container>
+            <ng-container matColumnDef="liquidity">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header="liquidity">נזילות</th>
+              <td mat-cell *matCellDef="let row">{{ liquidityLabel(row.liquidity) }}</td>
+            </ng-container>
+            <ng-container matColumnDef="riskLevel">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header="riskLevel">סיכון</th>
+              <td mat-cell *matCellDef="let row">
+                <span class="risk" [attr.data-level]="row.riskLevel"><bdi>{{ row.riskLevel }}</bdi> {{ riskLabel(row.riskLevel) }}</span>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns"></tr>
+          </table>
+          <mat-paginator [length]="total()" [pageIndex]="pageIndex()" [pageSize]="20" [pageSizeOptions]="[20]" (page)="onPage($event)" />
+        </div>
+        @if (selected().length >= 4) {
+          <p class="gv-muted">נבחרו 4 מוצרים. כדי לבחור מוצר נוסף יש להסיר אחד.</p>
+        }
+      }
+    </div>
+  </div>
+
+  @if (selected().length > 0) {
+    <div class="compare-bar">
+      <button type="button" mat-flat-button [disabled]="selected().length < 2" (click)="openCompare()">
+        השווה (<bdi>{{ selected().length }}</bdi>)
+      </button>
+    </div>
+  }
+  @if (compareOpen() && selected().length >= 2) {
+    <article class="gv-card compare">
+      <h2>השוואה צמודה</h2>
+      <ul>
+        @for (item of selected(); track item.productId) {
+          <li>
+            <a [routerLink]="['/products', item.productId]">{{ item.name }}</a>
+            <span>{{ item.institutionName }} · {{ item.track }}</span>
+            <bdi [class]="signedClass(item.return3y)">{{ formatPercent(item.return3y, true) }}</bdi>
+            ל-3 שנים, דמי מצבירה <bdi>{{ formatPercent(item.feeAssets) }}</bdi>
+          </li>
+        }
+      </ul>
+    </article>
+  }
+</section>

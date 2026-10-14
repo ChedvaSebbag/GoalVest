@@ -25,6 +25,14 @@ class EmailAlreadyExists(BusinessRuleViolation):
         super().__init__("כתובת האימייל כבר רשומה", code="EMAIL_EXISTS")
 
 
+class Forbidden(Exception):
+    """המשתמש מחובר, אבל הפעולה אינה על המשאב של הגוף שלו."""
+
+    def __init__(self, message: str = "אין הרשאה לפעולה הזו") -> None:
+        self.code = "FORBIDDEN"
+        super().__init__(message)
+
+
 class NotFound(Exception):
     """משאב חסר, או שייך למשתמש אחר. התשובה לא חושפת אם הוא קיים."""
 
