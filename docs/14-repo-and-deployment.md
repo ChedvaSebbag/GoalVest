@@ -56,6 +56,7 @@ TAVILY_API_KEY=
 GMAIL_MCP_CREDENTIALS_PATH=./secrets/gmail.json
 # DOCUMENT_STORAGE_DIR=~/goalvest-documents   ברירת מחדל אם לא הוגדר: תיקייה מחוץ לקוד
 AGENT_POLL_SECONDS=20
+AGENT_MODE=deep
 PRICE_ALERT_DEFAULT_PCT=5
 ```
 

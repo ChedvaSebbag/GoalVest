@@ -38,7 +38,7 @@ def test_cannot_send_offer_with_allocation_not_100():
 | TC-07 | שני מופעים של הסוכן לוקחים אותה בקשה | אחד מצליח, השני מקבל ConcurrencyError ומדלג | FR-51 |
 | TC-08 | יעד 4 שנים, אין השתלמות קיימת | ציון השתלמות ≤ 40, דגל `LOCKUP_EXCEEDS_HORIZON` | FR-52 |
 | TC-09 | המשקיע החריג "שוק ההון" | ציון ואחוז 0 לשוק ההון | 9.5 |
-| TC-10 | Ollama כבוי | `AIAssessmentFailed`, Flask ממשיך לעבוד | NFR-15 |
+| TC-10 | Ollama כבוי | `AssessmentAborted` עם `attempt_not_counted`, הבקשה חוזרת ל-`SUBMITTED`, אין `AIAssessmentFailed`, Flask ממשיך לעבוד | NFR-15, 03 §3.9 |
 | TC-11 | דחיית הערכה בלי הערה | 400 | FR-44 |
 | TC-12 | הצעה עם סכום 90% | 422 `ALLOCATION_NOT_100` | FR-45 |
 | TC-13 | Rebuild Projections | טבלאות זהות למצב לפני Rebuild | NFR-13 |

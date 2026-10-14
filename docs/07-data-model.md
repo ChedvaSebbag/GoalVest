@@ -63,8 +63,9 @@ CREATE TABLE ConsumerCheckpoints (       -- למעקב של ה-Worker וה-Agent
 | `GoalArchived` | Goal | reason | API |
 | `InvestmentRequestSubmitted` | InvestmentRequest | goal_id, investor_id, snapshot של יעד ופרופיל סיכון, consent_share_contact | API |
 | `AssessmentStarted` | InvestmentRequest | attempt, agent_run_id, model | Agent |
-| `AIAssessmentCompleted` | InvestmentRequest | overall_score, channel_scores{}, allocation{}, recommended_products[], rationale, risk_flags[], sources[], duration_ms, model | Agent |
+| `AIAssessmentCompleted` | InvestmentRequest | attempt, overall_score, channel_scores{}, allocation{}, recommended_products[], rationale, risk_flags[], sources[], duration_ms, model | Agent |
 | `AIAssessmentFailed` | InvestmentRequest | attempt, error_code, message, retry_at? | Agent |
+| `AssessmentAborted` | InvestmentRequest | reason, attempt_not_counted (תמיד true) | Agent |
 | `LeadClaimed` | InvestmentRequest | agent_id, institution_id | API |
 | `AssessmentApproved` | InvestmentRequest | agent_id, note? | API |
 | `AssessmentRejected` | InvestmentRequest | agent_id, note | API |
@@ -83,7 +84,7 @@ CREATE TABLE ConsumerCheckpoints (       -- למעקב של ה-Worker וה-Agent
 | `PriceAlertTriggered` | Portfolio | symbol, change_pct, price, trading_date | Worker |
 | `NotificationSent` | (לפי הקשר) | channel (email / in_app), template, recipient_user_id, related_event_id | Worker |
 
-סטטוסי `InvestmentRequest` שקיימים בקוד גם לפני אירועי הסוכן: `SUBMITTED`, `AI_PROCESSING`, `AI_EVALUATED`, `IN_REVIEW`, `CANCELLED`. ביטול מותר מ-`SUBMITTED`, `AI_EVALUATED` ו-`IN_REVIEW` (03 §3.9). עריכה או ארכוב כשהבקשה ב-`AI_PROCESSING` נדחים בקוד `REQUEST_IN_PROCESSING`. אירועי `AssessmentStarted`, `AIAssessmentCompleted` ו-`LeadClaimed` עדיין לא נכתבים כאן; הסוכן יחבר אותם לסטטוסים הקיימים.
+סטטוסי `InvestmentRequest`: `SUBMITTED`, `AI_PROCESSING`, `AI_EVALUATED`, `IN_REVIEW`, `FAILED`, `CANCELLED`. ביטול מותר מ-`SUBMITTED`, `AI_EVALUATED` ו-`IN_REVIEW` (03 §3.9). עריכה או ארכוב כשהבקשה ב-`AI_PROCESSING` נדחים בקוד `REQUEST_IN_PROCESSING`. `AssessmentStarted` מעביר ל-`AI_PROCESSING`, `AIAssessmentCompleted` ל-`AI_EVALUATED`, ו-`AIAssessmentFailed` חוזר ל-`SUBMITTED` עד הניסיון השלישי ואז ל-`FAILED`. `AssessmentAborted` חוזר ל-`SUBMITTED` בלי לצרוך ניסיון (03 §3.9). `LeadClaimed` עדיין לא נכתב כאן.
 
 דוגמת payload:
 
@@ -116,7 +117,7 @@ CREATE TABLE ConsumerCheckpoints (       -- למעקב של ה-Worker וה-Agent
 | `rm_users` | user_id, email (unique, אחרי `strip().lower()`), full_name, phone, role, institution_id, status, password_hash | התחברות, הרשאות |
 | `rm_investor_profiles` | user_id, risk_score, risk_label, birth_year, … | שאלון, דשבורד |
 | `rm_goals` | goal_id, investor_id, type, title, amounts, target_date, active_request_id, status | S7, S8 |
-| `rm_requests` | request_id, goal_id, investor_id, status, overall_score, claimed_by, institution_id, assessment_review (approved/rejected/null), created_at, updated_at | תור הסוכן, S8 |
+| `rm_requests` | request_id, goal_id, investor_id, status, overall_score, claimed_by, institution_id, assessment_review (approved/rejected/null), retry_at, created_at, updated_at | תור הסוכן, S8 |
 | `rm_assessments` | request_id, attempt, json מלא של ההערכה, created_at | S8, S15 |
 | `rm_leads` | request_id, institution_id (שורה לכל גוף רלוונטי), investor_display_name, goal_type, amount, horizon_years, risk_label, ai_score, status, is_new | S14 טבלת לידים |
 | `rm_agent_kpis` | institution_id, count_by_status (עמודה לכל סטטוס), offers_sent, offers_accepted, avg_ai_score | S14 KPI |

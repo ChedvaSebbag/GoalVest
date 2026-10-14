@@ -1,0 +1,80 @@
+@if (assessment().pendingReview) {
+  <p class="tag">טרם נבדק על ידי סוכן</p>
+}
+<p class="overall">ציון כללי <bdi>{{ assessment().overallScore }}</bdi></p>
+
+<h3>ציון לכל אפיק</h3>
+<ul class="scores">
+  @for (channel of channels; track channel.key) {
+    <li>
+      <span>{{ channel.label }}</span>
+      <span class="track" aria-hidden="true"><span class="fill" [style.width.%]="score(channel.key)"></span></span>
+      <bdi>{{ score(channel.key) }}</bdi>
+    </li>
+  }
+</ul>
+
+<h3>תמהיל</h3>
+<ul class="scores">
+  @for (channel of channels; track channel.key) {
+    <li>
+      <span>{{ channel.label }}</span>
+      <bdi>{{ share(channel.key) }}%</bdi>
+    </li>
+  }
+</ul>
+
+<h3>מסלולים</h3>
+@if (assessment().recommendedProducts.length === 0) {
+  <p class="gv-muted">אין מסלולים להצגה.</p>
+} @else {
+  <ul class="products">
+    @for (product of assessment().recommendedProducts; track product.productId) {
+      <li>
+        <strong>{{ product.name || 'מסלול' }}</strong>
+        <span>התאמה <bdi>{{ product.fitScore }}</bdi></span>
+        <p>{{ product.reason }}</p>
+      </li>
+    }
+  </ul>
+}
+
+<h3>דגלי סיכון</h3>
+@if (assessment().riskFlags.length === 0) {
+  <p class="gv-muted">אין דגלי סיכון.</p>
+} @else {
+  <ul class="flags">
+    @for (flag of assessment().riskFlags; track flag.code + flag.text) {
+      <li [attr.data-severity]="flag.severity">
+        <span>{{ severity(flag.severity) }}</span>
+        <p>{{ flag.text }}</p>
+      </li>
+    }
+  </ul>
+}
+
+<h3>נימוק</h3>
+<p class="rationale">{{ assessment().rationale }}</p>
+
+<h3>מקורות</h3>
+@if (assessment().sources.length === 0) {
+  <p class="gv-muted">אין מקורות להצגה.</p>
+} @else {
+  <ul class="sources">
+    @for (source of assessment().sources; track source.title + (source.url ?? '')) {
+      <li>
+        <span>{{ sourceKind(source.type) }}</span>
+        @if (source.url) {
+          <a [href]="source.url" target="_blank" rel="noopener"><bdi>{{ source.title }}</bdi></a>
+        } @else {
+          <strong>{{ source.title }}</strong>
+        }
+        @if (source.excerpt) {
+          <p>{{ source.excerpt }}</p>
+        }
+      </li>
+    }
+  </ul>
+}
+
+<gv-disclaimer />

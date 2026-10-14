@@ -69,6 +69,8 @@
 | 422 `CONSENT_REQUIRED` | הגשה בלי אישור שיתוף פרטים |
 
 `PUT /api/investor/goals/{id}` עם `consentShareContact: true` ושינוי בשדות, כשיש בקשה פעילה שאינה בעיבוד: `GoalUpdated`, `RequestCancelled` על הישנה, ו-`InvestmentRequestSubmitted` חדשה. ארכוב סוגר בקשה פעילה ולא פותח חדשה.
+
+`GET /api/investor/goals/{id}` מוסיף `assessment`. בלי הערכה שהושלמה הערך הוא `null`. כשיש שורה ב-`rm_assessments` חוזרים `overallScore`, `channelScores` ו-`allocation` (מפתחות `capitalMarket`, `hishtalmut`, `gemelPolicy`), `recommendedProducts` (`productId`, `name`, `fitScore`, `reason`), `rationale`, `riskFlags` (`code`, `severity`, `text`), `sources` (`type`, `title`, `url`, `excerpt`) ו-`pendingReview`. `pendingReview` הוא `true` כל עוד `assessment_review` ריק, והמסך מציג «טרם נבדק על ידי סוכן».
 | GET | `/api/investor/dashboard` | Query | KPI, יעדים, תמהיל, מסלולים מומלצים |
 | GET | `/api/investor/offers` | Query | הצעות שהתקבלו |
 | POST | `/api/investor/offers/{offerId}/accept` | Command | קבלה |

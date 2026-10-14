@@ -31,6 +31,24 @@
     </article>
 
     <article class="gv-card">
+      <h2>הערכת AI</h2>
+      @if (refreshError()) {
+        <p class="gv-error" role="alert">{{ refreshError() }}</p>
+        <button type="button" mat-stroked-button (click)="load(item.goalId, true)">נסה שוב</button>
+      }
+      @if (item.assessment; as assessment) {
+        <gv-assessment-card [assessment]="assessment" />
+      } @else if (item.requestStatus === 'FAILED') {
+        <p>לא הצלחנו להשלים את ההערכה אחרי שלושה ניסיונות.</p>
+      } @else if (item.activeRequestId) {
+        <p>ההערכה עדיין בהכנה. היא תופיע כאן כשהסוכן יסיים.</p>
+        <button type="button" mat-stroked-button (click)="load(item.goalId, true)">רענן</button>
+      } @else {
+        <p class="gv-muted">אחרי הגשת בקשה תופיע כאן הערכת ההתאמה.</p>
+      }
+    </article>
+
+    <article class="gv-card">
       <h2>סטטוס הבקשה</h2>
       @if (!item.activeRequestId) {
         <p>אין בקשה פעילה ליעד הזה.</p>

@@ -59,4 +59,6 @@ npx @modelcontextprotocol/inspector python -m mcp_tools.server
 python -m worker.indexer          # לולאה כל 15 שניות
 python -m worker.indexer --once   # הרצה אחת
 python -m worker.index_knowledge  # seed/knowledge אל knowledge_base
+python -m agent                   # לולאת הערכה כל 20 שניות. AGENT_MODE=deep או chain
+python -m agent --once --request <id> --verbose
 ```

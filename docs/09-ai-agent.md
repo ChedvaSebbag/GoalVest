@@ -30,6 +30,8 @@ while True:
         result = run_assessment(req)                         # Deep Agent
         if result.ok:
             commands.complete_assessment(req.id, result.payload)   # AIAssessmentCompleted
+        elif result.infrastructure:
+            commands.abort_assessment(req.id, result.reason)       # AssessmentAborted
         else:
             commands.fail_assessment(req.id, result.error)         # AIAssessmentFailed
     sleep(20)
@@ -37,7 +39,10 @@ while True:
 
 - רץ כ-`python -m agent` בקונטיינר או בטרמינל נפרד.
 - Heartbeat ללוג כל דקה. Graceful shutdown על SIGTERM.
-- בקשה שתקועה ב-`AI_PROCESSING` יותר מ-10 דקות נחשבת כושלת ומוחזרת לתור.
+- בקשה שתקועה ב-`AI_PROCESSING` יותר מ-10 דקות נרשמת כ-`AIAssessmentFailed` וחוזרת לתור. הניסיון נספר.
+- Ollama, Chroma או Tavily לא זמינים: נרשם `AssessmentAborted` (`attempt_not_counted: true`), הסטטוס חוזר ל-`SUBMITTED`, והסבב הבא מנסה שוב. אין עדכון ישיר של `rm_requests`.
+- `AGENT_MODE=deep` (ברירת מחדל) מריץ את ה-Deep Agent, ואחרי שני כשלי פורמט עובר לשרשרת. `AGENT_MODE=chain` מדלג על ה-Deep Agent ומריץ רק את השרשרת.
+- בדיקה והדגמה: `python -m agent --once --request <id> --verbose` מדפיס חוקים, מקורות RAG, מוצרים, תוצאות Tools, Tavily, זמן ריצה ותוצאה.
 
 ## 9.4 סדרת הבדיקות
 
@@ -89,7 +94,8 @@ agent = create_deep_agent(
 - הסוכן הראשי מתכנן (`write_todos`), מאציל ל-2 תת-סוכנים, ואז מסנתז.
 - מספר צעדים מקסימלי: 25. Timeout לבקשה: 4 דקות.
 - הפלט הסופי מנותח ל-`AssessmentOutput` (Pydantic). כשל → ניסיון תיקון אחד עם הודעת השגיאה.
-- גיבוי: אם מודל 7B לא מצליח בעקביות לעבוד עם תת-סוכנים, מריצים את שלבים 2–5 כשרשרת קריאות קבועה ומשתמשים ב-Deep Agent לסינתזה ולתכנון בלבד (מתועד כהחלטה ב-ADR).
+- גיבוי (החלטה ממומשת): אחרי שני כשלי פורמט של ה-Deep Agent, או כש-`AGENT_MODE=chain`, שלבים 2–5 רצים כשרשרת קבועה. ה-LLM משמש לסינתזה בלבד. אם גם הסינתזה לא בפורמט תקין, נשמרת הערכה דטרמיניסטית שנבנתה מהראיות שנאספו (חוקים, מועמדים ומקורות אמיתיים), כל עוד יש מוצר, מקור RAG ומקור Web. בלי הראיות האלה נרשם `AIAssessmentFailed`.
+- בשרשרת, מס ותנודתיות נקראים ממימוש `mcp_tools` בתוך התהליך, ו-Tavily נקרא ב-API של החיפוש. ה-Deep Agent מגיע לאותם כלים דרך MCP (`goalvest-tools` ב-stdio ו-`npx -y tavily-mcp`).
 
 ## 9.7 System Prompt (תמצית)
 

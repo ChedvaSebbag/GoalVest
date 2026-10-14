@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.infrastructure.serialization import loads
 from app.infrastructure.tables import rm_goals, rm_requests
+from app.queries.assessments import assessment_view
 
 
 def find_active_request(session: Session, goal_id: UUID):
@@ -54,7 +55,14 @@ def get_goal(session: Session, goal_id: UUID, investor_id: UUID) -> dict | None:
         "excludedChannels": loads(row["excluded_channels"]),
         "preferredChannels": loads(row["preferred_channels"]),
         "preferredInstitutions": loads(row["preferred_institutions"]),
+        "assessment": None,
     })
+    request_id = summary["activeRequestId"]
+    if request_id is not None:
+        review = session.execute(
+            sa.select(rm_requests.c.assessment_review).where(rm_requests.c.request_id == UUID(request_id))
+        ).scalar_one_or_none()
+        summary["assessment"] = assessment_view(session, UUID(request_id), review)
     return summary
 
 

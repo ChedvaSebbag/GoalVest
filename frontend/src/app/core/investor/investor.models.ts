@@ -27,6 +27,43 @@ export interface GoalSummary {
   consentShareContact: boolean | null;
 }
 
+export interface ChannelFigures {
+  capitalMarket: number;
+  hishtalmut: number;
+  gemelPolicy: number;
+}
+
+export interface AssessmentProduct {
+  productId: string;
+  name: string;
+  fitScore: number;
+  reason: string;
+}
+
+export interface AssessmentSource {
+  type: string;
+  title: string;
+  url: string | null;
+  excerpt: string | null;
+}
+
+export interface AssessmentFlag {
+  code: string;
+  severity: string;
+  text: string;
+}
+
+export interface AssessmentView {
+  overallScore: number;
+  channelScores: ChannelFigures;
+  allocation: ChannelFigures;
+  recommendedProducts: AssessmentProduct[];
+  rationale: string;
+  riskFlags: AssessmentFlag[];
+  sources: AssessmentSource[];
+  pendingReview: boolean;
+}
+
 export interface GoalDetails extends GoalSummary {
   initialAmount: string;
   monthlyDeposit: string;
@@ -35,6 +72,7 @@ export interface GoalDetails extends GoalSummary {
   excludedChannels: string[];
   preferredChannels: string[];
   preferredInstitutions: string[];
+  assessment: AssessmentView | null;
 }
 
 export interface TimelineItem {

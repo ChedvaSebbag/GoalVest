@@ -106,6 +106,7 @@ stateDiagram-v2
     AI_PROCESSING --> AI_EVALUATED: AIAssessmentCompleted
     AI_PROCESSING --> SUBMITTED: AIAssessmentFailed (retry)
     AI_PROCESSING --> FAILED: AIAssessmentFailed (3rd)
+    AI_PROCESSING --> SUBMITTED: AssessmentAborted
     AI_EVALUATED --> IN_REVIEW: LeadClaimed
     IN_REVIEW --> REEVALUATION_REQUESTED: ReevaluationRequested
     REEVALUATION_REQUESTED --> AI_PROCESSING: AssessmentStarted
@@ -120,6 +121,8 @@ stateDiagram-v2
 ```
 
 אישור או דחייה של הערכת ה-AI (FR-44) הם אירועים נפרדים (`AssessmentApproved` / `AssessmentRejected`) שלא משנים את הסטטוס הראשי. הם מתועדים ומשפיעים על התצוגה למשקיע ועל מדדי איכות ה-AI.
+
+`AssessmentAborted` מחזיר את הבקשה מ-`AI_PROCESSING` ל-`SUBMITTED` כשתשתית ההערכה לא זמינה (Ollama, Chroma או Tavily). ה-payload כולל `reason` ו-`attempt_not_counted: true`. האירוע לא נספר מתוך שלושת הניסיונות, ולא נכתב `AIAssessmentFailed`.
 
 ## 3.10 User Stories נבחרים עם קריטריוני קבלה
 

@@ -1,4 +1,4 @@
-"""InvestmentRequest – הגשה וביטול. סטטוסי הסוכן קיימים כאן לפני האירועים שמובילים אליהם."""
+"""InvestmentRequest – הגשה, ביטול והערכת AI. ראו docs/03 §3.9."""
 
 from enum import StrEnum
 from uuid import UUID
@@ -6,6 +6,12 @@ from uuid import UUID
 from goalvest_core.aggregate import AggregateRoot
 from goalvest_core.errors import BusinessRuleViolation
 from goalvest_core.event import Event
+from goalvest_core.events.investment_request import (
+    AIAssessmentCompleted,
+    AIAssessmentFailed,
+    AssessmentAborted,
+    AssessmentStarted,
+)
 
 
 class RequestStatus(StrEnum):
@@ -13,6 +19,7 @@ class RequestStatus(StrEnum):
     AI_PROCESSING = "AI_PROCESSING"
     AI_EVALUATED = "AI_EVALUATED"
     IN_REVIEW = "IN_REVIEW"
+    FAILED = "FAILED"
     CANCELLED = "CANCELLED"
 
 
@@ -22,7 +29,9 @@ CANCELLABLE_STATUSES = frozenset({
     RequestStatus.IN_REVIEW,
 })
 
-# הסוכן רושם כאן אירוע → סטטוס, בלי להוסיף ערך ל-enum ובלי אירוע מובנה חדש.
+MAX_ASSESSMENT_ATTEMPTS = 3
+
+# אירוע עתידי יכול להירשם כאן בלי ערך חדש ב-enum. אירועי הסוכן מטופלים במפורש.
 STATUS_TRANSITIONS: dict[str, RequestStatus] = {}
 
 
@@ -36,6 +45,8 @@ class InvestmentRequest(AggregateRoot):
         self.investor_id: UUID | None = None
         self.consent_share_contact = False
         self.snapshot: dict = {}
+        self.content_failures = 0
+        self.processing_attempt: int | None = None
 
     def submit(
         self,
@@ -99,6 +110,55 @@ class InvestmentRequest(AggregateRoot):
             )
         self._record("RequestCancelled", {"by": by, "reason": cleaned}, metadata)
 
+    def start_assessment(self, *, agent_run_id: UUID, model: str, metadata: dict | None = None) -> None:
+        self._ensure_submittable()
+        started = AssessmentStarted(
+            attempt=self.content_failures + 1,
+            agent_run_id=str(agent_run_id),
+            model=model,
+        )
+        self._record(started.event_type, started.payload(), metadata)
+
+    def complete_assessment(self, assessment: dict, metadata: dict | None = None) -> None:
+        if self.status is not RequestStatus.AI_PROCESSING:
+            raise BusinessRuleViolation("אין הערכה בעיבוד", code="ASSESSMENT_NOT_PROCESSING")
+        body = dict(assessment)
+        body["attempt"] = self.processing_attempt or 1
+        completed = AIAssessmentCompleted(body)
+        self._record(completed.event_type, completed.payload(), metadata)
+
+    def fail_assessment(
+        self,
+        *,
+        error_code: str,
+        message: str,
+        retry_at: str,
+        metadata: dict | None = None,
+    ) -> None:
+        if self.status is not RequestStatus.AI_PROCESSING:
+            raise BusinessRuleViolation("אין הערכה בעיבוד", code="ASSESSMENT_NOT_PROCESSING")
+        attempt = self.processing_attempt or (self.content_failures + 1)
+        terminal = self.content_failures + 1 >= MAX_ASSESSMENT_ATTEMPTS
+        failed = AIAssessmentFailed(
+            attempt=attempt,
+            error_code=error_code,
+            message=message.strip()[:500],
+            retry_at=None if terminal else retry_at,
+        )
+        self._record(failed.event_type, failed.payload(), metadata)
+
+    def abort_assessment(self, *, reason: str, metadata: dict | None = None) -> None:
+        if self.status is not RequestStatus.AI_PROCESSING:
+            raise BusinessRuleViolation("אין הערכה בעיבוד", code="ASSESSMENT_NOT_PROCESSING")
+        aborted = AssessmentAborted(reason=reason.strip()[:300])
+        self._record(aborted.event_type, aborted.payload(), metadata)
+
+    def _ensure_submittable(self) -> None:
+        if self.content_failures >= MAX_ASSESSMENT_ATTEMPTS or self.status is RequestStatus.FAILED:
+            raise BusinessRuleViolation("מוצו ניסיונות ההערכה", code="ASSESSMENT_EXHAUSTED")
+        if self.status is not RequestStatus.SUBMITTED:
+            raise BusinessRuleViolation("אי אפשר להתחיל הערכה בסטטוס הזה", code="ASSESSMENT_NOT_ALLOWED")
+
     def _when(self, event: Event) -> None:
         if event.event_type == "InvestmentRequestSubmitted":
             payload = event.payload
@@ -110,6 +170,28 @@ class InvestmentRequest(AggregateRoot):
             return
         if event.event_type == "RequestCancelled":
             self.status = RequestStatus.CANCELLED
+            return
+        if event.event_type == "AssessmentStarted":
+            self.status = RequestStatus.AI_PROCESSING
+            raw = event.payload.get("attempt")
+            self.processing_attempt = int(raw) if raw is not None else self.content_failures + 1
+            return
+        if event.event_type == "AIAssessmentCompleted":
+            self.status = RequestStatus.AI_EVALUATED
+            self.processing_attempt = None
+            return
+        if event.event_type == "AIAssessmentFailed":
+            self.content_failures += 1
+            self.processing_attempt = None
+            self.status = (
+                RequestStatus.FAILED
+                if self.content_failures >= MAX_ASSESSMENT_ATTEMPTS
+                else RequestStatus.SUBMITTED
+            )
+            return
+        if event.event_type == "AssessmentAborted":
+            self.status = RequestStatus.SUBMITTED
+            self.processing_attempt = None
             return
         transition = STATUS_TRANSITIONS.get(event.event_type)
         if transition is not None:

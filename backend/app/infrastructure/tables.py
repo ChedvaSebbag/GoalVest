@@ -121,9 +121,19 @@ rm_requests = sa.Table(
     sa.Column("assessment_review", sa.Unicode(20)),
     sa.Column("created_at", sa.DateTime(timezone=False), nullable=False),
     sa.Column("updated_at", sa.DateTime(timezone=False), nullable=False),
+    sa.Column("retry_at", sa.DateTime(timezone=False)),
 )
 
 sa.Index("IX_rm_requests_goal", rm_requests.c.goal_id)
+
+rm_assessments = sa.Table(
+    "rm_assessments",
+    metadata,
+    sa.Column("request_id", sa.Uuid, primary_key=True),
+    sa.Column("attempt", sa.Integer, primary_key=True),
+    sa.Column("assessment", sa.UnicodeText, nullable=False),
+    sa.Column("created_at", sa.DateTime(timezone=False), nullable=False),
+)
 
 rm_products = sa.Table(
     "rm_products",

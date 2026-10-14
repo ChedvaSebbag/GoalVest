@@ -1,0 +1,20 @@
+# ספים שאינם שיעור מס או תקופת נעילה. נעילה וגיל קצבה נקראים מ-mcp_tools/tax_rules.yaml.
+hishtalmut_score_cap: 40
+growth_labels:
+  - צמיחה
+growth_horizon_years: 3
+equity_allocation_cap: 40
+conservative_labels:
+  - סולידי
+long_horizon_years: 15
+severe_penalty: 10
+retirement_bonus: 15
+candidate_min: 10
+candidate_max: 15
+lockup_text: "טווח היעד קצר מתקופת הנעילה של קרן ההשתלמות, ולכן הציון לאפיק הזה מוגבל."
+emergency_text: "אין קרן חירום. כדאי לשקול להפריד 3–6 חודשי הוצאות בחיסכון נזיל."
+growth_text: "פרופיל צמיחה עם טווח קצר. כדאי לשקול להגביל את חלק המניות בתמהיל."
+inflation_text: "טווח ארוך ופרופיל סולידי. כדאי לשקול את סיכון האינפלציה."
+liquidity_text: "צוין צורך בנזילות לפני היעד. מתאים יותר שוק ההון ואפיקים נזילים."
+excluded_text: "האפיק סומן כלא רצוי, ולכן הציון והאחוז הם 0."
+retirement_text: "יעד פרישה שמגיע לגיל הקצבה. כדאי לשקול גמל להשקעה, לפי כללי המס של המערכת."

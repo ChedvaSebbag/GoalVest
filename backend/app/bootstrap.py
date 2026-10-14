@@ -2,6 +2,16 @@
 
 from sqlalchemy.orm import Session
 
+from app.commands.assessments import (
+    AbortAssessment,
+    CompleteAssessment,
+    FailAssessment,
+    StartAssessment,
+    handle_abort_assessment,
+    handle_complete_assessment,
+    handle_fail_assessment,
+    handle_start_assessment,
+)
 from app.commands.bus import CommandBus
 from app.commands.goals import (
     ArchiveGoal,
@@ -45,7 +55,14 @@ from app.projections.products import (
     project_product_deactivated,
     project_product_updated,
 )
-from app.projections.requests import project_request_cancelled, project_request_submitted
+from app.projections.requests import (
+    project_assessment_aborted,
+    project_assessment_completed,
+    project_assessment_failed,
+    project_assessment_started,
+    project_request_cancelled,
+    project_request_submitted,
+)
 from app.projections.users import project_user_registered
 
 
@@ -59,6 +76,10 @@ def build_dispatcher() -> ProjectionDispatcher:
     dispatcher.register("GoalArchived", project_goal_archived)
     dispatcher.register("InvestmentRequestSubmitted", project_request_submitted)
     dispatcher.register("RequestCancelled", project_request_cancelled)
+    dispatcher.register("AssessmentStarted", project_assessment_started)
+    dispatcher.register("AIAssessmentCompleted", project_assessment_completed)
+    dispatcher.register("AIAssessmentFailed", project_assessment_failed)
+    dispatcher.register("AssessmentAborted", project_assessment_aborted)
     dispatcher.register("ProductCreated", project_product_created)
     dispatcher.register("ProductUpdated", project_product_updated)
     dispatcher.register("ProductDeactivated", project_product_deactivated)
@@ -78,6 +99,10 @@ def build_command_bus(session: Session, dispatcher: ProjectionDispatcher) -> Com
     bus.register(ArchiveGoal, handle_archive_goal)
     bus.register(SubmitInvestmentRequest, handle_submit_request)
     bus.register(CancelInvestmentRequest, handle_cancel_request)
+    bus.register(StartAssessment, handle_start_assessment)
+    bus.register(CompleteAssessment, handle_complete_assessment)
+    bus.register(FailAssessment, handle_fail_assessment)
+    bus.register(AbortAssessment, handle_abort_assessment)
     bus.register(CreateProduct, handle_create_product)
     bus.register(UpdateProduct, handle_update_product)
     bus.register(DeactivateProduct, handle_deactivate_product)
