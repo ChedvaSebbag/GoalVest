@@ -47,6 +47,7 @@ class Product(AggregateRoot):
         self.min_deposit = Decimal(0)
         self.description = ""
         self.status = ""
+        self._document_ids: set[str] = set()
 
     def create(
         self,
@@ -102,6 +103,41 @@ class Product(AggregateRoot):
             metadata,
         )
 
+    def mark_document_indexed(
+        self,
+        *,
+        document_id: str,
+        chunks_count: int,
+        embedding_model: str,
+        metadata: dict | None = None,
+    ) -> None:
+        self._require_document(document_id)
+        if isinstance(chunks_count, bool) or not isinstance(chunks_count, int) or chunks_count < 1:
+            _invalid("מספר הקטעים אינו תקין", "chunksCount", "INVALID_CHUNKS")
+        model = embedding_model.strip()
+        if not model:
+            _invalid("חסר מודל הטמעה", "embeddingModel", "INVALID_MODEL")
+        self._record(
+            "ProductDocumentIndexed",
+            {"document_id": document_id, "chunks_count": chunks_count, "embedding_model": model},
+            metadata,
+        )
+
+    def mark_document_index_failed(self, *, document_id: str, error: str, metadata: dict | None = None) -> None:
+        self._require_document(document_id)
+        message = error.strip()
+        if not message:
+            _invalid("חסר תיאור שגיאה", "error", "INVALID_ERROR")
+        self._record(
+            "ProductDocumentIndexFailed",
+            {"document_id": document_id, "error": message[:300]},
+            metadata,
+        )
+
+    def _require_document(self, document_id: str) -> None:
+        if document_id not in self._document_ids:
+            raise BusinessRuleViolation("המסמך לא נמצא על המוצר", code="DOCUMENT_NOT_FOUND")
+
     def _ensure_active(self) -> None:
         if self.status != "ACTIVE":
             raise BusinessRuleViolation("המוצר מושבת", code="PRODUCT_INACTIVE")
@@ -120,6 +156,9 @@ class Product(AggregateRoot):
             self.status = "INACTIVE"
             return
         if event.event_type == "ProductDocumentUploaded":
+            self._document_ids.add(str(payload["document_id"]))
+            return
+        if event.event_type in {"ProductDocumentIndexed", "ProductDocumentIndexFailed"}:
             return
         raise NotImplementedError(f"Product אינו מטפל ב-{event.event_type}")
 

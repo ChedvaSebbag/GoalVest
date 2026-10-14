@@ -38,6 +38,8 @@ from app.projections.dispatcher import ProjectionDispatcher
 from app.projections.goals import project_goal_archived, project_goal_created, project_goal_updated
 from app.projections.investor_profiles import project_profile_created, project_risk_assessed
 from app.projections.products import (
+    project_document_index_failed,
+    project_document_indexed,
     project_document_uploaded,
     project_product_created,
     project_product_deactivated,
@@ -61,6 +63,8 @@ def build_dispatcher() -> ProjectionDispatcher:
     dispatcher.register("ProductUpdated", project_product_updated)
     dispatcher.register("ProductDeactivated", project_product_deactivated)
     dispatcher.register("ProductDocumentUploaded", project_document_uploaded)
+    dispatcher.register("ProductDocumentIndexed", project_document_indexed)
+    dispatcher.register("ProductDocumentIndexFailed", project_document_index_failed)
     return dispatcher
 
 

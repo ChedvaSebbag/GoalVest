@@ -130,7 +130,7 @@ CREATE TABLE ConsumerCheckpoints (       -- למעקב של ה-Worker וה-Agent
 
 `license_no` נשמר ב-payload של `UserRegistered` ואינו עמודה ב-`rm_users`.
 
-`storage_path` של מסמך הוא שם קובץ יחסי (`{document_id}.pdf` או `.docx`) תחת `DOCUMENT_STORAGE_DIR`, מחוץ לתיקיית הקוד. `index_status` נפתח ב-`PENDING_INDEX`. אירועי `ProductDocumentIndexed` ו-`ProductDocumentIndexFailed` נשארים ל-Worker ואינם נכתבים בהעלאה.
+`storage_path` של מסמך הוא שם קובץ יחסי (`{document_id}.pdf` או `.docx`) תחת `DOCUMENT_STORAGE_DIR`, מחוץ לתיקיית הקוד. `index_status` נפתח ב-`PENDING_INDEX`. אירועי `ProductDocumentIndexed` ו-`ProductDocumentIndexFailed` נכתבים על ידי ה-Indexer, לא בהעלאה. עדכון `ConsumerCheckpoints` ורישום האירוע נעשים באותה טרנזקציה. ההטמעה ב-Chroma היא upsert עם מזהה `{document_id}:{chunk_index}`.
 
 סוגי מוצר (`type`): `HISHTALMUT`, `GEMEL_INVESTMENT`, `SAVINGS_POLICY`, `STOCK`, `ETF`. סינון "סוג אפיק" משתמש בשלושת האפיקים `CAPITAL_MARKET` (מניה ותעודת סל), `HISHTALMUT`, `GEMEL_POLICY` (גמל להשקעה ופוליסת חיסכון). נזילות: `NONE`, `PARTIAL`, `HIGH`. סוגי מסמך: `POLICY_TERMS`, `QUARTERLY_REPORT`, `TAX_RULES`, `MARKET_REPORT`.
 

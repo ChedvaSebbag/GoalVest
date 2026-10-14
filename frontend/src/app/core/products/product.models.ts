@@ -18,6 +18,7 @@ export interface ProductSummary {
   liquidity: string;
   minDeposit: string;
   isActive: boolean;
+  documents?: ProductDocument[];
 }
 
 export interface ProductDocument {

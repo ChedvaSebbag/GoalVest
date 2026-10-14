@@ -113,6 +113,7 @@ export const STATUS_LABELS: Record<string, string> = {
   ARCHIVED: 'בארכיון',
   PENDING_INDEX: 'ממתין',
   INDEXED: 'מוטמע',
+  INDEX_FAILED: 'נכשל',
   ACTIVE: 'פעיל',
   INACTIVE: 'מושבת',
 };

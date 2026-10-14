@@ -86,7 +86,11 @@ if __name__ == "__main__":
     mcp.run()          # stdio
 ```
 
-**הדגמה**: חיבור `goalvest-tools` גם ל-Claude Desktop או ל-MCP Inspector כדי להראות שה-Tools עצמאיים ונגישים לכל לקוח MCP.
+**מימוש**: `mcp_tools/server.py` (FastMCP, stdio). שיעורי המס ב-`mcp_tools/tax_rules.yaml` בלבד. `get_stock_volatility` קורא ל-yfinance ושומר cache של 15 דקות. חיבור ל-MCP Inspector משורש ה-Repo, אחרי הפעלת סביבת ה-backend:
+
+```bash
+npx @modelcontextprotocol/inspector python -m mcp_tools.server
+```
 
 ## 11.3 Skill מ-Skills.sh (דרישה 2)
 

@@ -31,6 +31,13 @@ event_store = sa.Table(
 
 sa.Index("IX_EventStore_Type", event_store.c.event_type, event_store.c.global_position)
 
+consumer_checkpoints = sa.Table(
+    "ConsumerCheckpoints",
+    metadata,
+    sa.Column("consumer_name", sa.Unicode(50), primary_key=True),
+    sa.Column("last_position", sa.BigInteger().with_variant(sa.Integer, "sqlite"), nullable=False),
+)
+
 processed_commands = sa.Table(
     "ProcessedCommands",
     metadata,

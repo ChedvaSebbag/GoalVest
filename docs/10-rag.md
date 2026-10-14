@@ -17,8 +17,8 @@
 2. **ניקוי**: הסרת כותרות/פוטרים חוזרים, נרמול רווחים, שמירה על מספרי סעיפים.
 3. **פיצול**: `RecursiveCharacterTextSplitter`, ‏800 תווים עם חפיפה של 120, עם העדפה לפיצול לפי כותרות וסעיפים.
 4. **הטמעה**: `bge-m3` דרך Ollama, ב-Batches של 32.
-5. **שמירה**: `collection.upsert(ids=f"{document_id}:{i}", ...)`. מחיקה והטמעה מחדש כשמסמך מוחלף.
-6. **אירוע**: `ProductDocumentIndexed` עם מספר ה-chunks.
+5. **שמירה**: `collection.upsert(ids=f"{document_id}:{i}", ...)`. אותם מזהים נכתבים שוב בהרצה חוזרת, בלי כפילויות. מחיקה והטמעה מחדש כשמסמך מוחלף.
+6. **אירוע**: `ProductDocumentIndexed` עם מספר ה-chunks, או `ProductDocumentIndexFailed`. עדכון `ConsumerCheckpoints` ורישום האירוע נעשים באותה טרנזקציה, אחרי ה-upsert.
 
 ## 10.3 חיפוש
 

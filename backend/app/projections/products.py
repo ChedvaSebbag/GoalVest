@@ -93,6 +93,24 @@ def project_document_uploaded(event: Event, session: Session) -> None:
     )
 
 
+def project_document_indexed(event: Event, session: Session) -> None:
+    payload = event.payload
+    session.execute(
+        sa.update(rm_product_documents)
+        .where(rm_product_documents.c.document_id == UUID(str(payload["document_id"])))
+        .values(index_status="INDEXED", chunks_count=int(payload["chunks_count"]))
+    )
+
+
+def project_document_index_failed(event: Event, session: Session) -> None:
+    payload = event.payload
+    session.execute(
+        sa.update(rm_product_documents)
+        .where(rm_product_documents.c.document_id == UUID(str(payload["document_id"])))
+        .values(index_status="INDEX_FAILED", chunks_count=None)
+    )
+
+
 def _institution_name(institution_id: UUID) -> str:
     institution = find_institution(institution_id)
     return institution.name if institution is not None else str(institution_id)

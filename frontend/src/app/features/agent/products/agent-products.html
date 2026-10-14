@@ -21,16 +21,32 @@
   } @else {
     <div class="list">
       @for (item of items(); track item.productId) {
-        <article class="gv-card row">
-          <div>
-            <h2>{{ item.name }}</h2>
-            <p class="gv-muted">{{ productTypeLabel(item.type) }} · {{ item.track }}</p>
+        <article class="gv-card product">
+          <div class="row">
+            <div>
+              <h2>{{ item.name }}</h2>
+              <p class="gv-muted">{{ productTypeLabel(item.type) }} · {{ item.track }}</p>
+            </div>
+            <gv-status-chip [status]="item.isActive ? 'ACTIVE' : 'INACTIVE'" />
+            <div class="gv-actions">
+              <a mat-stroked-button [routerLink]="['/agent/products', item.productId, 'edit']">עריכה</a>
+              <a mat-stroked-button [routerLink]="['/agent/products', item.productId, 'documents']">מסמכים</a>
+            </div>
           </div>
-          <gv-status-chip [status]="item.isActive ? 'ACTIVE' : 'INACTIVE'" />
-          <div class="gv-actions">
-            <a mat-stroked-button [routerLink]="['/agent/products', item.productId, 'edit']">עריכה</a>
-            <a mat-stroked-button [routerLink]="['/agent/products', item.productId, 'documents']">מסמכים</a>
-          </div>
+          @if (item.documents) {
+            @if (item.documents.length === 0) {
+              <p class="gv-muted">אין מסמכים</p>
+            } @else {
+              <ul class="docs">
+                @for (doc of item.documents; track doc.documentId) {
+                  <li>
+                    <span><bdi>{{ doc.fileName }}</bdi></span>
+                    <gv-status-chip [status]="doc.indexStatus" />
+                  </li>
+                }
+              </ul>
+            }
+          }
         </article>
       }
     </div>

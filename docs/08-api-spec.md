@@ -94,7 +94,7 @@
 | GET | `/api/agent/products/{id}/documents` | Query | סטטוס הטמעה | AGENT |
 | GET | `/api/documents/{docId}/download` | Query | הורדת קובץ | מחובר |
 
-`GET /api/products` מחזיר `{ items, page, pageSize, total }`. `pageSize` הוא 20. `sort` בפורמט `field,asc|desc` על `name`, `type`, `track`, `institution`, `return1y`, `return3y`, `return5y`, `feeAssets`, `feeDeposit`, `stdDev`, `riskLevel`, `liquidity`. `type` חוזר על עצמו ומקבל אפיק (`CAPITAL_MARKET`, `HISHTALMUT`, `GEMEL_POLICY`) או סוג מוצר. `q` מחפש בשם, בגוף, במסלול ובסימול. מוצר מושבת לא מופיע בקטלוג. `includeInactive=true` מחזיר לסוכן רק את מוצרי הגוף שלו, כולל מושבתים.
+`GET /api/products` מחזיר `{ items, page, pageSize, total }`. `pageSize` הוא 20. `sort` בפורמט `field,asc|desc` על `name`, `type`, `track`, `institution`, `return1y`, `return3y`, `return5y`, `feeAssets`, `feeDeposit`, `stdDev`, `riskLevel`, `liquidity`. `type` חוזר על עצמו ומקבל אפיק (`CAPITAL_MARKET`, `HISHTALMUT`, `GEMEL_POLICY`) או סוג מוצר. `q` מחפש בשם, בגוף, במסלול ובסימול. מוצר מושבת לא מופיע בקטלוג. `includeInactive=true` מחזיר לסוכן רק את מוצרי הגוף שלו, כולל מושבתים. בתשובה הזו לכל מוצר יש גם `documents[]` עם `documentId`, `fileName`, `docType`, `indexStatus` (`PENDING_INDEX` / `INDEXED` / `INDEX_FAILED`) ו-`chunksCount`.
 
 `GET /api/products/{id}` מחזיר את שדות המוצר, `documents[]` (`documentId`, `fileName`, `docType`, `indexStatus`, `chunksCount`) ו-`agents[]` (`id`, `fullName`). `fit` הוא `null` כל עוד אין הערכת AI למוצר.
 

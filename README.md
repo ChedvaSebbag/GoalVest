@@ -51,3 +51,12 @@ cd frontend && npm start                                       # http://localhos
 cd backend && source .venv/bin/activate && pytest   # SQLite בזיכרון, בלי Somee
 cd frontend && npx ng test --watch=false
 ```
+
+**MCP ו-RAG** (משורש ה-Repo, עם סביבת ה-backend)
+```bash
+source backend/.venv/bin/activate
+npx @modelcontextprotocol/inspector python -m mcp_tools.server
+python -m worker.indexer          # לולאה כל 15 שניות
+python -m worker.indexer --once   # הרצה אחת
+python -m worker.index_knowledge  # seed/knowledge אל knowledge_base
+```

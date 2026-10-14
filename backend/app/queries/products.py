@@ -72,9 +72,15 @@ def list_products(
         .order_by(*_order(sort))
         .offset((page - 1) * size)
         .limit(size)
-    ).mappings()
+    ).mappings().all()
+    items = [_summary(row) for row in rows]
+    own_catalog = include_inactive and viewer_role == "AGENT" and viewer_institution is not None
+    if own_catalog:
+        grouped = _documents_by_product(session, [UUID(item["productId"]) for item in items])
+        for item in items:
+            item["documents"] = grouped.get(item["productId"], [])
     return {
-        "items": [_summary(row) for row in rows],
+        "items": items,
         "page": page,
         "pageSize": size,
         "total": int(total),
@@ -207,6 +213,20 @@ def _summary(row) -> dict:
         "minDeposit": _decimal(row["min_deposit"]),
         "isActive": bool(row["is_active"]),
     }
+
+
+def _documents_by_product(session: Session, product_ids: list[UUID]) -> dict[str, list[dict]]:
+    if not product_ids:
+        return {}
+    rows = session.execute(
+        sa.select(rm_product_documents)
+        .where(rm_product_documents.c.product_id.in_(product_ids))
+        .order_by(rm_product_documents.c.uploaded_at.asc())
+    ).mappings()
+    grouped: dict[str, list[dict]] = {}
+    for row in rows:
+        grouped.setdefault(str(row["product_id"]), []).append(_document(row))
+    return grouped
 
 
 def _documents(session: Session, product_id: UUID) -> list[dict]:

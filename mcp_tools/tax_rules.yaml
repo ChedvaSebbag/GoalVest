@@ -1,0 +1,24 @@
+# שיעורים מפושטים להמחשה. יש לאמת מול רשות המסים / משרד האוצר לפני הגשה.
+inflation_default: "0.025"
+notes:
+  - "זו הערכה מפושטת, בלי מס יסף, קיזוז הפסדים או מקרים מיוחדים."
+  - "השיעורים נקראים מקובץ הכללים ויש לאמת אותם מול רשות המסים."
+
+capital_market:
+  real_gain_tax_rate: "0.25"
+
+hishtalmut:
+  lockup_years: "6"
+  reduced_lockup:
+    from_age: 60
+    years: "3"
+  exemption_ceiling: null
+  post_lockup_tax_rate: "0.25"
+  early_withdrawal_tax_rate: "0.25"
+
+gemel_lehashkaa:
+  annuity_age: 60
+  lump_sum_tax_rate: "0.25"
+
+savings_policy:
+  real_gain_tax_rate: "0.25"

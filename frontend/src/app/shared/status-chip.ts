@@ -35,6 +35,7 @@ import { STATUS_LABELS } from '../core/investor/investor.models';
     }
     .chip[data-status='CANCELLED'],
     .chip[data-status='FAILED'],
+    .chip[data-status='INDEX_FAILED'],
     .chip[data-status='INACTIVE'] {
       background: color-mix(in srgb, var(--gv-status-cancelled) 16%, white);
       color: var(--gv-status-cancelled);

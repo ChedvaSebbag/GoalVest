@@ -127,6 +127,25 @@ def test_docx_magic_is_accepted():
     assert product.uncommitted_events[0].payload["doc_type"] == "QUARTERLY_REPORT"
 
 
+def test_index_events_require_an_uploaded_document():
+    created = _product()
+    history = list(created.uncommitted_events)
+    product = Product.from_events(history)
+    with pytest.raises(BusinessRuleViolation) as caught:
+        product.mark_document_indexed(document_id="missing", chunks_count=2, embedding_model="bge-m3")
+    assert caught.value.code == "DOCUMENT_NOT_FOUND"
+    product.upload_document(content=b"%PDF-1.4\n", original_name="report.pdf", doc_type="POLICY_TERMS")
+    document_id = product.uncommitted_events[0].payload["document_id"]
+    history.extend(product.uncommitted_events)
+    saved = Product.from_events(history)
+    saved.mark_document_indexed(document_id=document_id, chunks_count=2, embedding_model="bge-m3")
+    indexed = saved.uncommitted_events[0]
+    assert indexed.event_type == "ProductDocumentIndexed"
+    assert indexed.payload["chunks_count"] == 2
+    saved.mark_document_index_failed(document_id=document_id, error="נדרש מסמך עם טקסט")
+    assert saved.uncommitted_events[1].event_type == "ProductDocumentIndexFailed"
+
+
 def test_unknown_institution_is_rejected():
     with pytest.raises(BusinessRuleViolation) as caught:
         Product().create(institution_id=uuid4(), known_institutions=set(), **_fields())

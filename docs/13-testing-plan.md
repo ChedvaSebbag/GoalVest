@@ -57,6 +57,7 @@ def test_cannot_send_offer_with_allocation_not_100():
 | TC-26 | משקיע אחר קורא, מעדכן, מוחק, מבטל או צופה בציר הזמן | 404 | 02 |
 | TC-27 | הגשת בקשה בלי שאלון סיכון | 422 `RISK_PROFILE_REQUIRED` | FR-10, 07 §7.1 |
 | TC-28 | סוכן קורא `GET /api/investor/goals` | 403 | 02 |
+| TC-29 | ה-Indexer נעצר אחרי upsert ולפני commit | הרצה חוזרת שומרת אותם `{document_id}:{i}`, אירוע אחד, וה-checkpoint זז רק איתו | 10, 11 |
 
 ## 13.4 תרחישי E2E (הדגמה)
 
