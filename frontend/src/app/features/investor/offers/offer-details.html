@@ -1,0 +1,55 @@
+<section class="gv-page">
+  <a routerLink="/investor/offers">חזרה להצעות</a>
+
+  @if (offer() === null && !failed()) {
+    <div class="gv-skeleton"></div>
+  } @else if (failed() || offer() === null) {
+    <article class="gv-card">
+      <p class="gv-error" role="alert">לא הצלחנו לטעון את ההצעה.</p>
+      <button type="button" mat-stroked-button (click)="load()">נסה שוב</button>
+    </article>
+  } @else if (offer(); as item) {
+    <header class="head">
+      <h1>{{ item.goalTitle }}</h1>
+      <gv-status-chip [status]="item.status" />
+    </header>
+    <article class="gv-card">
+      <p>{{ item.agentName }} · {{ item.institutionName }}</p>
+      <p class="gv-muted"><bdi>{{ formatDate(item.createdAt) }}</bdi></p>
+      <p>{{ item.message }}</p>
+      <table>
+        <caption class="gv-muted">תמהיל ההצעה</caption>
+        <thead><tr><th>מוצר</th><th>אחוז</th></tr></thead>
+        <tbody>
+          @for (row of item.items; track row.productId) {
+            <tr>
+              <td><a [routerLink]="['/products', row.productId]">{{ row.name || 'מסלול' }}</a></td>
+              <td><bdi>{{ row.percent }}%</bdi></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      @if (message()) {
+        <p class="gv-error" role="alert">{{ message() }}</p>
+      }
+      @if (item.status === 'SENT') {
+        <div class="gv-actions">
+          <button type="button" mat-flat-button [disabled]="busy()" (click)="accept()">קבלת ההצעה</button>
+          <button type="button" mat-stroked-button (click)="declineDialog.showModal()">דחיית ההצעה</button>
+        </div>
+      }
+      <gv-disclaimer />
+    </article>
+
+    <dialog #declineDialog>
+      <form method="dialog">
+        <h2>דחיית ההצעה</h2>
+        <label>סיבה <textarea name="reason" [(ngModel)]="reason"></textarea></label>
+        <div class="gv-actions">
+          <button type="button" mat-flat-button [disabled]="busy()" (click)="decline(declineDialog)">דחייה</button>
+          <button type="submit" mat-stroked-button>ביטול</button>
+        </div>
+      </form>
+    </dialog>
+  }
+</section>

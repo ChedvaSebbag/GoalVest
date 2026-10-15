@@ -1,0 +1,5 @@
+.head { margin-block-end: calc(var(--gv-space) * 3); }
+h1, h2 { margin: 0; color: var(--gv-primary); }
+.list { display: grid; gap: calc(var(--gv-space) * 2); }
+.row { display: flex; justify-content: space-between; align-items: center; gap: var(--gv-space); }
+p { margin: var(--gv-space) 0; }

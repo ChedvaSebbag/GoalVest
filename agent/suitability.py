@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from datetime import date
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 import yaml
@@ -86,6 +86,8 @@ def evaluate(snapshot: dict, *, today: date, rules: dict, tax_rules: dict) -> Su
         prefer.extend(["capital_market", "gemel_policy"])
         flags.append(_flag("LIQUIDITY_NEED", "info", rules["liquidity_text"]))
 
+    _unrealistic(goal, today, rules, flags)
+
     annuity_age = _whole(tax_rules["gemel_lehashkaa"]["annuity_age"])
     birth_year = answers.get("birth_year")
     retirement = goal.get("type") == "RETIREMENT" and isinstance(birth_year, int) and not isinstance(birth_year, bool)
@@ -102,6 +104,36 @@ def evaluate(snapshot: dict, *, today: date, rules: dict, tax_rules: dict) -> Su
         risk_score=int(risk.get("score") or 3),
         penalty=int(rules["severe_penalty"]),
     )
+
+
+def _unrealistic(goal: dict, today: date, rules: dict, flags: list[dict]) -> None:
+    try:
+        initial = Decimal(str(goal.get("initial_amount") or 0))
+        monthly = Decimal(str(goal.get("monthly_deposit") or 0))
+        target = Decimal(str(goal.get("target_amount") or 0))
+        rate = Decimal(str(rules["optimistic_annual_rate"]))
+        ratio = Decimal(str(rules["goal_unrealistic_ratio"]))
+        horizon = _date(goal["target_date"])
+    except (InvalidOperation, KeyError, TypeError, ValueError):
+        return
+    if target <= 0:
+        return
+    days = max((horizon - today).days, 0)
+    years = Decimal(days) / Decimal(365)
+    forecast = (initial * ((Decimal(1) + rate) ** years)) + (monthly * Decimal(12) * years)
+    if forecast >= target * ratio:
+        return
+    shown = forecast.quantize(Decimal(1))
+    flags.append(_flag(
+        "GOAL_UNREALISTIC",
+        "high",
+        str(rules["goal_unrealistic_text"]).format(
+            rate=f"{int((rate * 100).quantize(Decimal(1)))}%",
+            percent=f"{int((ratio * 100).quantize(Decimal(1)))}%",
+            forecast=int(shown),
+            target=int(target.quantize(Decimal(1))),
+        ),
+    ))
 
 
 def _flag(code: str, severity: str, text: str) -> dict:

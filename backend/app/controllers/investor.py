@@ -9,12 +9,14 @@ from app.auth.require_role import require_role
 from app.bootstrap import build_command_bus
 from app.commands.goals import ArchiveGoal, CreateGoal, GoalData, UpdateGoal
 from app.commands.investor_profile import AssessRiskProfile, CreateInvestorProfile
+from app.commands.offers import AcceptOffer, DeclineOffer
 from app.controllers.errors import error_response, rule_response
 from app.controllers.http import actor_id, command_id, correlation_id, missing_command_id, parse_body
 from app.infrastructure.db import get_db
-from app.investor.schemas import GoalBody, GoalUpdateBody, ProfileBody, RiskBody
-from app.queries.goals import get_goal, list_goals
+from app.investor.schemas import GoalBody, GoalUpdateBody, ProfileBody, ReasonBody, RiskBody
+from app.queries.goals import get_goal, investor_dashboard, list_goals
 from app.queries.investor_profiles import get_profile
+from app.queries.offers import get_offer, list_offers
 
 investor_bp = Blueprint("investor", __name__)
 
@@ -139,6 +141,62 @@ def delete_goal(goal_id: UUID):
         command_id=key,
         actor_id=actor_id(),
         goal_id=goal_id,
+        reason=reason,
+        correlation_id=correlation_id(),
+    ))
+
+
+@investor_bp.get("/investor/dashboard")
+@require_role("INVESTOR")
+def read_dashboard():
+    return jsonify(investor_dashboard(get_db(), actor_id()))
+
+
+@investor_bp.get("/investor/offers")
+@require_role("INVESTOR")
+def read_offers():
+    return jsonify(list_offers(get_db(), actor_id()))
+
+
+@investor_bp.get("/investor/offers/<uuid:offer_id>")
+@require_role("INVESTOR")
+def read_offer(offer_id: UUID):
+    offer = get_offer(get_db(), offer_id, actor_id())
+    if offer is None:
+        return error_response(404, "NOT_FOUND", "הפריט לא נמצא")
+    return jsonify(offer)
+
+
+@investor_bp.post("/investor/offers/<uuid:offer_id>/accept")
+@require_role("INVESTOR")
+def accept_offer(offer_id: UUID):
+    key = command_id()
+    if key is None:
+        return missing_command_id()
+    return _dispatch(AcceptOffer(
+        command_id=key,
+        actor_id=actor_id(),
+        offer_id=offer_id,
+        correlation_id=correlation_id(),
+    ))
+
+
+@investor_bp.post("/investor/offers/<uuid:offer_id>/decline")
+@require_role("INVESTOR")
+def decline_offer(offer_id: UUID):
+    key = command_id()
+    if key is None:
+        return missing_command_id()
+    reason = ""
+    if request.get_json(silent=True) is not None:
+        body, error = parse_body(ReasonBody)
+        if error is not None:
+            return error
+        reason = body.reason
+    return _dispatch(DeclineOffer(
+        command_id=key,
+        actor_id=actor_id(),
+        offer_id=offer_id,
         reason=reason,
         correlation_id=correlation_id(),
     ))

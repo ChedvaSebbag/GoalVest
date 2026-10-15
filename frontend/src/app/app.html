@@ -3,8 +3,16 @@
   <span class="tagline">השקעות מבוססות-מטרות</span>
   <span class="spacer"></span>
   <a routerLink="/system">מצב המערכת</a>
-  @if (user()) {
-    <a routerLink="/products">השוואת מוצרים</a>
+  @if (user(); as current) {
+    @if (current.role === 'INVESTOR') {
+      <a routerLink="/investor" routerLinkActive="active">היעדים שלי</a>
+      <a routerLink="/investor/offers" routerLinkActive="active">הצעות</a>
+      <gv-notification-bell />
+    } @else if (current.role === 'AGENT') {
+      <a routerLink="/agent" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">דשבורד</a>
+      <a routerLink="/agent/products" routerLinkActive="active">המוצרים שלי</a>
+    }
+    <a routerLink="/products" routerLinkActive="active">השוואת מוצרים</a>
     <button type="button" (click)="logout()">התנתקות</button>
   }
 </mat-toolbar>

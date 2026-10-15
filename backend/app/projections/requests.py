@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.infrastructure.serialization import to_naive_utc
 from app.infrastructure.tables import event_store, rm_assessments, rm_goals, rm_request_timeline, rm_requests
+from app.projections.leads import sync_lead_status, sync_leads_after_assessment
 from app.projections.values import as_json
 
 
@@ -51,18 +52,30 @@ def project_request_cancelled(event: Event, session: Session) -> None:
         .where(rm_goals.c.active_request_id == event.aggregate_id)
         .values(active_request_id=None, updated_at=occurred)
     )
+    sync_lead_status(session, event.aggregate_id, "CANCELLED", occurred)
     _timeline(session, event, _cancel_text(event.payload.get("reason") or ""))
 
 
 def project_assessment_started(event: Event, session: Session) -> None:
     _touch(session, event, status="AI_PROCESSING", retry_at=None)
+    sync_lead_status(session, event.aggregate_id, "AI_PROCESSING", to_naive_utc(event.occurred_at))
     _timeline(session, event, "ההערכה האוטומטית התחילה", actor="סוכן AI")
 
 
 def project_assessment_completed(event: Event, session: Session) -> None:
     occurred = to_naive_utc(event.occurred_at)
     score = event.payload.get("overall_score")
-    _touch(session, event, status="AI_EVALUATED", overall_score=score, retry_at=None)
+    _touch(
+        session,
+        event,
+        status="AI_EVALUATED",
+        overall_score=score,
+        retry_at=None,
+        claimed_by=None,
+        institution_id=None,
+        assessment_review=None,
+        assessment_note=None,
+    )
     session.execute(
         sa.insert(rm_assessments).values(
             request_id=event.aggregate_id,
@@ -71,6 +84,7 @@ def project_assessment_completed(event: Event, session: Session) -> None:
             created_at=occurred,
         )
     )
+    sync_leads_after_assessment(session, event)
     _timeline(session, event, "ההערכה האוטומטית הושלמה", actor="סוכן AI")
 
 
@@ -78,12 +92,14 @@ def project_assessment_failed(event: Event, session: Session) -> None:
     attempt = int(event.payload["attempt"])
     status = "FAILED" if attempt >= 3 else "SUBMITTED"
     _touch(session, event, status=status, retry_at=_retry(event.payload.get("retry_at")))
+    sync_lead_status(session, event.aggregate_id, status, to_naive_utc(event.occurred_at))
     text = "ההערכה נכשלה" if status == "FAILED" else "ההערכה לא הושלמה ותחזור לתור"
     _timeline(session, event, text, actor="סוכן AI")
 
 
 def project_assessment_aborted(event: Event, session: Session) -> None:
     _touch(session, event, status="SUBMITTED", retry_at=None)
+    sync_lead_status(session, event.aggregate_id, "SUBMITTED", to_naive_utc(event.occurred_at))
     _timeline(session, event, "ההערכה הופסקה בגלל תקלת תשתית ותחזור לתור", actor="סוכן AI")
 
 

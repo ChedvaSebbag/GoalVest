@@ -1,0 +1,35 @@
+<section class="gv-page">
+  <header class="head">
+    <h1>הצעות שקיבלתי</h1>
+  </header>
+
+  @if (offers() === null) {
+    <div class="gv-skeleton"></div>
+  } @else if (failed()) {
+    <article class="gv-card">
+      <p class="gv-error" role="alert">לא הצלחנו לטעון את ההצעות.</p>
+      <button type="button" mat-stroked-button (click)="load()">נסה שוב</button>
+    </article>
+  } @else if (offers()?.length === 0) {
+    <article class="gv-card">
+      <h2>עדיין אין הצעות</h2>
+      <p class="gv-muted">כשסוכן ישלח הצעה היא תופיע כאן.</p>
+      <a mat-stroked-button routerLink="/investor">חזרה ליעדים</a>
+    </article>
+  } @else {
+    <div class="list">
+      @for (offer of offers(); track offer.offerId) {
+        <article class="gv-card">
+          <div class="row">
+            <h2>{{ offer.goalTitle }}</h2>
+            <gv-status-chip [status]="offer.status" />
+          </div>
+          <p>{{ offer.agentName }} · {{ offer.institutionName }}</p>
+          <p class="gv-muted"><bdi>{{ formatDate(offer.createdAt) }}</bdi></p>
+          <a mat-stroked-button [routerLink]="['/investor/offers', offer.offerId]">לפרטים</a>
+        </article>
+      }
+    </div>
+  }
+  <gv-disclaimer />
+</section>

@@ -25,7 +25,12 @@ import { STATUS_LABELS } from '../core/investor/investor.models';
       background: color-mix(in srgb, var(--gv-status-review) 16%, white);
       color: var(--gv-status-review);
     }
-    .chip[data-status='OFFER_SENT'] {
+    .chip[data-status='REEVALUATION_REQUESTED'] {
+      background: color-mix(in srgb, var(--gv-status-processing) 16%, white);
+      color: var(--gv-status-processing);
+    }
+    .chip[data-status='OFFER_SENT'],
+    .chip[data-status='SENT'] {
       background: color-mix(in srgb, var(--gv-status-offer) 16%, white);
       color: var(--gv-status-offer);
     }
@@ -33,6 +38,7 @@ import { STATUS_LABELS } from '../core/investor/investor.models';
       background: color-mix(in srgb, var(--gv-status-accepted) 16%, white);
       color: var(--gv-status-accepted);
     }
+    .chip[data-status='DECLINED'],
     .chip[data-status='CANCELLED'],
     .chip[data-status='FAILED'],
     .chip[data-status='INDEX_FAILED'],

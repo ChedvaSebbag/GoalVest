@@ -1,0 +1,10 @@
+.head { display: flex; justify-content: space-between; align-items: center; gap: var(--gv-space); margin-block: calc(var(--gv-space) * 2); }
+h1, h2 { margin: 0; color: var(--gv-primary); }
+table { width: 100%; border-collapse: collapse; margin-block-start: calc(var(--gv-space) * 2); }
+th, td { text-align: start; padding: var(--gv-space); border-block-end: 1px solid var(--gv-skeleton); }
+caption { text-align: start; }
+a { color: var(--gv-primary); }
+dialog { border: 0; border-radius: var(--gv-radius); box-shadow: var(--gv-shadow); padding: calc(var(--gv-space) * 3); width: min(28rem, calc(100% - 2rem)); }
+dialog::backdrop { background: color-mix(in srgb, var(--gv-text) 40%, transparent); }
+label { display: flex; flex-direction: column; gap: 4px; margin-block: var(--gv-space); }
+textarea { font: inherit; padding: var(--gv-space); border: 1px solid var(--gv-skeleton); border-radius: 8px; }

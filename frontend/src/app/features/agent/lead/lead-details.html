@@ -1,0 +1,156 @@
+<section class="gv-page lead">
+  <a routerLink="/agent">חזרה לדשבורד</a>
+
+  @if (lead() === null && !failed()) {
+    <div class="gv-skeleton"></div>
+    <div class="gv-skeleton"></div>
+  } @else if (failed() || lead() === null) {
+    <article class="gv-card">
+      <p class="gv-error" role="alert">לא הצלחנו לטעון את הליד.</p>
+      <button type="button" mat-stroked-button (click)="load()">נסה שוב</button>
+    </article>
+  } @else if (lead(); as item) {
+    <header class="head">
+      <h1>{{ item.goal.title }}</h1>
+      <gv-status-chip [status]="item.status" />
+    </header>
+    @if (message()) {
+      <p class="gv-error" role="alert">{{ message() }}</p>
+    }
+
+    <div class="layout">
+      <article class="gv-card">
+        <h2>המשקיע והיעד</h2>
+        <p>{{ item.investor.displayName }}</p>
+        @if (item.investor.email) {
+          <p>אימייל <bdi>{{ item.investor.email }}</bdi></p>
+        }
+        @if (item.investor.phone) {
+          <p>טלפון <bdi>{{ item.investor.phone }}</bdi></p>
+        }
+        <p>{{ goalTypeLabel(item.goal.type) }}</p>
+        <p>סכום יעד <bdi>{{ item.goal.targetAmount | money }}</bdi></p>
+        <p>הון התחלתי <bdi>{{ item.goal.initialAmount | money }}</bdi></p>
+        <p>הפקדה חודשית <bdi>{{ item.goal.monthlyDeposit | money }}</bdi></p>
+        <p>מועד יעד <bdi>{{ formatDate(item.goal.targetDate) }}</bdi></p>
+        <p>טווח <bdi>{{ item.goal.horizonYears }}</bdi> שנים</p>
+        <p>פרופיל סיכון {{ item.goal.riskLabel }} <bdi>{{ item.goal.riskScore }}</bdi></p>
+        @if (item.review.status) {
+          <p>בדיקת ההערכה: {{ item.review.status === 'approved' ? 'אושרה' : 'נדחתה' }}</p>
+          @if (item.review.note) { <p>{{ item.review.note }}</p> }
+        }
+      </article>
+
+      <article class="gv-card">
+        <h2>הערכת AI</h2>
+        @if (item.assessment) {
+          <gv-assessment-card [assessment]="item.assessment" />
+          <details>
+            <summary>פרטים טכניים</summary>
+            <p>מודל <bdi>{{ item.assessment.model || '—' }}</bdi></p>
+            <p>זמן ריצה <bdi>{{ item.assessment.durationMs ?? '—' }}</bdi> מילישניות</p>
+          </details>
+        } @else {
+          <p class="gv-muted">אין הערכה להצגה.</p>
+        }
+      </article>
+
+      <article class="gv-card actions">
+        <h2>פעולות</h2>
+        @if (item.status === 'AI_EVALUATED') {
+          <button type="button" mat-flat-button [disabled]="busy()" (click)="claim()">קח ליד</button>
+        }
+        @if (item.status === 'IN_REVIEW' && item.claimedByMe) {
+          <button type="button" mat-stroked-button (click)="approveDialog.showModal()">אשר הערכה</button>
+          <button type="button" mat-stroked-button (click)="rejectDialog.showModal()">דחה הערכה</button>
+          <button type="button" mat-stroked-button (click)="reevaluateDialog.showModal()">בקש הערכה מחדש</button>
+          <button type="button" mat-flat-button (click)="offerDialog.showModal()">שלח הצעה</button>
+        }
+        @if (item.status !== 'AI_EVALUATED' && !(item.status === 'IN_REVIEW' && item.claimedByMe)) {
+          <p class="gv-muted">אין פעולה זמינה בסטטוס הזה.</p>
+        }
+      </article>
+    </div>
+
+    <article class="gv-card timeline">
+      <h2>ציר זמן</h2>
+      @if (item.timeline.length === 0) {
+        <p class="gv-muted">עדיין אין אירועים.</p>
+      } @else {
+        <ol>
+          @for (event of item.timeline; track event.occurredAt + event.eventType) {
+            <li>
+              <strong>{{ event.displayText }}</strong>
+              <span>{{ event.actor }} · <bdi>{{ formatDate(event.occurredAt) }}</bdi></span>
+            </li>
+          }
+        </ol>
+      }
+    </article>
+
+    <dialog #approveDialog>
+      <form method="dialog">
+        <h3>אישור הערכה</h3>
+        <label>הערה <textarea name="note" [(ngModel)]="note"></textarea></label>
+        <div class="gv-actions">
+          <button type="button" mat-flat-button [disabled]="busy()" (click)="approve(approveDialog)">אישור</button>
+          <button type="submit" mat-stroked-button>ביטול</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog #rejectDialog>
+      <form method="dialog">
+        <h3>דחיית הערכה</h3>
+        <label>הערה <textarea name="rejectNote" [(ngModel)]="note" required></textarea></label>
+        <div class="gv-actions">
+          <button type="button" mat-flat-button [disabled]="busy()" (click)="reject(rejectDialog)">דחייה</button>
+          <button type="submit" mat-stroked-button>ביטול</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog #reevaluateDialog>
+      <form method="dialog">
+        <h3>בקשת הערכה מחדש</h3>
+        <label>סיבה <textarea name="reason" [(ngModel)]="reason" required></textarea></label>
+        <div class="gv-actions">
+          <button type="button" mat-flat-button [disabled]="busy()" (click)="reevaluate(reevaluateDialog)">שליחה</button>
+          <button type="submit" mat-stroked-button>ביטול</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog #offerDialog>
+      <form method="dialog">
+        <h3>שליחת הצעה</h3>
+        @for (row of offerItems(); track $index) {
+          <div class="offer-row">
+            <label>
+              מוצר
+              <select [ngModel]="row.productId" (ngModelChange)="updateOffer($index, { productId: $event })" [name]="'product' + $index">
+                <option value="">בחירה</option>
+                @for (product of item.products; track product.productId) {
+                  <option [value]="product.productId">{{ product.name }}</option>
+                }
+              </select>
+            </label>
+            <label>
+              אחוז
+              <input type="number" min="1" max="100" [ngModel]="row.percent" (ngModelChange)="updateOffer($index, { percent: $event === '' ? null : +$event })" [name]="'percent' + $index" />
+            </label>
+            @if (offerItems().length > 1) {
+              <button type="button" (click)="removeOfferRow($index)" [attr.aria-label]="'הסרת מוצר ' + ($index + 1)">הסרה</button>
+            }
+          </div>
+        }
+        <p>סכום <bdi>{{ offerSum() }}%</bdi></p>
+        @if (offerItems().length < 3) {
+          <button type="button" mat-stroked-button (click)="addOfferRow()">הוספת מוצר</button>
+        }
+        <label>הודעה <textarea name="offerMessage" [(ngModel)]="offerMessage" required></textarea></label>
+        <div class="gv-actions">
+          <button type="button" mat-flat-button [disabled]="busy()" (click)="sendOffer(offerDialog)">שליחה</button>
+          <button type="submit" mat-stroked-button>ביטול</button>
+        </div>
+      </form>
+    </dialog>
+  }
+</section>

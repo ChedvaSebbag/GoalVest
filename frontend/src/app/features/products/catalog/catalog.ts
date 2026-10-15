@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSortModule, Sort } from '@angular/material/sort';
@@ -46,6 +46,7 @@ function hebrewPaginator(): MatPaginatorIntl {
 export class Catalog {
   private readonly queries = inject(ProductQueriesService);
   private readonly authQueries = inject(AuthQueriesService);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly channels = CHANNELS;
   protected readonly liquidityOptions = LIQUIDITY_OPTIONS;
@@ -66,7 +67,7 @@ export class Catalog {
   protected readonly selected = signal<ProductSummary[]>([]);
   protected readonly compareOpen = signal(false);
 
-  protected q = '';
+  protected q = this.route.snapshot.queryParamMap.get('q') ?? '';
   protected selectedTypes = new Set<string>();
   protected riskMin: number | null = null;
   protected riskMax: number | null = null;

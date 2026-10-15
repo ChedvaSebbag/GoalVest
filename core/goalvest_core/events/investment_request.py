@@ -48,6 +48,95 @@ class AIAssessmentFailed:
 
 
 @dataclass(frozen=True)
+class LeadClaimed:
+    agent_id: str
+    institution_id: str
+    event_type: str = "LeadClaimed"
+    schema_version: int = 1
+
+    def payload(self) -> dict:
+        return {"agent_id": self.agent_id, "institution_id": self.institution_id}
+
+
+@dataclass(frozen=True)
+class AssessmentApproved:
+    agent_id: str
+    note: str | None = None
+    event_type: str = "AssessmentApproved"
+    schema_version: int = 1
+
+    def payload(self) -> dict:
+        body = {"agent_id": self.agent_id}
+        if self.note:
+            body["note"] = self.note
+        return body
+
+
+@dataclass(frozen=True)
+class AssessmentRejected:
+    agent_id: str
+    note: str
+    event_type: str = "AssessmentRejected"
+    schema_version: int = 1
+
+    def payload(self) -> dict:
+        return {"agent_id": self.agent_id, "note": self.note}
+
+
+@dataclass(frozen=True)
+class ReevaluationRequested:
+    agent_id: str
+    reason: str
+    event_type: str = "ReevaluationRequested"
+    schema_version: int = 1
+
+    def payload(self) -> dict:
+        return {"agent_id": self.agent_id, "reason": self.reason}
+
+
+@dataclass(frozen=True)
+class OfferSent:
+    offer_id: str
+    agent_id: str
+    items: list
+    message: str
+    event_type: str = "OfferSent"
+    schema_version: int = 1
+
+    def payload(self) -> dict:
+        return {
+            "offer_id": self.offer_id,
+            "agent_id": self.agent_id,
+            "items": list(self.items),
+            "message": self.message,
+        }
+
+
+@dataclass(frozen=True)
+class OfferAccepted:
+    offer_id: str
+    event_type: str = "OfferAccepted"
+    schema_version: int = 1
+
+    def payload(self) -> dict:
+        return {"offer_id": self.offer_id}
+
+
+@dataclass(frozen=True)
+class OfferDeclined:
+    offer_id: str
+    reason: str | None = None
+    event_type: str = "OfferDeclined"
+    schema_version: int = 1
+
+    def payload(self) -> dict:
+        body = {"offer_id": self.offer_id}
+        if self.reason:
+            body["reason"] = self.reason
+        return body
+
+
+@dataclass(frozen=True)
 class AssessmentAborted:
     reason: str
     attempt_not_counted: bool = True

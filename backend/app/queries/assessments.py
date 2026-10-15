@@ -16,13 +16,16 @@ _CHANNEL_KEYS = (
 )
 
 
+QUEUED_STATUSES = ("SUBMITTED", "REEVALUATION_REQUESTED")
+
+
 def pending_requests(session: Session, now: datetime, limit: int = 3) -> list[dict]:
     moment = to_naive_utc(now)
     version = _version()
     rows = session.execute(
         _columns(version)
         .where(
-            rm_requests.c.status == "SUBMITTED",
+            rm_requests.c.status.in_(QUEUED_STATUSES),
             sa.or_(rm_requests.c.retry_at.is_(None), rm_requests.c.retry_at <= moment),
         )
         .order_by(rm_requests.c.updated_at)
@@ -85,6 +88,8 @@ def assessment_view(session: Session, request_id: UUID, review: str | None) -> d
             if isinstance(source, dict)
         ],
         "pendingReview": review is None,
+        "model": payload.get("model"),
+        "durationMs": payload.get("duration_ms"),
     }
 
 

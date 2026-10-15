@@ -119,12 +119,91 @@ rm_requests = sa.Table(
     sa.Column("claimed_by", sa.Uuid),
     sa.Column("institution_id", sa.Uuid),
     sa.Column("assessment_review", sa.Unicode(20)),
+    sa.Column("assessment_note", sa.Unicode(500)),
     sa.Column("created_at", sa.DateTime(timezone=False), nullable=False),
     sa.Column("updated_at", sa.DateTime(timezone=False), nullable=False),
     sa.Column("retry_at", sa.DateTime(timezone=False)),
 )
 
 sa.Index("IX_rm_requests_goal", rm_requests.c.goal_id)
+
+rm_leads = sa.Table(
+    "rm_leads",
+    metadata,
+    sa.Column("request_id", sa.Uuid, primary_key=True),
+    sa.Column("institution_id", sa.Uuid, primary_key=True),
+    sa.Column("investor_id", sa.Uuid, nullable=False),
+    sa.Column("investor_display_name", sa.Unicode(200), nullable=False),
+    sa.Column("goal_type", sa.Unicode(30), nullable=False),
+    sa.Column("goal_title", sa.Unicode(200), nullable=False),
+    sa.Column("amount", sa.Numeric(18, 2), nullable=False),
+    sa.Column("horizon_years", sa.Integer, nullable=False),
+    sa.Column("risk_label", sa.Unicode(40), nullable=False),
+    sa.Column("ai_score", sa.Integer),
+    sa.Column("status", sa.Unicode(30), nullable=False),
+    sa.Column("is_new", sa.Boolean, nullable=False),
+    sa.Column("created_at", sa.DateTime(timezone=False), nullable=False),
+    sa.Column("updated_at", sa.DateTime(timezone=False), nullable=False),
+)
+
+sa.Index("IX_rm_leads_institution", rm_leads.c.institution_id, rm_leads.c.status)
+
+rm_agent_kpis = sa.Table(
+    "rm_agent_kpis",
+    metadata,
+    sa.Column("institution_id", sa.Uuid, primary_key=True),
+    sa.Column("evaluated_count", sa.Integer, nullable=False),
+    sa.Column("in_review_count", sa.Integer, nullable=False),
+    sa.Column("offer_sent_count", sa.Integer, nullable=False),
+    sa.Column("offers_sent", sa.Integer, nullable=False),
+    sa.Column("offers_accepted", sa.Integer, nullable=False),
+    sa.Column("avg_ai_score", sa.Numeric(6, 1)),
+    sa.Column("updated_at", sa.DateTime(timezone=False), nullable=False),
+)
+
+rm_agent_product_interest = sa.Table(
+    "rm_agent_product_interest",
+    metadata,
+    sa.Column("product_id", sa.Uuid, primary_key=True),
+    sa.Column("institution_id", sa.Uuid, nullable=False),
+    sa.Column("recommended_count", sa.Integer, nullable=False),
+    sa.Column("offers_count", sa.Integer, nullable=False),
+    sa.Column("accepted_count", sa.Integer, nullable=False),
+)
+
+sa.Index("IX_rm_agent_product_interest_institution", rm_agent_product_interest.c.institution_id)
+
+rm_offers = sa.Table(
+    "rm_offers",
+    metadata,
+    sa.Column("offer_id", sa.Uuid, primary_key=True),
+    sa.Column("request_id", sa.Uuid, nullable=False),
+    sa.Column("investor_id", sa.Uuid, nullable=False),
+    sa.Column("agent_id", sa.Uuid, nullable=False),
+    sa.Column("institution_id", sa.Uuid, nullable=False),
+    sa.Column("items_json", sa.UnicodeText, nullable=False),
+    sa.Column("message", sa.UnicodeText, nullable=False),
+    sa.Column("status", sa.Unicode(20), nullable=False),
+    sa.Column("created_at", sa.DateTime(timezone=False), nullable=False),
+    sa.Column("updated_at", sa.DateTime(timezone=False), nullable=False),
+)
+
+sa.Index("IX_rm_offers_investor", rm_offers.c.investor_id, rm_offers.c.status)
+sa.Index("IX_rm_offers_institution", rm_offers.c.institution_id)
+
+rm_notifications = sa.Table(
+    "rm_notifications",
+    metadata,
+    sa.Column("notification_id", sa.Uuid, primary_key=True),
+    sa.Column("user_id", sa.Uuid, nullable=False),
+    sa.Column("title", sa.Unicode(200), nullable=False),
+    sa.Column("body", sa.Unicode(1000), nullable=False),
+    sa.Column("link", sa.Unicode(300), nullable=False),
+    sa.Column("is_read", sa.Boolean, nullable=False),
+    sa.Column("created_at", sa.DateTime(timezone=False), nullable=False),
+)
+
+sa.Index("IX_rm_notifications_user", rm_notifications.c.user_id, rm_notifications.c.is_read)
 
 rm_assessments = sa.Table(
     "rm_assessments",

@@ -179,6 +179,21 @@ def test_lockup_caps_hishtalmut_without_an_existing_fund():
     assert "hishtalmut" not in kept.score_caps
 
 
+def test_unrealistic_goal_adds_a_severe_numeric_flag():
+    snapshot = _snapshot(years=2)
+    snapshot["goal"]["target_amount"] = "2000000.00"
+    snapshot["goal"]["initial_amount"] = "10000.00"
+    snapshot["goal"]["monthly_deposit"] = "100.00"
+    result = evaluate(snapshot, today=TODAY, rules=load_rules(), tax_rules=load_tax_rules())
+    flag = next(item for item in result.flags if item["code"] == "GOAL_UNREALISTIC")
+    assert flag["severity"] == "high"
+    assert "8%" in flag["text"]
+    assert "70%" in flag["text"]
+    assert "2000000" in flag["text"]
+    ordinary = _rules()
+    assert all(item["code"] != "GOAL_UNREALISTIC" for item in ordinary.flags)
+
+
 def test_excluded_capital_market_is_zero():
     result = evaluate(
         _snapshot(excluded=["CAPITAL_MARKET"]),

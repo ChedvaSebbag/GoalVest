@@ -73,6 +73,7 @@
 `GET /api/investor/goals/{id}` מוסיף `assessment`. בלי הערכה שהושלמה הערך הוא `null`. כשיש שורה ב-`rm_assessments` חוזרים `overallScore`, `channelScores` ו-`allocation` (מפתחות `capitalMarket`, `hishtalmut`, `gemelPolicy`), `recommendedProducts` (`productId`, `name`, `fitScore`, `reason`), `rationale`, `riskFlags` (`code`, `severity`, `text`), `sources` (`type`, `title`, `url`, `excerpt`) ו-`pendingReview`. `pendingReview` הוא `true` כל עוד `assessment_review` ריק, והמסך מציג «טרם נבדק על ידי סוכן».
 | GET | `/api/investor/dashboard` | Query | KPI, יעדים, תמהיל, מסלולים מומלצים |
 | GET | `/api/investor/offers` | Query | הצעות שהתקבלו |
+| GET | `/api/investor/offers/{offerId}` | Query | פרטי הצעה |
 | POST | `/api/investor/offers/{offerId}/accept` | Command | קבלה |
 | POST | `/api/investor/offers/{offerId}/decline` | Command | דחייה `{ reason? }` |
 | GET | `/api/investor/portfolio` | Query | אחזקות + שווי נוכחי |
@@ -154,3 +155,7 @@ Content-Type: application/json
 ```
 
 חוקים שנבדקים ב-Aggregate: הליד בסטטוס `IN_REVIEW` ומשויך לסוכן הזה, כל המוצרים פעילים ושייכים לגוף של הסוכן, סכום האחוזים 100, 1–3 מוצרים.
+
+סוכן רואה רק לידים של הגוף שלו. ליד של גוף אחר, או בקשה בלי מוצר של הגוף בהמלצה, מחזירים 404. כשאין הסכמה לשיתוף פרטים השם הוא «משקיע אנונימי», בלי אימייל ובלי טלפון. דחיית הערכה בלי הערה מחזירה 400. סכום אחוזים שאינו 100 מחזיר 422 `ALLOCATION_NOT_100`.
+
+`AIAssessmentCompleted` יוצר שורת ליד לכל גוף שיש לו מוצר בהמלצה. `python -m scripts.rebuild_leads` (מתוך `backend`) בונה מחדש לידים, מדדי סוכן וספירת המלצות מההערכות וההצעות שכבר שמורות, בלי לגעת ב-Event Store.
