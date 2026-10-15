@@ -3,7 +3,7 @@
 #  GoalVest – הפעלת כל המערכת בפקודה אחת
 #
 #  הפעלה רגילה:          bash dev.sh
-#  אחרי git pull / שינוי: bash dev.sh --setup   (התקנות + מיגרציות)
+#  אחרי git pull / שינוי: bash dev.sh --setup   (התקנות + מיגרציות + בניית לידים)
 #  עצירה של הכול:        Ctrl + C
 # ============================================================
 set -u
@@ -67,6 +67,8 @@ source backend/.venv/bin/activate
 if [ "${1:-}" = "--setup" ]; then
   echo "📦 מתקינה תלויות ומריצה מיגרציות..."
   (cd backend && pip install -q -r requirements.txt && python -m scripts.migrate) || { echo "✗ ההתקנה בשרת נכשלה"; exit 1; }
+  echo "🔁 בונה מחדש את טבלאות הלידים מהאירועים..."
+  (cd backend && python -m scripts.rebuild_leads) || echo "⚠ בניית הלידים נכשלה – ממשיכה בכל זאת"
   (cd frontend && (npm install --silent || npx -y npm@11 install)) || { echo "✗ npm install נכשל"; exit 1; }
 fi
 
