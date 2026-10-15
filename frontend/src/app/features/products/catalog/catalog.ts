@@ -52,10 +52,9 @@ export class Catalog {
 
   protected readonly channels = CHANNELS;
   protected readonly liquidityOptions = LIQUIDITY_OPTIONS;
-  protected readonly columns = [
-    'select', 'type', 'name', 'institution', 'track',
-    'return1y', 'return3y', 'return5y', 'feeAssets', 'feeDeposit', 'stdDev', 'liquidity', 'riskLevel',
-  ];
+  /** טבלה מצומצמת: הפרטים המלאים בהשוואה ובדף המוצר */
+  protected readonly columns = ['select', 'name', 'return1y', 'return3y', 'return5y', 'feeAssets', 'riskLevel'];
+  protected readonly advanced = signal(false);
   protected readonly productTypeLabel = productTypeLabel;
   protected readonly liquidityLabel = liquidityLabel;
   protected readonly riskLabel = riskLabel;
@@ -171,6 +170,13 @@ export class Catalog {
 
   protected openCompare(): void {
     this.compareOpen.set(true);
+    setTimeout(() => document.getElementById('compare')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  }
+
+  /** האם למוצר יש את הערך הנמוך ביותר בין המוצרים שנבחרו (למשל דמי ניהול) */
+  protected isBest(product: ProductSummary, key: 'feeAssets'): boolean {
+    const values = this.selected().map((item) => Number(item[key]));
+    return Number(product[key]) === Math.min(...values);
   }
 
   protected signedClass(value: string): string {

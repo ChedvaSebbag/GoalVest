@@ -1,52 +1,60 @@
 <section class="gv-page">
-  <header class="head">
-    <h1>המוצרים שלי</h1>
-    <a mat-flat-button routerLink="/agent/products/new">מוצר חדש</a>
+  <header class="gv-page-head">
+    <div>
+      <h1>המוצרים שלי</h1>
+      <p>מוצרי הגוף שלך. ה-AI ממליץ עליהם למשקיעים, והמסמכים שמעלים כאן משמשים אותו בהערכות.</p>
+    </div>
   </header>
 
   @if (items() === null) {
     <div class="gv-skeleton"></div>
     <div class="gv-skeleton"></div>
   } @else if (failed()) {
-    <article class="gv-card">
-      <p class="gv-error" role="alert">לא הצלחנו לטעון את המוצרים.</p>
-      <button type="button" mat-stroked-button (click)="load()">נסה שוב</button>
+    <article class="gv-card gv-empty">
+      <span class="material-symbols-rounded" aria-hidden="true">cloud_off</span>
+      <h2>לא הצלחנו לטעון את המוצרים</h2>
+      <div class="gv-actions"><button type="button" mat-flat-button (click)="load()">נסה שוב</button></div>
     </article>
   } @else if (items()?.length === 0) {
-    <article class="gv-card">
+    <article class="gv-card gv-empty">
+      <span class="material-symbols-rounded" aria-hidden="true">inventory_2</span>
       <h2>עדיין אין מוצרים</h2>
-      <p class="gv-muted">מוצרים של הגוף שלך מופיעים בקטלוג, וסוכן ה-AI יכול להמליץ עליהם. כשהוא ממליץ על מוצר שלך, המשקיע מופיע אצלך כליד.</p>
-      <a mat-flat-button routerLink="/agent/products/new">מוצר חדש</a>
+      <p>כשה-AI ממליץ על מוצר שלך, המשקיע מופיע אצלך כליד. כדאי להתחיל ממוצר אחד.</p>
+      <div class="gv-actions"><a mat-flat-button routerLink="/agent/products/new">הוספת מוצר</a></div>
     </article>
   } @else {
     <div class="list">
       @for (item of items(); track item.productId) {
         <article class="gv-card product">
           <div class="row">
-            <div>
+            <span class="icon material-symbols-rounded" aria-hidden="true">inventory_2</span>
+            <div class="body">
               <h2>{{ item.name }}</h2>
-              <p class="gv-muted">{{ productTypeLabel(item.type) }} · {{ item.track }}</p>
+              <span class="gv-muted">{{ productTypeLabel(item.type) }} · {{ item.track }}</span>
             </div>
             <gv-status-chip [status]="item.isActive ? 'ACTIVE' : 'INACTIVE'" />
-            <div class="gv-actions">
-              <a mat-stroked-button [routerLink]="['/agent/products', item.productId, 'edit']">עריכה</a>
-              <a mat-stroked-button [routerLink]="['/agent/products', item.productId, 'documents']">מסמכים</a>
+          </div>
+          <div class="foot">
+            <span class="docs-count">
+              <span class="material-symbols-rounded" aria-hidden="true">description</span>
+              @if (!item.documents || item.documents.length === 0) {
+                אין מסמכים עדיין
+              } @else {
+                <bdi>{{ item.documents.length }}</bdi> מסמכים
+                @for (doc of item.documents; track doc.documentId) {
+                  <gv-status-chip [status]="doc.indexStatus" />
+                }
+              }
+            </span>
+            <div class="actions">
+              <a mat-button [routerLink]="['/agent/products', item.productId, 'edit']">
+                <span class="material-symbols-rounded" aria-hidden="true">edit</span>עריכה
+              </a>
+              <a mat-stroked-button [routerLink]="['/agent/products', item.productId, 'documents']">
+                <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>מסמכים
+              </a>
             </div>
           </div>
-          @if (item.documents) {
-            @if (item.documents.length === 0) {
-              <p class="gv-muted">אין מסמכים</p>
-            } @else {
-              <ul class="docs">
-                @for (doc of item.documents; track doc.documentId) {
-                  <li>
-                    <span><bdi>{{ doc.fileName }}</bdi></span>
-                    <gv-status-chip [status]="doc.indexStatus" />
-                  </li>
-                }
-              </ul>
-            }
-          }
         </article>
       }
     </div>

@@ -29,7 +29,7 @@ describe('user guidance', () => {
     http.expectOne('/api/investor/dashboard').flush({ plannedCapital: '0.00', activeGoals: 0, pendingOffers: 0, goals: [] });
     await investor.whenStable();
     const text = investor.nativeElement.textContent as string;
-    expect(text).toContain('היעדים שלי');
+    expect(text).toContain('שלום');
     expect(text).toContain('הצעד הבא');
     expect(text).toContain('להגדיר את היעד הראשון');
     http.verify();

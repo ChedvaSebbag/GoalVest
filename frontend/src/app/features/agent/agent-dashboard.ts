@@ -11,6 +11,7 @@ import { AgentDashboard as AgentKpis, LeadSummary, ProductInterest } from '../..
 import { chartColor } from '../../core/charts';
 import { GOAL_TYPES, formatDate, goalTypeLabel } from '../../core/investor/investor.models';
 import { MoneyPipe } from '../../shared/money.pipe';
+import { AuthService } from '../../core/auth/auth.service';
 import { StatusChip } from '../../shared/status-chip';
 import { InfoTip } from '../../shared/info-tip';
 import { NextStep, NextStepCard } from '../../shared/next-step';
@@ -26,6 +27,8 @@ const SEEN_KEY = 'gv-agent-seen';
 export class AgentDashboard {
   private readonly queries = inject(AgentQueriesService);
   private readonly reload = new Subject<void>();
+  private readonly user = inject(AuthService).user;
+  protected readonly firstName = computed(() => (this.user()?.fullName ?? '').trim().split(/\s+/)[0] ?? '');
 
   protected readonly formatDate = formatDate;
   protected readonly goalTypeLabel = goalTypeLabel;
@@ -100,9 +103,9 @@ export class AgentDashboard {
     return {
       labels: items.map((item) => item.name),
       datasets: [
-        { label: 'הומלץ', data: items.map((item) => item.recommended), backgroundColor: chartColor('--gv-primary'), stack: 'interest' },
-        { label: 'הצעות', data: items.map((item) => item.offers), backgroundColor: chartColor('--gv-accent'), stack: 'interest' },
-        { label: 'התקבלו', data: items.map((item) => item.accepted), backgroundColor: chartColor('--gv-success'), stack: 'interest' },
+        { label: 'הומלץ', data: items.map((item) => item.recommended), backgroundColor: chartColor('--gv-primary'), stack: 'interest', maxBarThickness: 48 },
+        { label: 'הצעות', data: items.map((item) => item.offers), backgroundColor: chartColor('--gv-accent'), stack: 'interest', maxBarThickness: 48 },
+        { label: 'התקבלו', data: items.map((item) => item.accepted), backgroundColor: chartColor('--gv-status-processing'), stack: 'interest', maxBarThickness: 48 },
       ],
     };
   });
@@ -114,7 +117,7 @@ export class AgentDashboard {
       x: { stacked: true, ticks: { font: { family: 'Heebo' } } },
       y: { stacked: true, beginAtZero: true, ticks: { precision: 0, font: { family: 'Heebo' } } },
     },
-    plugins: { legend: { rtl: true, labels: { font: { family: 'Heebo' } } } },
+    plugins: { legend: { position: 'bottom', rtl: true, labels: { font: { family: 'Heebo' }, boxWidth: 12, padding: 14 } } },
   };
 
   constructor() {

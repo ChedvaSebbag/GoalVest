@@ -1,6 +1,10 @@
-<section class="gv-page">
-  <h1>שאלון סיכון</h1>
-  <p class="intro">השאלון בודק כמה סיכון ותנודתיות מתאימים לך. התשובות קובעות את פרופיל הסיכון, וסוכן ה-AI משתמש בו בכל הערכה. אין תשובות נכונות או לא נכונות, וזה לוקח בערך שתי דקות.</p>
+<section class="gv-page narrow">
+  <header class="gv-page-head">
+    <div>
+      <h1>שאלון סיכון</h1>
+      <p>8 שאלות קצרות שקובעות כמה תנודתיות מתאימה לך. אין תשובות נכונות או לא נכונות.</p>
+    </div>
+  </header>
   <mat-progress-bar mode="determinate" [value]="progress()" aria-label="התקדמות השאלון" />
   <p class="gv-muted step-count">
     @if (result()) {

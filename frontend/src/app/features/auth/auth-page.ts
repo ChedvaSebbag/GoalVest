@@ -1,6 +1,6 @@
 import { Component, computed, inject, isDevMode, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -24,7 +24,6 @@ import { Institution, UserRole, homeRouteForRole } from '../../core/auth/auth.mo
     MatButtonModule,
     MatAutocompleteModule,
     MatProgressBarModule,
-    RouterLink,
   ],
   templateUrl: './auth-page.html',
   styleUrl: './auth-page.scss',

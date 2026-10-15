@@ -1,7 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { MatTabsModule } from '@angular/material/tabs';
 import { ProductQueriesService } from '../../../core/products/product-queries.service';
 import {
   ProductDetails,
@@ -14,9 +13,11 @@ import {
 import { Disclaimer } from '../../../shared/disclaimer';
 import { MoneyPipe } from '../../../shared/money.pipe';
 
+import { InfoTip } from '../../../shared/info-tip';
+
 @Component({
   selector: 'gv-product-details',
-  imports: [RouterLink, MatButtonModule, MatTabsModule, MoneyPipe, Disclaimer],
+  imports: [RouterLink, MatButtonModule, MoneyPipe, Disclaimer, InfoTip],
   templateUrl: './product-details.html',
   styleUrl: './product-details.scss',
 })

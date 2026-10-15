@@ -39,19 +39,28 @@ export interface NextStep {
       flex-wrap: wrap;
       align-items: center;
       gap: calc(var(--gv-space) * 2);
-      padding: calc(var(--gv-space) * 2) calc(var(--gv-space) * 3);
+      padding: calc(var(--gv-space) * 2.5) calc(var(--gv-space) * 3);
       margin-block-end: calc(var(--gv-space) * 3);
       border-radius: var(--gv-radius);
-      border-inline-start: 6px solid var(--tone);
-      background: color-mix(in srgb, var(--tone) 8%, var(--gv-surface));
-      box-shadow: var(--gv-shadow);
+      border: 1px solid color-mix(in srgb, var(--tone) 25%, var(--gv-border));
+      background: color-mix(in srgb, var(--tone) 6%, var(--gv-surface));
     }
     .next[data-tone='success'] { --tone: var(--gv-success); }
     .next[data-tone='warning'] { --tone: var(--gv-warning); }
-    .icon { font-size: 36px; color: var(--tone); }
-    .body { flex: 1; min-inline-size: 200px; }
-    .label { margin: 0; font-size: 0.8rem; font-weight: 700; color: var(--tone); }
-    h2 { margin: 2px 0 4px; font-size: 1.15rem; color: var(--gv-text); }
+    .icon {
+      display: grid;
+      place-items: center;
+      inline-size: 48px !important;
+      block-size: 48px;
+      border-radius: 14px;
+      background: var(--gv-surface);
+      color: var(--tone);
+      font-size: 28px;
+      box-shadow: var(--gv-shadow);
+    }
+    .body { flex: 1; min-inline-size: 220px; }
+    .label { margin: 0; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.3px; color: var(--tone); }
+    h2 { margin: 2px 0; font-size: 1.1rem; color: var(--gv-text); }
     p { margin: 0; color: var(--gv-text-muted); }
   `,
 })

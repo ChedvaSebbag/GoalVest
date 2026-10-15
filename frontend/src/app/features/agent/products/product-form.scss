@@ -1,3 +1,6 @@
-h1 { color: var(--gv-primary); }
-.form { display: flex; flex-direction: column; margin-block-start: calc(var(--gv-space) * 2); }
-.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: calc(var(--gv-space) * 2); }
+.form { display: flex; flex-direction: column; }
+.form h2 { font-size: 1rem; margin: calc(var(--gv-space) * 2) 0 var(--gv-space); padding-block-start: calc(var(--gv-space) * 2); border-block-start: 1px solid var(--gv-border); }
+.form h2:first-child { margin-block-start: 0; padding-block-start: 0; border: 0; }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: calc(var(--gv-space) * 1.5); }
+.gv-actions { justify-content: space-between; padding-block-start: calc(var(--gv-space) * 2); border-block-start: 1px solid var(--gv-border); }
+.danger { --mat-button-text-label-text-color: var(--gv-error); }

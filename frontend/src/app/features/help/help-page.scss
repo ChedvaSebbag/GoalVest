@@ -8,7 +8,7 @@
   margin-block-end: calc(var(--gv-space) * 3);
 }
 .head button { display: inline-flex; align-items: center; gap: 6px; }
-h1, h2 { margin: 0; color: var(--gv-primary); }
+h1, h2 { margin: 0; }
 h1 + p { margin-block: 4px 0; }
 h3 { margin: 0 0 4px; }
 
@@ -70,7 +70,8 @@ h3 { margin: 0 0 4px; }
   color: var(--gv-on-primary);
   font-weight: 700;
 }
-.icon { font-size: 28px; color: var(--gv-accent); }
+.icon { font-size: 28px; color: var(--gv-primary); }
+.guide li.gv-card { margin: 0; }
 
 .table-wrap { overflow-x: auto; margin-block: calc(var(--gv-space) * 2); }
 table { inline-size: 100%; border-collapse: collapse; }

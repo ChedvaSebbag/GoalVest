@@ -1,17 +1,19 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartData, ChartOptions } from 'chart.js';
 import { chartColor } from '../../../core/charts';
 import { InvestorQueriesService } from '../../../core/investor/investor-queries.service';
 import {
+  GOAL_TYPES,
   InvestorDashboard as DashboardView,
   InvestorDashboardGoal,
   formatDate,
   goalTypeLabel,
 } from '../../../core/investor/investor.models';
+import { AuthService } from '../../../core/auth/auth.service';
 import { Disclaimer } from '../../../shared/disclaimer';
 import { MoneyPipe } from '../../../shared/money.pipe';
 import { StatusChip } from '../../../shared/status-chip';
@@ -26,18 +28,21 @@ import { NextStep, NextStepCard } from '../../../shared/next-step';
 })
 export class InvestorDashboard {
   private readonly queries = inject(InvestorQueriesService);
-  private readonly router = inject(Router);
+  private readonly user = inject(AuthService).user;
+  protected readonly firstName = computed(() => (this.user()?.fullName ?? '').trim().split(/\s+/)[0] ?? '');
 
   protected readonly formatDate = formatDate;
   protected readonly goalTypeLabel = goalTypeLabel;
   protected readonly dashboard = signal<DashboardView | null>(null);
   protected readonly failed = signal(false);
   protected readonly selectedId = signal<string | null>(null);
-  protected query = '';
 
-  protected readonly selected = computed(() => {
-    const goals = this.dashboard()?.goals ?? [];
-    return goals.find((goal) => goal.goalId === this.selectedId()) ?? goals[0] ?? null;
+  /** יעדים שכבר יש להם הערכת AI – רק להם יש תמהיל להציג */
+  protected readonly assessedGoals = computed(() => (this.dashboard()?.goals ?? []).filter((goal) => goal.assessment));
+
+  protected readonly selected = computed<InvestorDashboardGoal | null>(() => {
+    const goals = this.assessedGoals();
+    return goals.find((goal) => goal.goalId === this.selectedId()) ?? goals.at(0) ?? null;
   });
 
   /** מה המשקיע צריך לעשות עכשיו, לפי מצב היעדים והבקשות */
@@ -134,7 +139,7 @@ export class InvestorDashboard {
         backgroundColor: [
           chartColor('--gv-primary'),
           chartColor('--gv-accent'),
-          chartColor('--gv-success'),
+          chartColor('--gv-status-processing'),
         ],
       }],
     };
@@ -142,7 +147,7 @@ export class InvestorDashboard {
 
   protected readonly donutOptions: ChartOptions<'doughnut'> = {
     responsive: true,
-    plugins: { legend: { rtl: true, labels: { font: { family: 'Heebo' } } } },
+    plugins: { legend: { position: 'bottom', rtl: true, labels: { font: { family: 'Heebo' }, boxWidth: 12, padding: 14 } } },
   };
 
   constructor() {
@@ -155,7 +160,7 @@ export class InvestorDashboard {
     this.queries.dashboard().subscribe({
       next: (dashboard) => {
         this.dashboard.set(dashboard);
-        this.selectedId.set(dashboard.goals[0]?.goalId ?? null);
+        this.selectedId.set(dashboard.goals.find((goal) => goal.assessment)?.goalId ?? null);
       },
       error: () => {
         this.dashboard.set({ plannedCapital: '0.00', activeGoals: 0, pendingOffers: 0, goals: [] });
@@ -164,12 +169,8 @@ export class InvestorDashboard {
     });
   }
 
-  protected choose(goal: InvestorDashboardGoal): void {
-    this.selectedId.set(goal.goalId);
-  }
-
-  protected search(): void {
-    void this.router.navigate(['/products'], { queryParams: { q: this.query.trim() } });
+  protected goalIcon(type: string): string {
+    return GOAL_TYPES.find((item) => item.value === type)?.icon ?? 'flag';
   }
 
   protected statusOf(goal: InvestorDashboardGoal): string {

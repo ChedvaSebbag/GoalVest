@@ -3,12 +3,13 @@ import {
   AssessmentView,
   ChannelFigures,
 } from '../../../core/investor/investor.models';
+import { RouterLink } from '@angular/router';
 import { Disclaimer } from '../../../shared/disclaimer';
 import { InfoTip } from '../../../shared/info-tip';
 
 @Component({
   selector: 'gv-assessment-card',
-  imports: [Disclaimer, InfoTip],
+  imports: [Disclaimer, InfoTip, RouterLink],
   templateUrl: './assessment-card.html',
   styleUrl: './assessment-card.scss',
 })

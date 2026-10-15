@@ -1,9 +1,19 @@
-<section class="gv-page">
-  <h1>{{ goalId ? 'עריכת יעד' : 'יעד חדש' }}</h1>
-  <p class="gv-muted">שלב <bdi>{{ step() }}</bdi> מתוך <bdi>4</bdi></p>
-  <ol class="steps">
+<section class="gv-page narrow">
+  <header class="gv-page-head">
+    <div>
+      <h1>{{ goalId ? 'עריכת יעד' : 'יעד חדש' }}</h1>
+      <p>ארבעה שלבים קצרים, בערך שתי דקות.</p>
+    </div>
+  </header>
+
+  <ol class="steps" aria-label="שלבי האשף">
     @for (label of ['סוג היעד', 'סכומים', 'מועד', 'העדפות']; track label; let i = $index) {
-      <li [class.on]="step() === i + 1">{{ label }}</li>
+      <li [class.on]="step() === i + 1" [class.done]="step() > i + 1" [attr.aria-current]="step() === i + 1 ? 'step' : null">
+        <span class="num">
+          @if (step() > i + 1) { <span class="material-symbols-rounded" aria-hidden="true">check</span> } @else { <bdi>{{ i + 1 }}</bdi> }
+        </span>
+        <span class="label">{{ label }}</span>
+      </li>
     }
   </ol>
 
@@ -19,7 +29,7 @@
   <form class="gv-card" [formGroup]="form" (ngSubmit)="save()">
     @if (step() === 1) {
       <h2>סוג היעד</h2>
-      <p class="hint">למה מיועד הכסף? סוג היעד עוזר לסוכן ה-AI להבין את הטווח ואת רמת הגמישות.</p>
+      <p class="hint">למה מיועד הכסף?</p>
       <div class="types">
         @for (type of types; track type.value) {
           <button type="button" class="choice" [class.on]="form.controls.type.value === type.value" [attr.aria-pressed]="form.controls.type.value === type.value" (click)="pickType(type.value)">
@@ -31,13 +41,13 @@
       <label>
         שם היעד
         <input type="text" formControlName="title" placeholder="למשל: דירה ראשונה" />
-        <small class="hint">שם קצר שיעזור לך לזהות את היעד ברשימה.</small>
+        
       </label>
     }
 
     @if (step() === 2) {
       <h2>סכומים</h2>
-      <p class="hint">הסכומים בשקלים. צריך לפחות סכום התחלתי או הפקדה חודשית.</p>
+      <p class="hint">בשקלים. צריך לפחות סכום התחלתי או הפקדה חודשית.</p>
       <label>סכום התחלתי <bdi><input type="number" formControlName="initialAmount" min="0" /></bdi>
         <small class="hint">כמה כסף יש לך היום להשקיע ביעד הזה.</small></label>
       <label>הפקדה חודשית <bdi><input type="number" formControlName="monthlyDeposit" min="0" /></bdi>
@@ -51,7 +61,7 @@
 
     @if (step() === 3) {
       <h2>מועד יעד</h2>
-      <p class="hint">מתי צריך את הכסף? לפחות חצי שנה קדימה. טווח ארוך מאפשר בדרך כלל מסלולים עם פוטנציאל תשואה גבוה יותר.</p>
+      <p class="hint">מתי צריך את הכסף? לפחות חצי שנה קדימה.</p>
       <label>
         תאריך יעד
         <bdi dir="ltr"><input type="date" formControlName="targetDate" [min]="minDate" /></bdi>
@@ -68,7 +78,7 @@
 
     @if (step() === 4) {
       <h2>העדפות</h2>
-      <p class="hint">כל ההעדפות אופציונליות, חוץ מצורך בנזילות ומשתי ההסכמות בסוף.</p>
+      <p class="hint">רק הנזילות וההסכמות בסוף הן חובה.</p>
       <p>צורך בנזילות <gv-info-tip term="liquidity" /></p>
       <div class="choices">
         @for (option of liquidityOptions; track option.value) {

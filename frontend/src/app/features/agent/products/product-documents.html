@@ -1,20 +1,25 @@
-<section class="gv-page">
-  <a routerLink="/agent/products">חזרה למוצרים שלי</a>
-  <header class="head">
-    <h1>מסמכי מוצר</h1>
-    <button type="button" mat-stroked-button (click)="load()">רענון</button>
+<section class="gv-page narrow">
+  <a class="gv-back" routerLink="/agent/products">
+    <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
+    חזרה למוצרים שלי
+  </a>
+  <header class="gv-page-head">
+    <div>
+      <h1>מסמכי מוצר</h1>
+      <p>מסמך שמועלה כאן נקלט במאגר הידע <gv-info-tip term="docIndex" />, וה-AI יכול לצטט ממנו בהערכות.</p>
+    </div>
+    <button type="button" mat-stroked-button (click)="load()">
+      <span class="material-symbols-rounded" aria-hidden="true">refresh</span>רענון
+    </button>
   </header>
-  <p class="gv-muted">
-    מעלים כאן מסמך פוליסה או דף מוצר (PDF או DOCX, עד 10MB). אחרי ההעלאה המסמך ממתין להטמעה <gv-info-tip term="docIndex" />,
-    ובדרך כלל תוך דקה הסטטוס משתנה ל"מוטמע". מאותו רגע סוכן ה-AI יכול לצטט מהמסמך בהערכות.
-  </p>
 
   <form class="drop gv-card" (dragover)="$event.preventDefault()" (drop)="onDrop($event)" (ngSubmit)="upload()">
-    <label for="document-file">גרירה לכאן או בחירת קובץ</label>
-    <input id="document-file" type="file" accept=".pdf,.docx,application/pdf" (change)="onFile($event)" />
-    @if (file) {
-      <p>{{ file.name }}</p>
-    }
+    <label for="document-file" class="zone">
+      <span class="material-symbols-rounded" aria-hidden="true">cloud_upload</span>
+      <strong>{{ file ? file.name : 'גוררים קובץ לכאן או לוחצים לבחירה' }}</strong>
+      <span class="gv-muted">PDF או DOCX, עד 10MB</span>
+    </label>
+    <input id="document-file" class="file" type="file" accept=".pdf,.docx,application/pdf" (change)="onFile($event)" />
     <label>
       סוג מסמך
       <select name="docType" [(ngModel)]="docType">
@@ -26,7 +31,7 @@
     @if (message()) {
       <p role="status">{{ message() }}</p>
     }
-    <button mat-flat-button type="submit" [disabled]="uploading()">{{ uploading() ? 'מעלה…' : 'העלאה' }}</button>
+    <button mat-flat-button type="submit" [disabled]="uploading() || !file">{{ uploading() ? 'מעלה…' : 'העלאה' }}</button>
   </form>
 
   @if (items() === null) {
@@ -37,17 +42,19 @@
       <button type="button" mat-stroked-button (click)="load()">נסה שוב</button>
     </article>
   } @else if (items()?.length === 0) {
-    <article class="gv-card">
-      <h2>אין מסמכים</h2>
-      <p class="gv-muted">אפשר להעלות תנאי פוליסה, דוח או כללי מס.</p>
+    <article class="gv-card gv-empty">
+      <span class="material-symbols-rounded" aria-hidden="true">description</span>
+      <h2>אין מסמכים עדיין</h2>
+      <p>אפשר להעלות תנאי פוליסה, דוח שנתי או כללי מס.</p>
     </article>
   } @else {
     <ul>
       @for (item of items(); track item.documentId) {
         <li class="gv-card">
-          <div>
+          <span class="material-symbols-rounded doc-icon" aria-hidden="true">description</span>
+          <div class="doc">
             <strong>{{ item.fileName }}</strong>
-            <p class="gv-muted">{{ docTypeLabel(item.docType) }}</p>
+            <span class="gv-muted">{{ docTypeLabel(item.docType) }}</span>
           </div>
           <gv-status-chip [status]="item.indexStatus" />
         </li>

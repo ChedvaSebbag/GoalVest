@@ -6,15 +6,16 @@
 
 .auth-card {
   width: min(480px, 100%);
-  padding: calc(var(--gv-space) * 3);
-  border-radius: var(--gv-radius);
+  padding: calc(var(--gv-space) * 4);
+  border-radius: calc(var(--gv-radius) * 1.3);
+  border: 1px solid var(--gv-border);
   background: var(--gv-surface);
-  box-shadow: var(--gv-shadow);
+  box-shadow: var(--gv-shadow-lg);
 }
 
 h1 {
   margin: 0;
-  color: var(--gv-primary);
+  font-size: 1.4rem;
   font-weight: 700;
 }
 
@@ -36,9 +37,10 @@ h1 {
   text-align: start;
   padding: calc(var(--gv-space) * 2);
   border-radius: var(--gv-radius);
-  border: 1px solid var(--gv-text-muted);
+  border: 1.5px solid var(--gv-border);
   background: var(--gv-surface);
   color: var(--gv-text);
+  font: inherit;
   display: grid;
   gap: calc(var(--gv-space) * 0.5);
   cursor: pointer;
@@ -46,16 +48,14 @@ h1 {
 
 .role-card.selected {
   border-color: var(--gv-primary);
-  box-shadow: inset 0 0 0 1px var(--gv-primary);
+  background: var(--gv-primary-soft);
+  color: var(--gv-primary);
 }
 
 .form-error { color: var(--gv-error); margin: 0; }
 .success { color: var(--gv-success); margin: 0; }
 
-button[mat-flat-button] {
-  background: var(--gv-primary);
-  color: var(--gv-on-primary);
-}
+button[mat-flat-button][type='submit'] { block-size: 46px; }
 
 @media (max-width: 520px) {
   .roles { grid-template-columns: 1fr; }
@@ -63,13 +63,16 @@ button[mat-flat-button] {
 
 .intro {
   list-style: none;
-  padding: 0;
-  margin: calc(var(--gv-space) * 2) 0 var(--gv-space);
+  padding: 14px 16px;
+  border-radius: var(--gv-radius-sm);
+  background: var(--gv-bg);
+  font-size: 0.9rem;
+  margin: calc(var(--gv-space) * 2) 0 calc(var(--gv-space) * 2);
   display: grid;
   gap: var(--gv-space);
 }
 .intro li { display: flex; align-items: center; gap: var(--gv-space); }
-.intro .material-symbols-rounded { color: var(--gv-accent); }
+.intro .material-symbols-rounded { color: var(--gv-primary); font-size: 20px; }
 .help { color: var(--gv-primary); font-size: 0.9rem; }
 .small { font-size: 0.85rem; margin: 0; }
 .demo {
