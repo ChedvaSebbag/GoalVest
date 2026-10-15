@@ -5,6 +5,7 @@ import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'auth/login' },
+  { path: 'help', title: 'עזרה · GoalVest', loadComponent: () => import('./features/help/help-page').then(m => m.HelpPage) },
   { path: 'system', loadComponent: () => import('./features/system-status/system-status').then(m => m.SystemStatus) },
   { path: 'auth/login', loadComponent: () => import('./features/auth/auth-page').then(m => m.AuthPage), data: { tab: 'login' } },
   { path: 'auth/register', loadComponent: () => import('./features/auth/auth-page').then(m => m.AuthPage), data: { tab: 'register' } },

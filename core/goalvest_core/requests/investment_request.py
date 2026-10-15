@@ -48,6 +48,8 @@ CANCELLABLE_STATUSES = frozenset({
     RequestStatus.SUBMITTED,
     RequestStatus.AI_EVALUATED,
     RequestStatus.IN_REVIEW,
+    # בקשה שנכשלה שלוש פעמים: המשקיע יכול לבטל אותה ולהגיש מחדש (עריכת יעד)
+    RequestStatus.FAILED,
 })
 
 MAX_ASSESSMENT_ATTEMPTS = 3

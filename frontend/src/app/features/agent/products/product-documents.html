@@ -4,7 +4,10 @@
     <h1>מסמכי מוצר</h1>
     <button type="button" mat-stroked-button (click)="load()">רענון</button>
   </header>
-  <p class="gv-muted">PDF או DOCX עד 10MB. אחרי ההעלאה המסמך ממתין להטמעה.</p>
+  <p class="gv-muted">
+    מעלים כאן מסמך פוליסה או דף מוצר (PDF או DOCX, עד 10MB). אחרי ההעלאה המסמך ממתין להטמעה <gv-info-tip term="docIndex" />,
+    ובדרך כלל תוך דקה הסטטוס משתנה ל"מוטמע". מאותו רגע סוכן ה-AI יכול לצטט מהמסמך בהערכות.
+  </p>
 
   <form class="drop gv-card" (dragover)="$event.preventDefault()" (drop)="onDrop($event)" (ngSubmit)="upload()">
     <label for="document-file">גרירה לכאן או בחירת קובץ</label>

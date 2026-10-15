@@ -8,7 +8,7 @@
 - אפיון מלא: [`docs/`](docs/00-README.md)
 - הנחיות לסוכן הקוד: [`AGENTS.md`](AGENTS.md), [`CLAUDE.md`](CLAUDE.md)
 - Rules: `.cursor/rules/`, `.claude/rules/`
-- Skills: `.cursor/skills/`, `.claude/skills/`
+- Skills: `.cursor/skills/`, `.claude/skills/`. כולל `angular-developer` שהותקן מ-skills.sh (`npx skills add https://github.com/angular/skills`)
 
 ## טכנולוגיות
 Angular · Flask · MS SQL Server (Somee.com) · Event Sourcing + CQRS · ChromaDB · Ollama · LangChain Deep Agents · MCP
@@ -26,25 +26,51 @@ db/         מיגרציות SQL ל-Somee
 
 ## הרצה מקומית
 
-**פעם ראשונה**
+**דרישות מוקדמות (פעם אחת):** Docker Desktop, Ollama (https://ollama.com/download), Python 3.12, Node 20+, ODBC Driver 18 for SQL Server.
 ```bash
-cp .env.example .env                       # ולמלא את DB_CONNECTION_STRING
-docker compose up -d                       # ChromaDB
-# Ollama מותקן ישירות על ה-Mac (https://ollama.com/download)
+cp .env.example .env              # למלא DB_SERVER, DB_NAME, DB_USER, DB_PASSWORD, JWT_SECRET, TAVILY_API_KEY
 ollama pull qwen2.5:7b-instruct
 ollama pull bge-m3
-
-cd backend
-python3.12 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt            # כולל goalvest_core בעריכה חיה (-e ../core)
-cd ../frontend && npm install              # אם נכשל: npx npm@11 install
+cd backend && python3.12 -m venv .venv && cd ..
 ```
 
-**בכל פעם** (שני טרמינלים)
+**הרצה בפקודה אחת** (משורש ה-Repo)
 ```bash
-cd backend && source .venv/bin/activate && python wsgi.py     # http://localhost:5000
-cd frontend && npm start                                       # http://localhost:4200
+bash dev.sh --setup    # בפעם הראשונה ואחרי משיכת קוד חדש: pip install, מיגרציות, npm install
+bash dev.sh            # בכל פעם: ChromaDB, API, סוכן AI, Indexer ו-Angular
 ```
+הסקריפט מעלה את כל הרכיבים, מחכה שיהיו בריאים ופותח את הדפדפן ב-http://localhost:4200. הלוגים נכתבים ל-`logs/*.log`. Ctrl+C עוצר הכול.
+
+**נתוני הדגמה** (פעם אחת, אחרי `--setup`)
+```bash
+cd backend && source .venv/bin/activate
+python -m scripts.seed            # 25 מוצרים, 3 משקיעים, 3 סוכנים
+python -m scripts.rebuild_leads   # בונה מחדש את טבלאות הלידים מהאירועים
+```
+| חשבון | אימייל | סיסמה |
+|---|---|---|
+| משקיעה | `demo.investor1@goalvest.test` | `Demo1234` |
+| סוכן הראל | `demo.agent.harel@goalvest.test` | `Demo1234` |
+| סוכן כלל | `demo.agent.clal@goalvest.test` | `Demo1234` |
+| סוכן מגדל | `demo.agent.migdal@goalvest.test` | `Demo1234` |
+
+בסביבת פיתוח מסך ההתחברות מציג כפתורים שממלאים את החשבונות האלה.
+
+## איך משתמשים במערכת
+
+- **בכניסה הראשונה** מופיע סיור היכרות קצר. אפשר להציג אותו שוב מדף **עזרה** (קישור בסרגל העליון).
+- **בראש כל דשבורד** יש כרטיס "הצעד הבא" שאומר מה המצב ומה כדאי לעשות עכשיו.
+- **בדף יעד ובדף ליד** מוצג מסלול הבקשה: הגשה ← הערכת AI ← בדיקת סוכן ← הצעה ← סיום, עם הסבר מי צריך לפעול.
+- **סימן ?** ליד מונחים מקצועיים (דמי ניהול, סטיית תקן, ציון התאמה) מציג הסבר קצר.
+- **דף העזרה** (`/help`) כולל מדריך למשקיע ולסוכן, הסבר לכל סטטוס, מילון מונחים ושאלות נפוצות.
+
+תהליך מלא בקצרה:
+1. **משקיע** נרשם, ממלא שאלון סיכון ומגדיר יעד (סכום, מועד והעדפות).
+2. **סוכן ה-AI** מעריך את היעד תוך דקה עד שלוש: ציון, תמהיל, מסלולים, דגלי סיכון ומקורות.
+3. **סוכן אנושי** מהגוף המתאים לוקח את הליד, מאשר את ההערכה ושולח הצעה.
+4. **המשקיע** מקבל התראה ומאשר או דוחה.
+
+תסריט הדגמה: [`docs/17-demo-script.md`](docs/17-demo-script.md). שאלות הכנה: [`docs/18-exam-prep.md`](docs/18-exam-prep.md).
 
 **בדיקות**
 ```bash

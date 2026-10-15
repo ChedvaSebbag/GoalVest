@@ -36,9 +36,11 @@ function hebrewPaginator(): MatPaginatorIntl {
   return intl;
 }
 
+import { InfoTip } from '../../../shared/info-tip';
+
 @Component({
   selector: 'gv-catalog',
-  imports: [FormsModule, RouterLink, MatButtonModule, MatTableModule, MatSortModule, MatPaginatorModule],
+  imports: [FormsModule, RouterLink, MatButtonModule, MatTableModule, MatSortModule, MatPaginatorModule, InfoTip],
   providers: [{ provide: MatPaginatorIntl, useFactory: hebrewPaginator }],
   templateUrl: './catalog.html',
   styleUrl: './catalog.scss',

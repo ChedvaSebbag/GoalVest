@@ -23,3 +23,31 @@ label { display: grid; gap: calc(var(--gv-space)); margin-block-end: calc(var(--
 label.check { display: flex; align-items: center; }
 input { font: inherit; padding: calc(var(--gv-space)); border-radius: var(--gv-radius); border: 1px solid var(--gv-text-muted); }
 input[type='checkbox'] { width: auto; }
+.hint { display: block; margin: 0 0 calc(var(--gv-space) * 1.5); color: var(--gv-text-muted); font-size: 0.9rem; font-weight: 400; }
+label .hint { margin: 0; }
+.notice {
+  padding: calc(var(--gv-space) * 1.5) calc(var(--gv-space) * 2);
+  border-radius: calc(var(--gv-radius) / 1.5);
+  border-inline-start: 4px solid var(--gv-warning);
+  background: color-mix(in srgb, var(--gv-warning) 8%, var(--gv-surface));
+}
+.steps { counter-reset: step; flex-wrap: wrap; }
+.steps li { counter-increment: step; display: flex; align-items: center; gap: 6px; }
+.steps li::before {
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  inline-size: 24px;
+  block-size: 24px;
+  border-radius: 50%;
+  background: var(--gv-skeleton);
+  font-size: 0.8rem;
+}
+.steps li.on::before { background: var(--gv-primary); color: var(--gv-on-primary); }
+.after {
+  margin-block: calc(var(--gv-space) * 2);
+  padding: calc(var(--gv-space) * 1.5) calc(var(--gv-space) * 2);
+  border-radius: calc(var(--gv-radius) / 1.5);
+  background: var(--gv-bg);
+}
+.after ol { margin: var(--gv-space) 0 0; padding-inline-start: calc(var(--gv-space) * 2.5); line-height: 1.7; }

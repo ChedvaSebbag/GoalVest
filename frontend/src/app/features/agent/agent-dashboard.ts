@@ -12,12 +12,14 @@ import { chartColor } from '../../core/charts';
 import { GOAL_TYPES, formatDate, goalTypeLabel } from '../../core/investor/investor.models';
 import { MoneyPipe } from '../../shared/money.pipe';
 import { StatusChip } from '../../shared/status-chip';
+import { InfoTip } from '../../shared/info-tip';
+import { NextStep, NextStepCard } from '../../shared/next-step';
 
 const SEEN_KEY = 'gv-agent-seen';
 
 @Component({
   selector: 'gv-agent-dashboard',
-  imports: [FormsModule, RouterLink, MatButtonModule, BaseChartDirective, MoneyPipe, StatusChip],
+  imports: [FormsModule, RouterLink, MatButtonModule, BaseChartDirective, MoneyPipe, StatusChip, InfoTip, NextStepCard],
   templateUrl: './agent-dashboard.html',
   styleUrl: './agent-dashboard.scss',
 })
@@ -47,6 +49,51 @@ export class AgentDashboard {
   protected minScore = '';
   protected goalType = '';
   private readonly since = localStorage.getItem(SEEN_KEY);
+
+  /** מה הסוכן צריך לעשות עכשיו, לפי המדדים */
+  protected readonly nextStep = computed<NextStep | null>(() => {
+    const kpi = this.dashboard();
+    if (kpi === null) {
+      return null;
+    }
+    if (kpi.evaluated > 0) {
+      return {
+        icon: 'person_search',
+        tone: 'success',
+        title: kpi.evaluated === 1 ? 'יש ליד חדש שממתין לך' : `יש ${kpi.evaluated} לידים חדשים שממתינים לך`,
+        text: 'משקיעים שעברו הערכת AI ומתאימים למוצרים של הגוף שלך. פותחים ליד, קוראים את ההערכה ולוחצים "קח ליד".',
+        cta: { label: 'להצגת הלידים החדשים' },
+      };
+    }
+    if (kpi.inReview > 0) {
+      return {
+        icon: 'fact_check',
+        title: `${kpi.inReview} לידים בטיפול`,
+        text: 'בכל ליד אפשר לאשר או לדחות את הערכת ה-AI, ולשלוח הצעה של עד שלושה מוצרים.',
+        cta: { label: 'ללידים בטיפול' },
+      };
+    }
+    if ((this.interest() ?? []).length === 0) {
+      return {
+        icon: 'inventory_2',
+        tone: 'warning',
+        title: 'עדיין אין מוצרים לגוף שלך',
+        text: 'לידים מוצגים רק כשה-AI ממליץ על מוצר של הגוף. כדאי להוסיף מוצר ולהעלות מסמך פוליסה.',
+        cta: { label: 'להוספת מוצר', link: '/agent/products/new' },
+      };
+    }
+    return {
+      icon: 'done_all',
+      title: 'אין משימות פתוחות',
+      text: 'לידים חדשים מופיעים כאן אוטומטית, והדשבורד מתרענן כל 15 שניות.',
+    };
+  });
+
+  protected followNextStep(): void {
+    const kpi = this.dashboard();
+    this.selectTab(kpi && kpi.evaluated > 0 ? 'AI_EVALUATED' : 'IN_REVIEW');
+    document.getElementById('leads')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   protected readonly bars = computed<ChartData<'bar'>>(() => {
     const items = this.interest() ?? [];

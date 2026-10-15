@@ -14,6 +14,9 @@
       <h1>{{ item.goal.title }}</h1>
       <gv-status-chip [status]="item.status" />
     </header>
+    <article class="gv-card journey">
+      <gv-request-journey [status]="item.status" view="agent" />
+    </article>
     @if (message()) {
       <p class="gv-error" role="alert">{{ message() }}</p>
     }
@@ -34,7 +37,10 @@
         <p>הפקדה חודשית <bdi>{{ item.goal.monthlyDeposit | money }}</bdi></p>
         <p>מועד יעד <bdi>{{ formatDate(item.goal.targetDate) }}</bdi></p>
         <p>טווח <bdi>{{ item.goal.horizonYears }}</bdi> שנים</p>
-        <p>פרופיל סיכון {{ item.goal.riskLabel }} <bdi>{{ item.goal.riskScore }}</bdi></p>
+        <p>פרופיל סיכון {{ item.goal.riskLabel }} <bdi>{{ item.goal.riskScore }}</bdi> <gv-info-tip term="riskScore" /></p>
+        @if (!item.investor.email && !item.investor.phone) {
+          <p class="gv-muted">פרטי הקשר מוצגים אחרי לקיחת הליד, ורק אם המשקיע הסכים לשתף אותם.</p>
+        }
         @if (item.review.status) {
           <p>בדיקת ההערכה: {{ item.review.status === 'approved' ? 'אושרה' : 'נדחתה' }}</p>
           @if (item.review.note) { <p>{{ item.review.note }}</p> }
@@ -58,16 +64,22 @@
       <article class="gv-card actions">
         <h2>פעולות</h2>
         @if (item.status === 'AI_EVALUATED') {
+          <p class="explain">כדי לטפל בליד צריך קודם לקחת אותו. אחרי זה פרטי הקשר נחשפים, וסוכנים אחרים יראו שהליד בטיפול.</p>
           <button type="button" mat-flat-button [disabled]="busy()" (click)="claim()">קח ליד</button>
         }
         @if (item.status === 'IN_REVIEW' && item.claimedByMe) {
+          <p class="explain">מומלץ: 1. לבדוק את הערכת ה-AI. 2. לאשר או לדחות אותה. 3. לשלוח הצעה.</p>
           <button type="button" mat-stroked-button (click)="approveDialog.showModal()">אשר הערכה</button>
+          <small class="gv-muted">ההערכה נכונה, והמשקיע יראה שסוכן בדק אותה.</small>
           <button type="button" mat-stroked-button (click)="rejectDialog.showModal()">דחה הערכה</button>
+          <small class="gv-muted">ההערכה שגויה. צריך לכתוב הערה.</small>
           <button type="button" mat-stroked-button (click)="reevaluateDialog.showModal()">בקש הערכה מחדש</button>
+          <small class="gv-muted">הבקשה חוזרת לסוכן ה-AI עם הסיבה שכתבת.</small>
           <button type="button" mat-flat-button (click)="offerDialog.showModal()">שלח הצעה</button>
+          <small class="gv-muted">עד שלושה מוצרים של הגוף שלך, וסך האחוזים 100%.</small>
         }
         @if (item.status !== 'AI_EVALUATED' && !(item.status === 'IN_REVIEW' && item.claimedByMe)) {
-          <p class="gv-muted">אין פעולה זמינה בסטטוס הזה.</p>
+          <p class="gv-muted">{{ noActionText(item.status, item.claimedByMe) }}</p>
         }
       </article>
     </div>
@@ -121,6 +133,7 @@
     <dialog #offerDialog>
       <form method="dialog">
         <h3>שליחת הצעה</h3>
+        <p class="gv-muted">בוחרים עד שלושה מוצרים ומחלקים ביניהם אחוזים. הסכום חייב להיות בדיוק 100%.</p>
         @for (row of offerItems(); track $index) {
           <div class="offer-row">
             <label>
@@ -141,7 +154,7 @@
             }
           </div>
         }
-        <p>סכום <bdi>{{ offerSum() }}%</bdi></p>
+        <p [class.gv-error]="offerSum() !== 100">סכום <bdi>{{ offerSum() }}%</bdi>{{ offerSum() === 100 ? '' : ' (צריך להגיע ל-100%)' }}</p>
         @if (offerItems().length < 3) {
           <button type="button" mat-stroked-button (click)="addOfferRow()">הוספת מוצר</button>
         }

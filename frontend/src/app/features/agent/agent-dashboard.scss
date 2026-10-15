@@ -18,3 +18,11 @@ caption { text-align: start; margin-block-end: var(--gv-space); }
 .filters input, .filters select { font: inherit; padding: var(--gv-space); border: 1px solid var(--gv-skeleton); border-radius: 8px; background: var(--gv-surface); color: var(--gv-text); }
 .fresh { margin-inline-start: var(--gv-space); background: color-mix(in srgb, var(--gv-accent) 24%, white); color: var(--gv-primary); border-radius: 999px; padding: 0 var(--gv-space); font-size: 0.8rem; }
 a { color: var(--gv-primary); }
+.head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: calc(var(--gv-space) * 2); }
+.kpi span { display: inline-flex; align-items: center; }
+h2 { display: flex; align-items: center; }
+#leads { overflow-x: auto; }
+#leads > .gv-muted { margin-block: calc(var(--gv-space) * -1) calc(var(--gv-space) * 2); }
+.empty { display: flex; flex-direction: column; align-items: center; gap: var(--gv-space); padding: calc(var(--gv-space) * 3); text-align: center; }
+.empty .material-symbols-rounded { font-size: 40px; color: var(--gv-text-muted); }
+.empty p { margin: 0; max-inline-size: 480px; }

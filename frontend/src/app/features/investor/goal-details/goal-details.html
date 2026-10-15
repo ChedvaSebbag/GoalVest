@@ -23,8 +23,8 @@
         <div><dt>הפקדה חודשית</dt><dd><bdi>{{ item.monthlyDeposit | money }}</bdi></dd></div>
         <div><dt>סכום יעד</dt><dd><bdi>{{ item.targetAmount | money }}</bdi></dd></div>
         <div><dt>מועד יעד</dt><dd><bdi>{{ formatDate(item.targetDate) }}</bdi></dd></div>
-        <div><dt>גמישות</dt><dd>{{ flexibility(item.flexibility) }}</dd></div>
-        <div><dt>נזילות</dt><dd>{{ liquidity(item.liquidityNeed) }}</dd></div>
+        <div><dt>גמישות <gv-info-tip term="flexibility" /></dt><dd>{{ flexibility(item.flexibility) }}</dd></div>
+        <div><dt>נזילות <gv-info-tip term="liquidity" /></dt><dd>{{ liquidity(item.liquidityNeed) }}</dd></div>
         <div><dt>אפיקים מועדפים</dt><dd>{{ channels(item.preferredChannels) }}</dd></div>
         <div><dt>אפיקים לא רצויים</dt><dd>{{ channels(item.excludedChannels) }}</dd></div>
       </dl>
@@ -39,41 +39,46 @@
       @if (item.assessment; as assessment) {
         <gv-assessment-card [assessment]="assessment" />
       } @else if (item.requestStatus === 'FAILED') {
-        <p>לא הצלחנו להשלים את ההערכה אחרי שלושה ניסיונות.</p>
+        <p>לא הצלחנו להשלים את ההערכה אחרי שלושה ניסיונות. אפשר לשלוח את היעד שוב בכפתור "שליחה מחדש להערכה" שבהמשך.</p>
       } @else if (item.activeRequestId) {
-        <p>ההערכה עדיין בהכנה. היא תופיע כאן כשהסוכן יסיים.</p>
+        <div class="waiting" role="status">
+          <span class="material-symbols-rounded spin" aria-hidden="true">progress_activity</span>
+          <p>סוכן ה-AI מכין את ההערכה. זה לוקח בדרך כלל דקה עד שלוש, והעמוד מתעדכן לבד כל 15 שניות.</p>
+        </div>
         <button type="button" mat-stroked-button (click)="load(item.goalId, true)">רענן</button>
       } @else {
-        <p class="gv-muted">אחרי הגשת בקשה תופיע כאן הערכת ההתאמה.</p>
+        <p class="gv-muted">היעד עוד לא נשלח להערכה. אחרי השליחה תופיע כאן הערכת ההתאמה: ציון, תמהיל מומלץ ומסלולים.</p>
       }
     </article>
 
     <article class="gv-card">
       <h2>סטטוס הבקשה</h2>
-      @if (!item.activeRequestId) {
-        <p>אין בקשה פעילה ליעד הזה.</p>
-      } @else {
-        <gv-status-chip [status]="item.requestStatus ?? 'SUBMITTED'" />
-        @if (item.requestStatus === 'AI_PROCESSING') {
-          <p>הבקשה בעיבוד, ואי אפשר לבטל אותה כרגע.</p>
-        }
-      }
+      <gv-request-journey [status]="item.requestStatus ?? 'NO_REQUEST'" />
       @if (error()) {
         <p class="gv-error" role="alert">{{ error() }}</p>
       }
       <div class="gv-actions">
+        @if (item.requestStatus === 'FAILED' || !item.activeRequestId) {
+          <a mat-flat-button [routerLink]="['/investor/goals', item.goalId, 'edit']">
+            {{ item.requestStatus === 'FAILED' ? 'שליחה מחדש להערכה' : 'שליחה להערכה' }}
+          </a>
+        } @else if (item.requestStatus !== 'AI_PROCESSING') {
+          <a mat-stroked-button [routerLink]="['/investor/goals', item.goalId, 'edit']">עריכת יעד</a>
+        }
+        @if (item.requestStatus === 'OFFER_SENT') {
+          <a mat-flat-button routerLink="/investor/offers">לצפייה בהצעה</a>
+        }
         @if (item.activeRequestId && cancellable.has(item.requestStatus ?? '')) {
           <button type="button" mat-stroked-button (click)="cancel()" [disabled]="busy()">בטל בקשה</button>
         }
-        <a mat-stroked-button [routerLink]="['/investor/goals', item.goalId, 'edit']">עריכת יעד</a>
-        <button type="button" mat-button (click)="archive()" [disabled]="busy()">ארכב יעד</button>
+        <button type="button" mat-button (click)="archive()" [disabled]="busy() || item.requestStatus === 'AI_PROCESSING'">ארכב יעד</button>
       </div>
     </article>
 
     <article class="gv-card">
       <h2>ציר זמן</h2>
       @if (!item.activeRequestId) {
-        <p class="gv-muted">האירועים יופיעו כאן אחרי הגשת בקשה.</p>
+        <p class="gv-muted">כאן תופיע כל פעולה שקרתה בבקשה: הגשה, הערכה, טיפול סוכן והצעה.</p>
       } @else if (timeline().length === 0) {
         <p class="gv-muted">אין אירועים להצגה.</p>
       } @else {

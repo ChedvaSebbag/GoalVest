@@ -1,5 +1,6 @@
 <section class="gv-page">
   <h1>שאלון סיכון</h1>
+  <p class="intro">השאלון בודק כמה סיכון ותנודתיות מתאימים לך. התשובות קובעות את פרופיל הסיכון, וסוכן ה-AI משתמש בו בכל הערכה. אין תשובות נכונות או לא נכונות, וזה לוקח בערך שתי דקות.</p>
   <mat-progress-bar mode="determinate" [value]="progress()" aria-label="התקדמות השאלון" />
   <p class="gv-muted step-count">
     @if (result()) {
@@ -18,7 +19,8 @@
       <gv-disclaimer />
       <div class="gv-actions">
         <button type="button" mat-stroked-button (click)="restart()">חזרה לשאלון</button>
-        <a mat-flat-button routerLink="/investor">המשך ליעדים</a>
+        <a mat-stroked-button routerLink="/investor">לדשבורד</a>
+        <a mat-flat-button routerLink="/investor/goals/new">הצעד הבא: הגדרת יעד</a>
       </div>
     </article>
   } @else {

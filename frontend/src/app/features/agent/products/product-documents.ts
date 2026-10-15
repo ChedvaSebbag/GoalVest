@@ -9,9 +9,11 @@ import { StatusChip } from '../../../shared/status-chip';
 
 const MAX_BYTES = 10 * 1024 * 1024;
 
+import { InfoTip } from '../../../shared/info-tip';
+
 @Component({
   selector: 'gv-product-documents',
-  imports: [FormsModule, RouterLink, MatButtonModule, StatusChip],
+  imports: [FormsModule, RouterLink, MatButtonModule, StatusChip, InfoTip],
   templateUrl: './product-documents.html',
   styleUrl: './product-documents.scss',
 })

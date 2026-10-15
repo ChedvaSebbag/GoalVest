@@ -1,20 +1,22 @@
 @if (assessment().pendingReview) {
-  <p class="tag">טרם נבדק על ידי סוכן</p>
+  <p class="tag" title="ההערכה נוצרה על ידי ה-AI ועוד לא נבדקה על ידי סוכן אנושי">טרם נבדק על ידי סוכן</p>
 }
-<p class="overall">ציון כללי <bdi>{{ assessment().overallScore }}</bdi></p>
+<p class="overall">ציון כללי <bdi>{{ assessment().overallScore }}</bdi><span class="of">/100</span> <gv-info-tip term="overallScore" /></p>
+<p class="hint">{{ verdict() }}</p>
 
 <h3>ציון לכל אפיק</h3>
+<p class="hint">עד כמה כל אפיק מתאים ליעד, מ-0 עד 100.</p>
 <ul class="scores">
   @for (channel of channels; track channel.key) {
     <li>
-      <span>{{ channel.label }}</span>
+      <span>{{ channel.label }} <gv-info-tip [term]="channel.key" /></span>
       <span class="track" aria-hidden="true"><span class="fill" [style.width.%]="score(channel.key)"></span></span>
       <bdi>{{ score(channel.key) }}</bdi>
     </li>
   }
 </ul>
 
-<h3>תמהיל</h3>
+<h3>תמהיל <gv-info-tip term="allocation" /></h3>
 <ul class="scores">
   @for (channel of channels; track channel.key) {
     <li>
@@ -24,7 +26,7 @@
   }
 </ul>
 
-<h3>מסלולים</h3>
+<h3>מסלולים מומלצים <gv-info-tip term="fitScore" /></h3>
 @if (assessment().recommendedProducts.length === 0) {
   <p class="gv-muted">אין מסלולים להצגה.</p>
 } @else {
@@ -39,7 +41,7 @@
   </ul>
 }
 
-<h3>דגלי סיכון</h3>
+<h3>דגלי סיכון <gv-info-tip term="riskFlags" /></h3>
 @if (assessment().riskFlags.length === 0) {
   <p class="gv-muted">אין דגלי סיכון.</p>
 } @else {
@@ -56,7 +58,7 @@
 <h3>נימוק</h3>
 <p class="rationale">{{ assessment().rationale }}</p>
 
-<h3>מקורות</h3>
+<h3>מקורות <gv-info-tip term="sources" /></h3>
 @if (assessment().sources.length === 0) {
   <p class="gv-muted">אין מקורות להצגה.</p>
 } @else {

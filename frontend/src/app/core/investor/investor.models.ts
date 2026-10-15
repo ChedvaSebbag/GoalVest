@@ -192,7 +192,7 @@ export const STATUS_LABELS: Record<string, string> = {
   INACTIVE: 'מושבת',
 };
 
-export const CANCELLABLE = new Set(['SUBMITTED', 'AI_EVALUATED', 'IN_REVIEW']);
+export const CANCELLABLE = new Set(['SUBMITTED', 'AI_EVALUATED', 'IN_REVIEW', 'FAILED']);
 
 export const RISK_COPY: Record<string, [string, string]> = {
   'סולידי': ['הפרופיל מעדיף יציבות על פני תנודתיות.', 'כדאי לשקול אפיקים סולידיים יותר, לפי טווח היעד.'],

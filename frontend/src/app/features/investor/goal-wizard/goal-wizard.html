@@ -7,7 +7,9 @@
     }
   </ol>
 
-  @if (requestStatus() && requestStatus() !== 'CANCELLED' && requestStatus() !== 'NO_REQUEST') {
+  @if (requestStatus() === 'FAILED') {
+    <p class="notice">ההערכה הקודמת לא הושלמה. אפשר לעדכן פרטים או להשאיר כמו שהם, ובשמירה היעד יישלח שוב להערכה.</p>
+  } @else if (requestStatus() && requestStatus() !== 'CANCELLED' && requestStatus() !== 'NO_REQUEST') {
     <p class="notice">שמירה תסגור את הבקשה הפעילה ותפתח בקשה חדשה.</p>
   }
   @if (requestStatus() === 'AI_PROCESSING') {
@@ -17,6 +19,7 @@
   <form class="gv-card" [formGroup]="form" (ngSubmit)="save()">
     @if (step() === 1) {
       <h2>סוג היעד</h2>
+      <p class="hint">למה מיועד הכסף? סוג היעד עוזר לסוכן ה-AI להבין את הטווח ואת רמת הגמישות.</p>
       <div class="types">
         @for (type of types; track type.value) {
           <button type="button" class="choice" [class.on]="form.controls.type.value === type.value" [attr.aria-pressed]="form.controls.type.value === type.value" (click)="pickType(type.value)">
@@ -27,15 +30,20 @@
       </div>
       <label>
         שם היעד
-        <input type="text" formControlName="title" />
+        <input type="text" formControlName="title" placeholder="למשל: דירה ראשונה" />
+        <small class="hint">שם קצר שיעזור לך לזהות את היעד ברשימה.</small>
       </label>
     }
 
     @if (step() === 2) {
       <h2>סכומים</h2>
-      <label>סכום התחלתי <bdi><input type="number" formControlName="initialAmount" min="0" /></bdi></label>
-      <label>הפקדה חודשית <bdi><input type="number" formControlName="monthlyDeposit" min="0" /></bdi></label>
-      <label>סכום יעד <bdi><input type="number" formControlName="targetAmount" min="1" /></bdi></label>
+      <p class="hint">הסכומים בשקלים. צריך לפחות סכום התחלתי או הפקדה חודשית.</p>
+      <label>סכום התחלתי <bdi><input type="number" formControlName="initialAmount" min="0" /></bdi>
+        <small class="hint">כמה כסף יש לך היום להשקיע ביעד הזה.</small></label>
+      <label>הפקדה חודשית <bdi><input type="number" formControlName="monthlyDeposit" min="0" /></bdi>
+        <small class="hint">כמה אפשר להוסיף כל חודש. אפשר 0.</small></label>
+      <label>סכום יעד <bdi><input type="number" formControlName="targetAmount" min="1" /></bdi>
+        <small class="hint">כמה כסף צריך להיות לך בתאריך היעד.</small></label>
       @if (form.controls.targetAmount.value > 0 && form.controls.initialAmount.value <= 0 && form.controls.monthlyDeposit.value <= 0) {
         <p class="gv-error">צריך סכום התחלתי או הפקדה חודשית.</p>
       }
@@ -43,10 +51,12 @@
 
     @if (step() === 3) {
       <h2>מועד יעד</h2>
+      <p class="hint">מתי צריך את הכסף? לפחות חצי שנה קדימה. טווח ארוך מאפשר בדרך כלל מסלולים עם פוטנציאל תשואה גבוה יותר.</p>
       <label>
         תאריך יעד
         <bdi dir="ltr"><input type="date" formControlName="targetDate" [min]="minDate" /></bdi>
       </label>
+      <p>עד כמה המועד גמיש? <gv-info-tip term="flexibility" /></p>
       <div class="choices">
         @for (option of flexibilityOptions; track option.value) {
           <button type="button" class="choice" [class.on]="form.controls.flexibility.value === option.value" [attr.aria-pressed]="form.controls.flexibility.value === option.value" (click)="form.controls.flexibility.setValue(option.value)">
@@ -58,7 +68,8 @@
 
     @if (step() === 4) {
       <h2>העדפות</h2>
-      <p>צורך בנזילות</p>
+      <p class="hint">כל ההעדפות אופציונליות, חוץ מצורך בנזילות ומשתי ההסכמות בסוף.</p>
+      <p>צורך בנזילות <gv-info-tip term="liquidity" /></p>
       <div class="choices">
         @for (option of liquidityOptions; track option.value) {
           <button type="button" class="choice" [class.on]="form.controls.liquidityNeed.value === option.value" [attr.aria-pressed]="form.controls.liquidityNeed.value === option.value" (click)="form.controls.liquidityNeed.setValue(option.value)">
@@ -66,19 +77,19 @@
           </button>
         }
       </div>
-      <p>אפיקים מועדפים</p>
+      <p>אפיקים מועדפים <small class="hint">(ה-AI ייתן להם עדיפות)</small></p>
       <div class="choices inline">
         @for (option of channels; track option.value) {
           <button type="button" class="choice" [class.on]="on('preferredChannels', option.value)" [attr.aria-pressed]="on('preferredChannels', option.value)" (click)="toggle('preferredChannels', option.value)">{{ option.label }}</button>
         }
       </div>
-      <p>אפיקים לא רצויים</p>
+      <p>אפיקים לא רצויים <small class="hint">(ה-AI לא ימליץ עליהם)</small></p>
       <div class="choices inline">
         @for (option of channels; track option.value) {
           <button type="button" class="choice" [class.on]="on('excludedChannels', option.value)" [attr.aria-pressed]="on('excludedChannels', option.value)" (click)="toggle('excludedChannels', option.value)">{{ option.label }}</button>
         }
       </div>
-      <p>גופים מועדפים</p>
+      <p>גופים מועדפים <small class="hint">(סוכנים מהגופים האלה יראו את הבקשה)</small></p>
       @if (institutionsFailed()) {
         <p class="gv-error" role="alert">לא הצלחנו לטעון את רשימת הגופים.</p>
         <button type="button" mat-stroked-button (click)="loadInstitutions()">נסה שוב</button>
@@ -91,8 +102,19 @@
           }
         </div>
       }
-      <label class="check"><input type="checkbox" formControlName="consent" /> אני מסכים/ה לשתף את פרטי הקשר עם סוכן</label>
+      <label class="check"><input type="checkbox" formControlName="consent" /> אני מסכים/ה לשתף את פרטי הקשר עם סוכן <gv-info-tip term="consent" /></label>
       <label class="check"><input type="checkbox" formControlName="legal" /> אני מבין/ה שההערכה נוצרת אוטומטית ואינה ייעוץ השקעות</label>
+    }
+
+    @if (step() === 4) {
+      <div class="after">
+        <strong>מה קורה אחרי השמירה?</strong>
+        <ol>
+          <li>סוכן ה-AI מעריך את היעד, בדרך כלל תוך דקה עד שלוש.</li>
+          <li>ההערכה מופיעה בדף היעד: ציון, תמהיל ומסלולים מומלצים.</li>
+          <li>סוכן מגוף מתאים בודק את הבקשה ושולח הצעה, ומופיעה התראה בפעמון.</li>
+        </ol>
+      </div>
     }
 
     @if (error()) {

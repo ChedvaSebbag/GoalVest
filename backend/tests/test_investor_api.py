@@ -253,3 +253,21 @@ def test_edit_with_active_request_replaces_it(client):
     with Session(client.application.extensions["test_engine"]) as session:
         statuses = session.execute(sa.select(rm_requests.c.status)).scalars().all()
     assert sorted(statuses) == ["CANCELLED", "SUBMITTED"]
+
+
+def test_failed_request_is_resubmitted_on_save_even_without_changes(client):
+    token, goal_id = _ready(client)
+    request_id = _submit(client, token, goal_id).get_json()["id"]
+    _set_status(client, request_id, "FAILED")
+    saved = client.put(
+        f"/api/investor/goals/{goal_id}",
+        json={**_goal(), "consentShareContact": True},
+        headers=_headers(token),
+    )
+    assert saved.status_code == 201, saved.get_json()
+    details = client.get(f"/api/investor/goals/{goal_id}", headers=_headers(token)).get_json()
+    assert details["activeRequestId"] not in (None, request_id)
+    assert details["requestStatus"] == "SUBMITTED"
+    with Session(client.application.extensions["test_engine"]) as session:
+        statuses = session.execute(sa.select(rm_requests.c.status)).scalars().all()
+    assert sorted(statuses) == ["CANCELLED", "SUBMITTED"]

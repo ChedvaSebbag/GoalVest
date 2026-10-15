@@ -18,3 +18,4 @@ h1, h2 { margin: 0 0 calc(var(--gv-space) * 2); color: var(--gv-primary); }
 input { font: inherit; padding: calc(var(--gv-space)); border-radius: var(--gv-radius); border: 1px solid var(--gv-text-muted); }
 fieldset { border: 0; margin: 0 0 calc(var(--gv-space) * 2); padding: 0; }
 legend { margin-block-end: calc(var(--gv-space)); font-weight: 500; }
+.intro { color: var(--gv-text-muted); line-height: 1.7; margin-block: 0 calc(var(--gv-space) * 2); }

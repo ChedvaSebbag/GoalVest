@@ -11,9 +11,12 @@ import { AssessmentCard } from '../../investor/goal-details/assessment-card';
 import { MoneyPipe } from '../../../shared/money.pipe';
 import { StatusChip } from '../../../shared/status-chip';
 
+import { InfoTip } from '../../../shared/info-tip';
+import { RequestJourney } from '../../../shared/request-journey';
+
 @Component({
   selector: 'gv-lead-details',
-  imports: [FormsModule, RouterLink, MatButtonModule, AssessmentCard, MoneyPipe, StatusChip],
+  imports: [FormsModule, RouterLink, MatButtonModule, AssessmentCard, MoneyPipe, StatusChip, InfoTip, RequestJourney],
   templateUrl: './lead-details.html',
   styleUrl: './lead-details.scss',
 })
@@ -140,5 +143,22 @@ export class LeadDetailsPage {
         this.message.set(apiErrorMessage(error));
       },
     });
+  }
+
+  protected noActionText(status: string, claimedByMe: boolean): string {
+    switch (status) {
+      case 'IN_REVIEW':
+        return claimedByMe ? '' : 'הליד בטיפול של סוכן אחר מהגוף שלך.';
+      case 'OFFER_SENT':
+        return 'ההצעה נשלחה. ממתינים לתשובת המשקיע, ותופיע התראה כשיענה.';
+      case 'ACCEPTED':
+        return 'המשקיע אישר את ההצעה. כדאי ליצור איתו קשר להשלמת ההצטרפות.';
+      case 'REEVALUATION_REQUESTED':
+        return 'הבקשה חזרה לסוכן ה-AI. הליד יחזור לרשימת החדשים כשההערכה המעודכנת תהיה מוכנה.';
+      case 'CANCELLED':
+        return 'המשקיע ביטל את הבקשה.';
+      default:
+        return 'אין פעולה זמינה בסטטוס הזה.';
+    }
   }
 }

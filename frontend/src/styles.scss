@@ -77,3 +77,12 @@ body {
   background: var(--gv-skeleton);
   margin-block-end: calc(var(--gv-space) * 2);
 }
+
+// ---- Tooltip של מילון המונחים (gv-info-tip) ----
+.gv-tooltip .mdc-tooltip__surface {
+  font-family: Heebo, Arial, sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  max-inline-size: 280px;
+  text-align: start;
+}

@@ -1,12 +1,25 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { AuthService } from '../core/auth/auth.service';
+import { STATUS_HELP } from '../core/help/help-content';
 import { STATUS_LABELS } from '../core/investor/investor.models';
 
 @Component({
   selector: 'gv-status-chip',
-  template: `<span class="chip" [attr.data-status]="status()">{{ label() }}</span>`,
+  imports: [MatTooltipModule],
+  template: `<span
+    class="chip"
+    [attr.data-status]="status()"
+    [matTooltip]="explain()"
+    matTooltipClass="gv-tooltip"
+    [attr.tabindex]="explain() ? 0 : null"
+    [attr.aria-label]="explain() ? label() + '. ' + explain() : null"
+  >{{ label() }}</span>`,
   styles: `
     .chip {
       display: inline-block;
+      white-space: nowrap;
+      cursor: default;
       padding: 2px calc(var(--gv-space) * 1.5);
       border-radius: 999px;
       background: color-mix(in srgb, var(--gv-status-submitted) 16%, white);
@@ -59,5 +72,12 @@ import { STATUS_LABELS } from '../core/investor/investor.models';
 })
 export class StatusChip {
   readonly status = input.required<string>();
+  private readonly user = inject(AuthService).user;
   protected readonly label = computed(() => STATUS_LABELS[this.status()] ?? this.status());
+  /** הסבר קצר שמוצג במעבר עכבר: מה הסטטוס אומר ומה קורה עכשיו */
+  protected readonly explain = computed(() => {
+    const help = STATUS_HELP[this.status()];
+    if (!help) return '';
+    return this.user()?.role === 'AGENT' ? help.agent : help.investor;
+  });
 }

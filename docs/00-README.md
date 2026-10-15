@@ -36,6 +36,8 @@
 | 14-repo-and-deployment.md | מבנה ה-Repo, סביבות, Docker והרצה |
 | 15-roadmap.md | אבני דרך וחלוקת עבודה בצוות |
 | 16-open-questions.md | שאלות פתוחות והנחות שדורשות אישור |
+| 17-demo-script.md | תסריט הדגמה של 5 דקות |
+| 18-exam-prep.md | שאלות ותשובות לקראת ההצגה: Event Sourcing, CQRS, RAG, MCP, הסוכן |
 | ../.claude/rules/*.md | Rules לסוכן הקוד |
 | ../.claude/skills/*/SKILL.md | Skill שפותח בפרויקט |
 

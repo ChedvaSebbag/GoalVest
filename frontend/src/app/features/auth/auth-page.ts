@@ -1,6 +1,6 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, isDevMode, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -24,6 +24,7 @@ import { Institution, UserRole, homeRouteForRole } from '../../core/auth/auth.mo
     MatButtonModule,
     MatAutocompleteModule,
     MatProgressBarModule,
+    RouterLink,
   ],
   templateUrl: './auth-page.html',
   styleUrl: './auth-page.scss',
@@ -56,6 +57,19 @@ export class AuthPage {
     }
     return all.filter((item) => item.name.includes(query));
   });
+
+  /** חשבונות ה-seed מוצגים רק בסביבת פיתוח (ng serve), לא ב-build של production */
+  protected readonly showDemo = isDevMode();
+  protected readonly demoAccounts = [
+    { label: 'משקיעה לדוגמה', email: 'demo.investor1@goalvest.test' },
+    { label: 'סוכן – הראל', email: 'demo.agent.harel@goalvest.test' },
+    { label: 'סוכן – כלל', email: 'demo.agent.clal@goalvest.test' },
+    { label: 'סוכן – מגדל', email: 'demo.agent.migdal@goalvest.test' },
+  ];
+
+  protected fillDemo(email: string): void {
+    this.loginForm.setValue({ email, password: 'Demo1234' });
+  }
 
   protected readonly loginForm = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],

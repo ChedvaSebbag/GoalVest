@@ -60,3 +60,23 @@ button[mat-flat-button] {
 @media (max-width: 520px) {
   .roles { grid-template-columns: 1fr; }
 }
+
+.intro {
+  list-style: none;
+  padding: 0;
+  margin: calc(var(--gv-space) * 2) 0 var(--gv-space);
+  display: grid;
+  gap: var(--gv-space);
+}
+.intro li { display: flex; align-items: center; gap: var(--gv-space); }
+.intro .material-symbols-rounded { color: var(--gv-accent); }
+.help { color: var(--gv-primary); font-size: 0.9rem; }
+.small { font-size: 0.85rem; margin: 0; }
+.demo {
+  margin-block-start: var(--gv-space);
+  padding: var(--gv-space) calc(var(--gv-space) * 1.5);
+  border: 1px dashed var(--gv-skeleton);
+  border-radius: calc(var(--gv-radius) / 1.5);
+}
+.demo summary { cursor: pointer; color: var(--gv-primary); font-weight: 500; }
+.demo-list { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gv-space); margin-block-start: var(--gv-space); }

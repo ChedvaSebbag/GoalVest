@@ -1,7 +1,12 @@
 <section class="gv-page board">
   <header class="head">
     <h1>דשבורד סוכן</h1>
+    <a mat-stroked-button routerLink="/help">איך עובדים עם לידים?</a>
   </header>
+
+  @if (nextStep(); as step) {
+    <gv-next-step [step]="step" (action)="followNextStep()" />
+  }
 
   @if (leads() === null) {
     <div class="gv-skeleton"></div>
@@ -14,22 +19,22 @@
   } @else {
     @if (dashboard(); as kpi) {
       <div class="kpis">
-        <article class="gv-card kpi"><span>לידים חדשים</span><strong><bdi>{{ kpi.evaluated }}</bdi></strong></article>
+        <article class="gv-card kpi"><span>לידים חדשים <gv-info-tip term="leadNew" /></span><strong><bdi>{{ kpi.evaluated }}</bdi></strong></article>
         <article class="gv-card kpi"><span>בטיפול</span><strong><bdi>{{ kpi.inReview }}</bdi></strong></article>
         <article class="gv-card kpi"><span>הצעות פתוחות</span><strong><bdi>{{ kpi.offerSent }}</bdi></strong></article>
         <article class="gv-card kpi">
-          <span>שיעור המרה</span>
+          <span>שיעור המרה <gv-info-tip term="conversion" /></span>
           <strong><bdi>{{ kpi.conversionRate === null ? '—' : kpi.conversionRate + '%' }}</bdi></strong>
         </article>
         <article class="gv-card kpi">
-          <span>ציון AI ממוצע</span>
+          <span>ציון AI ממוצע <gv-info-tip term="avgScore" /></span>
           <strong><bdi>{{ kpi.averageScore ?? '—' }}</bdi></strong>
         </article>
       </div>
     }
 
     <article class="gv-card block">
-      <h2>מתעניינים לפי מוצר</h2>
+      <h2>מתעניינים לפי מוצר <gv-info-tip term="interest" /></h2>
       @if ((interest() ?? []).length === 0) {
         <p class="gv-muted">עדיין אין מוצרים לגוף. אפשר להוסיף מוצר במסך המוצרים.</p>
         <a mat-stroked-button routerLink="/agent/products">המוצרים שלי</a>
@@ -56,8 +61,9 @@
       }
     </article>
 
-    <article class="gv-card block">
+    <article class="gv-card block" id="leads">
       <h2>לידים</h2>
+      <p class="gv-muted">לוחצים על שם המשקיע כדי לפתוח את הליד. ליד "חדש" עוד לא נלקח לטיפול.</p>
       <div class="tabs" role="tablist">
         @for (tab of tabs; track tab.id) {
           <button type="button" role="tab" [attr.aria-selected]="status() === tab.id" (click)="selectTab(tab.id)">
@@ -85,7 +91,13 @@
       }
 
       @if ((leads() ?? []).length === 0) {
-        <p class="gv-muted">אין לידים בסטטוס הזה.</p>
+        <div class="empty">
+          <span class="material-symbols-rounded" aria-hidden="true">inbox</span>
+          <p class="gv-muted">אין לידים בסטטוס הזה. לידים חדשים מופיעים אחרי שה-AI מסיים להעריך בקשה שמתאימה למוצרים שלך.</p>
+          @if (status() !== '') {
+            <button type="button" mat-stroked-button (click)="selectTab('')">הצגת כל הלידים</button>
+          }
+        </div>
       } @else {
         <table>
           <thead>

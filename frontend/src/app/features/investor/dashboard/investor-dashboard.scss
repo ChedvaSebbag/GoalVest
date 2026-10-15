@@ -18,3 +18,8 @@ table { width: 100%; border-collapse: collapse; }
 th, td { text-align: start; padding: var(--gv-space); border-block-end: 1px solid var(--gv-skeleton); }
 a { color: var(--gv-primary); }
 .empty { margin-block-start: calc(var(--gv-space) * 2); }
+.grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.empty { text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--gv-space); }
+.empty p { max-inline-size: 520px; line-height: 1.7; }
+.big { font-size: 48px; color: var(--gv-accent); }
+.kpi span { display: inline-flex; align-items: center; }

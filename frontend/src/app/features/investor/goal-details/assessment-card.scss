@@ -18,3 +18,6 @@ h3 { margin: calc(var(--gv-space) * 2) 0 calc(var(--gv-space)); color: var(--gv-
 .flags span, .sources span { color: var(--gv-text-muted); font-size: 0.85rem; }
 .rationale, .products p, .sources p, .flags p { margin: calc(var(--gv-space)) 0 0; }
 .sources a { color: var(--gv-primary); }
+.hint { margin: 0 0 var(--gv-space); color: var(--gv-text-muted); font-size: 0.9rem; }
+.of { font-size: 0.9rem; color: var(--gv-text-muted); }
+h3 { display: flex; align-items: center; }

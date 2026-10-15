@@ -4,10 +4,14 @@
     <a mat-flat-button routerLink="/investor/goals/new">יעד חדש</a>
   </header>
 
+  @if (nextStep(); as step) {
+    <gv-next-step [step]="step" />
+  }
+
   <form class="search" (ngSubmit)="search()">
     <label>
       חיפוש מוצר
-      <input name="q" [(ngModel)]="query" />
+      <input name="q" [(ngModel)]="query" placeholder="שם מסלול, גוף או סימול" />
     </label>
     <button type="submit" mat-stroked-button>חיפוש</button>
   </form>
@@ -22,15 +26,16 @@
     </article>
   } @else if (dashboard(); as view) {
     <div class="kpis">
-      <article class="gv-card kpi"><span>סך הון מתוכנן</span><strong><bdi>{{ view.plannedCapital | money }}</bdi></strong></article>
+      <article class="gv-card kpi"><span>סך הון מתוכנן <gv-info-tip term="plannedCapital" /></span><strong><bdi>{{ view.plannedCapital | money }}</bdi></strong></article>
       <article class="gv-card kpi"><span>יעדים פעילים</span><strong><bdi>{{ view.activeGoals }}</bdi></strong></article>
       <article class="gv-card kpi"><span>הצעות שממתינות</span><strong><bdi>{{ view.pendingOffers }}</bdi></strong></article>
     </div>
 
     @if (view.goals.length === 0) {
       <article class="gv-card empty">
+        <span class="material-symbols-rounded big" aria-hidden="true">flag</span>
         <h2>עדיין אין יעדים</h2>
-        <p class="gv-muted">אפשר להגדיר יעד ולהגיש אותו להערכה.</p>
+        <p class="gv-muted">יעד הוא מטרה כספית עם סכום ותאריך, למשל "דירה בעוד 4 שנים". אחרי שמגדירים יעד, סוכן AI מעריך אילו אפיקי השקעה מתאימים לו.</p>
         <a mat-flat-button routerLink="/investor/goals/new">יעד חדש</a>
       </article>
     } @else {
@@ -57,7 +62,10 @@
       </div>
 
       <article class="gv-card mix">
-        <h2>תמהיל מומלץ</h2>
+        <h2>תמהיל מומלץ <gv-info-tip term="allocation" /></h2>
+        @if (selected(); as current) {
+          <p class="gv-muted">עבור היעד "{{ current.title }}". אפשר לבחור יעד אחר בכפתור "הצגת תמהיל".</p>
+        }
         @if (selected(); as current) {
         @if (current.assessment; as assessment) {
           <div class="chart">
@@ -68,7 +76,7 @@
             <p class="gv-muted">אין מסלולים להצגה.</p>
           } @else {
             <table>
-              <thead><tr><th>מסלול</th><th>התאמה</th></tr></thead>
+              <thead><tr><th>מסלול</th><th>התאמה <gv-info-tip term="fitScore" /></th></tr></thead>
               <tbody>
                 @for (product of assessment.recommendedProducts; track product.productId) {
                   <tr>
@@ -81,7 +89,7 @@
           }
           <gv-disclaimer />
         } @else {
-          <p class="gv-muted">עדיין אין תמהיל מומלץ ליעד שנבחר.</p>
+          <p class="gv-muted">עדיין אין תמהיל מומלץ ליעד הזה. התמהיל מופיע אחרי שסוכן ה-AI מסיים להעריך את היעד.</p>
         }
         }
       </article>

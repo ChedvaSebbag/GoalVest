@@ -7,3 +7,9 @@ dt { color: var(--gv-text-muted); }
 dd { margin: 0; }
 ol { list-style: none; margin: 0; padding: 0; display: grid; gap: calc(var(--gv-space) * 2); }
 li { display: grid; gap: 4px; padding-inline-start: calc(var(--gv-space) * 2); border-inline-start: 3px solid var(--gv-accent); }
+.waiting { display: flex; align-items: center; gap: calc(var(--gv-space) * 1.5); }
+.waiting p { margin: 0; }
+.spin { color: var(--gv-status-processing); animation: gv-spin 1.2s linear infinite; }
+@keyframes gv-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+dt { display: inline-flex; align-items: center; }

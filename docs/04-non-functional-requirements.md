@@ -5,7 +5,7 @@
 | # | דרישת המרצה | מימוש ב-GoalVest | איפה מתועד |
 |---|---|---|---|
 | 1 | פיתוח מבוסס סדרת מסמכי MD | תיקיית `docs/` (הסט הזה), `.claude/rules`, `.claude/skills`, `CLAUDE.md` בשורש | 00-README.md |
-| 2 | Skill אחד לפחות מ-Skills.sh | `analogjs/angular-skills` לפיתוח אנגולר (חלופה: Skill עיצוב Frontend). מותקן ב-`.claude/skills` ומתועד | 11-mcp-tools-skills-rules.md |
+| 2 | Skill אחד לפחות מ-Skills.sh | `angular-developer` מתוך `angular/skills` (הותקן עם `npx skills add`). נמצא ב-`.claude/skills`, ב-`.cursor/skills` וב-`.agents/skills`, ונעול ב-`skills-lock.json` | 11-mcp-tools-skills-rules.md |
 | 3 | הגדרת Skill אחד ו-Rule אחד לפחות | Skill: `add-cqrs-feature`. Rules: R1 ארכיטקטורה, R2 UI עברי, R3 ציות פיננסי | 11, `.claude/` |
 | 4 | שרת אפליקציה Flask | Flask 3 עם Blueprints, flask-jwt-extended, SQLAlchemy | 06-architecture.md |
 | 5 | מסד נתונים בענן | MS SQL Server ב-Somee.com | 07-data-model.md |

@@ -16,9 +16,11 @@ import {
   apiErrorMessage,
 } from '../../../core/investor/investor.models';
 
+import { InfoTip } from '../../../shared/info-tip';
+
 @Component({
   selector: 'gv-goal-wizard',
-  imports: [ReactiveFormsModule, MatButtonModule, RouterLink],
+  imports: [ReactiveFormsModule, MatButtonModule, RouterLink, InfoTip],
   templateUrl: './goal-wizard.html',
   styleUrl: './goal-wizard.scss',
 })

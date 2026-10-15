@@ -2,10 +2,14 @@
   <span class="brand">GoalVest</span>
   <span class="tagline">השקעות מבוססות-מטרות</span>
   <span class="spacer"></span>
-  <a routerLink="/system">מצב המערכת</a>
+  <a routerLink="/system" routerLinkActive="active">מצב המערכת</a>
+  <a routerLink="/help" routerLinkActive="active" class="help-link">
+    <span class="material-symbols-rounded" aria-hidden="true">help</span>
+    עזרה
+  </a>
   @if (user(); as current) {
     @if (current.role === 'INVESTOR') {
-      <a routerLink="/investor" routerLinkActive="active">היעדים שלי</a>
+      <a routerLink="/investor" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">היעדים שלי</a>
       <a routerLink="/investor/offers" routerLinkActive="active">הצעות</a>
       <gv-notification-bell />
     } @else if (current.role === 'AGENT') {
@@ -13,6 +17,7 @@
       <a routerLink="/agent/products" routerLinkActive="active">המוצרים שלי</a>
     }
     <a routerLink="/products" routerLinkActive="active">השוואת מוצרים</a>
+    <span class="who" [attr.aria-label]="'מחובר/ת כ' + roleLabel(current.role)">{{ roleLabel(current.role) }}</span>
     <button type="button" (click)="logout()">התנתקות</button>
   }
 </mat-toolbar>

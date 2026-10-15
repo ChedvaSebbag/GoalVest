@@ -8,7 +8,7 @@ from uuid import UUID
 from goalvest_core import BusinessRuleViolation, NotFound
 from goalvest_core.goals import Goal
 from goalvest_core.investor import InvestorProfile
-from goalvest_core.requests import InvestmentRequest
+from goalvest_core.requests import InvestmentRequest, RequestStatus
 
 from app.commands.bus import Command, CommandContext, CommandResult
 from app.commands.loading import load_typed, metadata_for, save
@@ -96,12 +96,15 @@ def handle_update_goal(command: UpdateGoal, ctx: CommandContext) -> CommandResul
         **command.data.as_kwargs(),
     )
     changed = bool(goal.uncommitted_events)
-    if request is not None and changed and not command.consent_share_contact:
+    # בקשה שנכשלה מוגשת מחדש בכל שמירה, גם בלי שינוי בשדות היעד
+    failed = request is not None and request.status is RequestStatus.FAILED
+    resubmit = request is not None and (changed or failed)
+    if resubmit and not command.consent_share_contact:
         raise BusinessRuleViolation("יש לאשר שיתוף פרטים עם סוכנים", code="CONSENT_REQUIRED")
-    opening = (request is not None and changed) or (request is None and command.consent_share_contact)
+    opening = resubmit or (request is None and command.consent_share_contact)
     profile = _scored_profile(ctx, command.actor_id) if opening else None
     save(ctx, goal, previous)
-    if request is not None and changed and profile is not None:
+    if resubmit and profile is not None:
         request_previous = request.version
         request.cancel(by=str(command.actor_id), reason="GOAL_UPDATED", metadata=meta)
         save(ctx, request, request_previous)
