@@ -70,7 +70,7 @@ def product_interest(session: Session, institution_id: UUID) -> dict:
         sa.select(rm_products.c.product_id, rm_products.c.name)
         .where(rm_products.c.institution_id == institution_id)
         .order_by(rm_products.c.name)
-    ).mappings()
+    ).mappings().all()
     interest = {
         row["product_id"]: row
         for row in session.execute(
