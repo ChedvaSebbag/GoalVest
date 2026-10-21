@@ -27,6 +27,9 @@ import { STATUS_LABELS } from '../core/investor/investor.models';
         @if (info.owner !== '—') {
           <p class="owner">מי צריך לפעול עכשיו: <strong>{{ info.owner }}</strong></p>
         }
+        @if (waitNote(); as note) {
+          <p class="wait"><span class="material-symbols-rounded" aria-hidden="true">hourglass_top</span><span>{{ note }}</span></p>
+        }
       </div>
     }
   `,
@@ -85,6 +88,16 @@ import { STATUS_LABELS } from '../core/investor/investor.models';
     .explain.stopped { background: color-mix(in srgb, var(--gv-error) 8%, var(--gv-surface)); }
     .explain p { margin: 0; }
     .owner { margin-block-start: 4px !important; font-size: 0.9rem; color: var(--gv-text-muted); }
+    .wait {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-block-start: calc(var(--gv-space)) !important;
+      padding-block-start: var(--gv-space);
+      border-block-start: 1px solid var(--gv-border);
+      font-size: 0.9rem;
+    }
+    .wait .material-symbols-rounded { font-size: 20px; color: var(--gv-primary); }
     @media (max-width: 520px) {
       .name { font-size: 0.75rem; }
       .dot { inline-size: 30px; block-size: 30px; font-size: 17px; }
@@ -102,4 +115,20 @@ export class RequestJourney {
   protected readonly stopped = computed(() => ['FAILED', 'CANCELLED'].includes(this.status() ?? ''));
   protected readonly label = computed(() => STATUS_LABELS[this.status() ?? 'NO_REQUEST'] ?? this.status() ?? '');
   protected readonly help = computed(() => STATUS_HELP[this.status() ?? 'NO_REQUEST'] ?? null);
+
+  /** למשקיע: כשהכדור לא אצלו – אומרים במפורש שאין מה לעשות ומה כן אפשר */
+  protected readonly waitNote = computed(() => {
+    if (this.view() !== 'investor') return null;
+    switch (this.status()) {
+      case 'SUBMITTED':
+      case 'AI_PROCESSING':
+        return 'כרגע אין לך מה לעשות. ההערכה תופיע כאן לבד בעוד כמה דקות.';
+      case 'AI_EVALUATED':
+      case 'IN_REVIEW':
+      case 'REEVALUATION_REQUESTED':
+        return 'כרגע אין לך מה לעשות. כשהסוכן ישלח הצעה תופיע התראה בפעמון, וההצעה תופיע ב"הצעות שקיבלתי". רוצה לשנות את היעד (למשל יותר שוק ההון)? "עריכת יעד" ושמירה שולחות בקשה חדשה להערכה.';
+      default:
+        return null;
+    }
+  });
 }
