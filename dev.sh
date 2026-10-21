@@ -50,7 +50,12 @@ if ! docker info >/dev/null 2>&1; then
   open -a Docker
   until docker info >/dev/null 2>&1; do sleep 2; done
 fi
-docker compose up -d chromadb >/dev/null 2>&1
+# Docker Desktop עונה ל-"docker info" לפני שהוא מוכן לגמרי – לכן מנסים כמה פעמים ומציגים שגיאה אמיתית
+for attempt in 1 2 3 4 5 6 7 8 9 10; do
+  if out=$(docker compose up -d chromadb 2>&1); then break; fi
+  if [ "$attempt" -eq 10 ]; then echo "✗ ChromaDB לא עלה:"; echo "$out" | tail -3; fi
+  sleep 3
+done
 wait_for "ChromaDB" "http://localhost:8000/api/v2/heartbeat" 60
 
 # 2) Ollama
