@@ -1,5 +1,9 @@
 """חיפוש סמנטי ב-ChromaDB. הסוכן ישתמש בזה. ראו docs/10 §10.3–10.4."""
 
+# Retrieval for RAG: the query is embedded with bge-m3 (Ollama) and the closest chunks are
+# fetched from ChromaDB (cosine distance, k=6). Collections: policy_documents, knowledge_base,
+# product_profiles. Results are passed to the LLM prompt as cited evidence.
+
 from worker.embeddings import embed_texts
 
 _COLLECTIONS = frozenset({"policy_documents", "knowledge_base", "product_profiles"})

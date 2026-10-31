@@ -1,5 +1,12 @@
 """EventStoreRepository – append ו-load. כתיבה ל-EventStore היא INSERT בלבד. ראו docs/07 §7.2."""
 
+# Append-only event store.
+# append() only INSERTs into EventStore (no UPDATE/DELETE anywhere - Rule R1) and runs the
+# projectors in the same transaction (ADR-1: synchronous projections), so read models are
+# consistent as soon as the command returns. UQ_Aggregate_Version (aggregate_id, version)
+# implements optimistic concurrency: a concurrent write raises ConcurrencyError -> HTTP 409.
+# load() returns an aggregate's events ordered by version for rehydration.
+
 from collections.abc import Sequence
 from uuid import UUID
 

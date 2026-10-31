@@ -57,8 +57,9 @@ export class AuthPage {
     return all.filter((item) => item.name.includes(query));
   });
 
-  /** חשבונות ה-seed מוצגים רק בסביבת פיתוח (ng serve), לא ב-build של production */
-  protected readonly showDemo = isDevMode();
+  /** חשבונות ה-seed מוצגים רק בפיתוח ורק על המחשב המקומי – לא בקישור שיתוף ולא ב-production */
+  protected readonly showDemo =
+    isDevMode() && ['localhost', '127.0.0.1'].includes(globalThis.location?.hostname ?? '');
   protected readonly demoAccounts = [
     { label: 'משקיעה לדוגמה', email: 'demo.investor1@goalvest.test' },
     { label: 'סוכן – הראל', email: 'demo.agent.harel@goalvest.test' },

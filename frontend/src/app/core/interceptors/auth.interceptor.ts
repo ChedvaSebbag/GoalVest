@@ -1,3 +1,6 @@
+// Adds the Bearer access token to every API call. On 401 it refreshes the session once and
+// retries the request; if that fails the user is sent to login. correlation.interceptor.ts adds
+// X-Correlation-Id for tracing a request across logs.
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';

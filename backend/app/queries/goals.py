@@ -1,5 +1,8 @@
 """קריאה מ-rm_goals ומבקשה הפעילה. אין טעינת Aggregate."""
 
+# Query side of CQRS: reads only rm_* tables and returns view-ready dicts. It never loads
+# aggregates or reads EventStore. Money is serialised from Decimal (never float).
+
 from datetime import date
 from decimal import Decimal
 from uuid import UUID

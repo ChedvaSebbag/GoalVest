@@ -1,5 +1,12 @@
 """CommandBus – רישום handlers ו-idempotency מול ProcessedCommands. ראו docs/06 §6.4."""
 
+# Command side of CQRS.
+# Controllers build a Command and call dispatch(); the bus routes it to the registered handler.
+# Handlers return only CommandResult(id, version) - never view data (Rule R1).
+# Idempotency: command_id comes from the Idempotency-Key header; a command already recorded in
+# ProcessedCommands returns the stored result without writing again. Events, projections and
+# the ProcessedCommands row are committed together.
+
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime

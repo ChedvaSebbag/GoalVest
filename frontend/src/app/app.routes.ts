@@ -1,3 +1,6 @@
+// Lazy-loaded standalone components. Guards: authGuard (signed in), roleGuard (INVESTOR/AGENT),
+// riskProfileGuard (investors complete the risk questionnaire first). Guards are UX only;
+// authorization is enforced by the API (@require_role).
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { riskProfileGuard } from './core/guards/risk-profile.guard';

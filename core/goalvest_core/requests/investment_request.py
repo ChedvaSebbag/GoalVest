@@ -1,5 +1,11 @@
 """InvestmentRequest – הגשה, ביטול, הערכת AI, ליד והצעה. ראו docs/03 §3.9 ו-docs/08 §8.7."""
 
+# InvestmentRequest is the request state machine (9 statuses, see RequestStatus).
+# Every command method (submit, cancel, claim, send_offer, ...) first checks that the transition
+# is legal for the current status - otherwise BusinessRuleViolation (HTTP 422 with a code) - and
+# then records exactly one event via _record. Business rules live here, never in controllers
+# or handlers. A FAILED request can be cancelled; saving the goal again resubmits it.
+
 from dataclasses import dataclass
 from enum import StrEnum
 from uuid import UUID

@@ -1,5 +1,12 @@
 """הרצת הערכה: איסוף ראיות, Deep Agent או שרשרת, ואז ולידציה. ראו docs/09 §9.4–9.6."""
 
+# Assessment steps:
+#   1. Rules: evaluate() with rules.yaml and tax_rules.yaml -> suitability flags and scores.
+#   2. Evidence: RAG search in ChromaDB and web search through the Tavily MCP server.
+#      sensitive_terms() strips personal data (name, email, amounts) before anything leaves the machine.
+#   3. Synthesis with the local LLM (Ollama): deep agent -> chain -> baseline, 2 attempts each.
+#   4. Validation: Pydantic schema (ModelAssessment), only candidate products, sourced claims.
+
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field

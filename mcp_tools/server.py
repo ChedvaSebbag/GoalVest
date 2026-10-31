@@ -1,5 +1,9 @@
 """שרת MCP goalvest-tools בתעבורת stdio. ראו docs/11 §11.2."""
 
+# MCP (Model Context Protocol) server exposing our domain tools to the agent over stdio.
+# Tools: calculate_investment_tax (rates read from tax_rules.yaml) and get_stock_volatility (yfinance).
+# The agent connects with MultiServerMCPClient; Tavily is a second MCP server (npx -y tavily-mcp).
+
 from mcp.server.fastmcp import FastMCP
 
 from mcp_tools.tax import calculate_investment_tax as compute_tax

@@ -1,5 +1,11 @@
 """Endpoints של בקשת השקעה. ראו docs/08 §8.3."""
 
+# Controller layer (MVC) as a Flask Blueprint, registered under /api.
+# Responsibilities only: role check (@require_role), body validation (Pydantic via parse_body),
+# reading the Idempotency-Key, building the Command and mapping domain errors to HTTP
+# (NotFound -> 404, BusinessRuleViolation -> 422). No business logic. Writes return 201 {id, version};
+# reads go through the query services.
+
 from uuid import UUID
 
 from flask import Blueprint, current_app, jsonify, request
