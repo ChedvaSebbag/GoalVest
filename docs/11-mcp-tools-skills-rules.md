@@ -96,8 +96,7 @@ npx @modelcontextprotocol/inspector python -m mcp_tools.server
 
 | Skill | שימוש | התקנה |
 |---|---|---|
-| `analogjs/angular-skills` | הנחיות לסוכן הקוד לכתיבת Angular מודרני: Standalone, Signals, Control Flow, בדיקות | `npx skills add analogjs/angular-skills` (לאמת את שם ה-Skill המדויק בעמוד ב-skills.sh) |
-| חלופה / תוספת | Skill לעיצוב Frontend מקצועי מ-skills.sh | לפי בחירה |
+| `angular-developer` (מתוך `angular/skills`, ה-Skills הרשמיים של צוות Angular) | הנחיות לסוכן הקוד לכתיבת Angular מודרני: Standalone, Signals, Control Flow, ניתוב, טפסים, נגישות ובדיקות. מחייב `ng build` אחרי כל שינוי | **הותקן:** `npx skills add https://github.com/angular/skills -s angular-developer -a claude-code -a cursor -a codex --copy`. הקבצים ב-`.claude/skills/`, `.cursor/skills/` ו-`.agents/skills/`, והגרסה נעולה ב-`skills-lock.json` |
 
 מתועד ב-README של ה-Repo: למה נבחר, איך הותקן, ודוגמה לפיצ'ר שנבנה בעזרתו.
 

@@ -1,5 +1,11 @@
 """AggregateRoot – שחזור מצב מאירועים ורישום אירועים חדשים. ראו docs/06 §6.5."""
 
+# Aggregate root (Event Sourcing).
+# State is never stored directly: it is rebuilt by replaying the aggregate's events in order
+# (from_events -> apply -> _when). _when only mutates fields; business rules live in the
+# subclasses' command methods. _record creates a new event with version + 1, applies it and
+# keeps it as uncommitted until the repository appends it. `version` drives optimistic concurrency.
+
 from collections.abc import Sequence
 from typing import ClassVar, Self
 from uuid import UUID, uuid4

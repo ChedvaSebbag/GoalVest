@@ -35,7 +35,7 @@ def test_submit_without_risk_score_or_consent_records_nothing():
     assert consent.value.code == "CONSENT_REQUIRED"
 
 
-@pytest.mark.parametrize("status", [RequestStatus.SUBMITTED, RequestStatus.AI_EVALUATED, RequestStatus.IN_REVIEW])
+@pytest.mark.parametrize("status", [RequestStatus.SUBMITTED, RequestStatus.AI_EVALUATED, RequestStatus.IN_REVIEW, RequestStatus.FAILED])
 def test_cancel_is_allowed_from_submitted_evaluated_and_review(status):
     request = _submitted()
     request.use_projected_status(status)

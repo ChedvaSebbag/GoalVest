@@ -1,5 +1,9 @@
 """בדיקת תפקיד על Endpoint. הרשאות אמיתיות נשארות בשרת. ראו docs/12 §12.2."""
 
+# Endpoint authorization: @require_role("INVESTOR" | "AGENT"). Missing/invalid JWT -> 401,
+# wrong role -> 403. Resource ownership is enforced in handlers/queries, which answer 404 for
+# another user's or another institution's data. Client-side guards are navigation only.
+
 from collections.abc import Callable
 from functools import wraps
 

@@ -31,4 +31,5 @@ def close_db(_exc: BaseException | None = None) -> None:
 def get_engine(connection_string: str) -> Engine:
     if not connection_string:
         raise RuntimeError("פרטי מסד הנתונים (DB_SERVER, DB_USER, DB_PASSWORD) לא הוגדרו בקובץ .env")
-    return create_engine(connection_string, pool_pre_ping=True, pool_recycle=1800)
+    # Somee סוגר חיבורים שלא בשימוש. מחדשים חיבור אחרי 4 דקות כדי לא לקבל "TCP Provider 0x20"
+    return create_engine(connection_string, pool_pre_ping=True, pool_recycle=240)

@@ -22,7 +22,8 @@ def _build_db_url() -> str:
         password=os.getenv("DB_PASSWORD", ""),
         host=server,
         database=os.getenv("DB_NAME", ""),
-        query={"driver": "ODBC Driver 18 for SQL Server", "TrustServerCertificate": "yes"},
+        # MARS: מאפשר כמה שאילתות פתוחות על אותו חיבור (בלי "Connection is busy")
+        query={"driver": "ODBC Driver 18 for SQL Server", "TrustServerCertificate": "yes", "MARS_Connection": "yes"},
     )
     return url.render_as_string(hide_password=False)
 

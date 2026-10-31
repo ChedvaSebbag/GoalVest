@@ -3,16 +3,26 @@ import {
   AssessmentView,
   ChannelFigures,
 } from '../../../core/investor/investor.models';
+import { RouterLink } from '@angular/router';
 import { Disclaimer } from '../../../shared/disclaimer';
+import { InfoTip } from '../../../shared/info-tip';
 
 @Component({
   selector: 'gv-assessment-card',
-  imports: [Disclaimer],
+  imports: [Disclaimer, InfoTip, RouterLink],
   templateUrl: './assessment-card.html',
   styleUrl: './assessment-card.scss',
 })
 export class AssessmentCard {
   readonly assessment = input.required<AssessmentView>();
+
+  /** משפט אחד שמסביר מה הציון הכללי אומר */
+  protected verdict(): string {
+    const score = this.assessment().overallScore;
+    if (score >= 70) return 'התאמה גבוהה: יש אפיקים שמתאימים היטב ליעד, לטווח ולפרופיל הסיכון שלך.';
+    if (score >= 40) return 'התאמה בינונית: יש אפשרויות מתאימות, אבל כדאי לקרוא את דגלי הסיכון ואת הנימוק.';
+    return 'התאמה נמוכה: ייתכן שהסכום, הטווח או ההעדפות קשים להשגה. כדאי לשקול לשנות את היעד או להתייעץ עם סוכן.';
+  }
 
   protected readonly channels: { key: keyof ChannelFigures; label: string }[] = [
     { key: 'capitalMarket', label: 'שוק ההון' },

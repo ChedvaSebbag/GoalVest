@@ -1,74 +1,70 @@
-<section class="gv-page board">
-  <header class="head">
-    <h1>דשבורד סוכן</h1>
+<section class="gv-page wide">
+  <header class="gv-page-head">
+    <div>
+      <h1>שלום{{ firstName() ? ', ' + firstName() : '' }}</h1>
+      <p>משקיעים שעברו הערכת AI ומתאימים למוצרים של הגוף שלך.</p>
+    </div>
   </header>
+
+  @if (nextStep(); as step) {
+    <gv-next-step [step]="step" (action)="followNextStep()" />
+  }
 
   @if (leads() === null) {
     <div class="gv-skeleton"></div>
     <div class="gv-skeleton"></div>
   } @else if (failed() && leads()?.length === 0 && dashboard()?.evaluated === 0) {
-    <article class="gv-card">
-      <p class="gv-error" role="alert">לא הצלחנו לטעון את הדשבורד.</p>
-      <button type="button" mat-stroked-button (click)="refresh()">נסה שוב</button>
+    <article class="gv-card gv-empty">
+      <span class="material-symbols-rounded" aria-hidden="true">cloud_off</span>
+      <h2>לא הצלחנו לטעון את הדשבורד</h2>
+      <div class="gv-actions"><button type="button" mat-flat-button (click)="refresh()">נסה שוב</button></div>
     </article>
   } @else {
     @if (dashboard(); as kpi) {
-      <div class="kpis">
-        <article class="gv-card kpi"><span>לידים חדשים</span><strong><bdi>{{ kpi.evaluated }}</bdi></strong></article>
-        <article class="gv-card kpi"><span>בטיפול</span><strong><bdi>{{ kpi.inReview }}</bdi></strong></article>
-        <article class="gv-card kpi"><span>הצעות פתוחות</span><strong><bdi>{{ kpi.offerSent }}</bdi></strong></article>
-        <article class="gv-card kpi">
-          <span>שיעור המרה</span>
+      <div class="gv-kpis">
+        <button type="button" class="gv-card gv-kpi kpi-btn" (click)="selectTab('AI_EVALUATED')" [class.on]="status() === 'AI_EVALUATED'">
+          <span>לידים חדשים <gv-info-tip term="leadNew" /></span>
+          <strong><bdi>{{ kpi.evaluated }}</bdi></strong>
+        </button>
+        <button type="button" class="gv-card gv-kpi kpi-btn" (click)="selectTab('IN_REVIEW')" [class.on]="status() === 'IN_REVIEW'">
+          <span>בטיפול שלך</span>
+          <strong><bdi>{{ kpi.inReview }}</bdi></strong>
+        </button>
+        <button type="button" class="gv-card gv-kpi kpi-btn" (click)="selectTab('OFFER_SENT')" [class.on]="status() === 'OFFER_SENT'">
+          <span>הצעות פתוחות</span>
+          <strong><bdi>{{ kpi.offerSent }}</bdi></strong>
+        </button>
+        <article class="gv-card gv-kpi">
+          <span>שיעור המרה <gv-info-tip term="conversion" /></span>
           <strong><bdi>{{ kpi.conversionRate === null ? '—' : kpi.conversionRate + '%' }}</bdi></strong>
         </article>
-        <article class="gv-card kpi">
-          <span>ציון AI ממוצע</span>
+        <article class="gv-card gv-kpi">
+          <span>ציון AI ממוצע <gv-info-tip term="avgScore" /></span>
           <strong><bdi>{{ kpi.averageScore ?? '—' }}</bdi></strong>
         </article>
       </div>
     }
 
-    <article class="gv-card block">
-      <h2>מתעניינים לפי מוצר</h2>
-      @if ((interest() ?? []).length === 0) {
-        <p class="gv-muted">עדיין אין מוצרים לגוף. אפשר להוסיף מוצר במסך המוצרים.</p>
-        <a mat-stroked-button routerLink="/agent/products">המוצרים שלי</a>
-      } @else {
-        <div class="chart">
-          <canvas baseChart type="bar" [data]="bars()" [options]="barOptions" aria-label="גרף מתעניינים לפי מוצר"></canvas>
+    <!-- לידים: הדבר החשוב ביותר בדשבורד, ולכן ראשון -->
+    <article class="gv-card leads" id="leads">
+      <div class="leads-head">
+        <h2>לידים</h2>
+        <div class="tabs" role="tablist" aria-label="סינון לפי סטטוס">
+          @for (tab of tabs; track tab.id) {
+            <button type="button" role="tab" [attr.aria-selected]="status() === tab.id" (click)="selectTab(tab.id)">
+              {{ tab.label }}
+            </button>
+          }
         </div>
-        <table>
-          <caption class="gv-muted">הומלץ, הצעות שנשלחו והצעות שהתקבלו</caption>
-          <thead>
-            <tr><th>מוצר</th><th>הומלץ</th><th>הצעות</th><th>התקבלו</th></tr>
-          </thead>
-          <tbody>
-            @for (item of interest(); track item.productId) {
-              <tr>
-                <td>{{ item.name }}</td>
-                <td><bdi>{{ item.recommended }}</bdi></td>
-                <td><bdi>{{ item.offers }}</bdi></td>
-                <td><bdi>{{ item.accepted }}</bdi></td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      }
-    </article>
-
-    <article class="gv-card block">
-      <h2>לידים</h2>
-      <div class="tabs" role="tablist">
-        @for (tab of tabs; track tab.id) {
-          <button type="button" role="tab" [attr.aria-selected]="status() === tab.id" (click)="selectTab(tab.id)">
-            {{ tab.label }}
-          </button>
-        }
       </div>
+
       <form class="filters" (ngSubmit)="refresh()">
-        <label>ציון מינימלי <input name="minScore" type="number" min="0" max="100" [(ngModel)]="minScore" /></label>
         <label>
-          סוג יעד
+          <span>ציון מינימלי</span>
+          <input name="minScore" type="number" min="0" max="100" [(ngModel)]="minScore" placeholder="0–100" />
+        </label>
+        <label>
+          <span>סוג יעד</span>
           <select name="goalType" [(ngModel)]="goalType">
             <option value="">הכל</option>
             @for (type of goalTypes; track type.value) {
@@ -80,41 +76,71 @@
       </form>
 
       @if (failed()) {
-        <p class="gv-error" role="alert">הרענון האחרון נכשל.</p>
-        <button type="button" mat-stroked-button (click)="refresh()">נסה שוב</button>
+        <p class="gv-error" role="alert">הרענון האחרון נכשל. <button type="button" mat-button (click)="refresh()">נסה שוב</button></p>
       }
 
       @if ((leads() ?? []).length === 0) {
-        <p class="gv-muted">אין לידים בסטטוס הזה.</p>
+        <div class="gv-empty">
+          <span class="material-symbols-rounded" aria-hidden="true">inbox</span>
+          <h3>אין לידים כאן</h3>
+          <p>לידים חדשים מופיעים אוטומטית אחרי שה-AI מעריך בקשה שמתאימה למוצרים שלך.</p>
+          @if (status() !== '') {
+            <div class="gv-actions"><button type="button" mat-stroked-button (click)="selectTab('')">הצגת כל הלידים</button></div>
+          }
+        </div>
       } @else {
-        <table>
-          <thead>
-            <tr>
-              <th>משקיע</th><th>יעד</th><th>סכום</th><th>טווח</th><th>סיכון</th><th>ציון</th><th>סטטוס</th><th>תאריך</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (lead of leads(); track lead.requestId) {
+        <div class="gv-table-wrap">
+          <table class="gv-table">
+            <thead>
               <tr>
-                <td>
-                  <a [routerLink]="['/agent/leads', lead.requestId]">{{ lead.investorName }}</a>
-                  @if (lead.isNew) { <span class="fresh">חדש</span> }
-                </td>
-                <td>{{ lead.goalTitle }} · {{ goalTypeLabel(lead.goalType) }}</td>
-                <td><bdi>{{ lead.amount | money }}</bdi></td>
-                <td><bdi>{{ lead.horizonYears }}</bdi> שנים</td>
-                <td>{{ lead.riskLabel }}</td>
-                <td><bdi>{{ lead.aiScore ?? '—' }}</bdi></td>
-                <td><gv-status-chip [status]="lead.status" /></td>
-                <td><bdi>{{ formatDate(lead.createdAt) }}</bdi></td>
+                <th>משקיע ויעד</th><th>סכום</th><th>טווח</th><th>סיכון</th><th>ציון AI</th><th>סטטוס</th><th><span class="sr-only">פעולה</span></th>
               </tr>
-            }
-          </tbody>
-        </table>
-        <div class="gv-actions">
-          <button type="button" mat-stroked-button [disabled]="page() === 1" (click)="previousPage()">הקודם</button>
-          <span>עמוד <bdi>{{ page() }}</bdi></span>
-          <button type="button" mat-stroked-button [disabled]="page() * 20 >= total()" (click)="nextPage()">הבא</button>
+            </thead>
+            <tbody>
+              @for (lead of leads(); track lead.requestId) {
+                <tr class="row" [routerLink]="['/agent/leads', lead.requestId]">
+                  <td>
+                    <div class="who">
+                      <strong>{{ lead.investorName }}</strong>
+                      @if (lead.isNew) { <span class="fresh">חדש</span> }
+                    </div>
+                    <span class="gv-muted small">{{ lead.goalTitle }} · {{ goalTypeLabel(lead.goalType) }} · <bdi>{{ formatDate(lead.createdAt) }}</bdi></span>
+                  </td>
+                  <td><bdi>{{ lead.amount | money }}</bdi></td>
+                  <td><bdi>{{ lead.horizonYears }}</bdi> שנים</td>
+                  <td>{{ lead.riskLabel }}</td>
+                  <td><span class="score"><bdi>{{ lead.aiScore ?? '—' }}</bdi></span></td>
+                  <td><gv-status-chip [status]="lead.status" /></td>
+                  <td class="go">
+                    <a mat-stroked-button [routerLink]="['/agent/leads', lead.requestId]" (click)="$event.stopPropagation()">פתיחה</a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (total() > 20) {
+          <div class="pager">
+            <button type="button" mat-stroked-button [disabled]="page() === 1" (click)="previousPage()">הקודם</button>
+            <span class="gv-muted">עמוד <bdi>{{ page() }}</bdi></span>
+            <button type="button" mat-stroked-button [disabled]="page() * 20 >= total()" (click)="nextPage()">הבא</button>
+          </div>
+        }
+      }
+    </article>
+
+    <article class="gv-card">
+      <h2>מתעניינים לפי מוצר <gv-info-tip term="interest" /></h2>
+      @if ((interest() ?? []).length === 0) {
+        <div class="gv-empty">
+          <span class="material-symbols-rounded" aria-hidden="true">inventory_2</span>
+          <p>עדיין אין מוצרים לגוף שלך.</p>
+          <div class="gv-actions"><a mat-flat-button routerLink="/agent/products/new">הוספת מוצר</a></div>
+        </div>
+      } @else {
+        <p class="gv-muted">כמה פעמים כל מוצר הומלץ על ידי ה-AI, כמה הצעות נשלחו וכמה התקבלו.</p>
+        <div class="chart">
+          <canvas baseChart type="bar" [data]="bars()" [options]="barOptions" aria-label="גרף מתעניינים לפי מוצר"></canvas>
         </div>
       }
     </article>

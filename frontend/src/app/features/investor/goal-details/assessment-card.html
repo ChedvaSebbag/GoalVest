@@ -1,80 +1,96 @@
-@if (assessment().pendingReview) {
-  <p class="tag">טרם נבדק על ידי סוכן</p>
-}
-<p class="overall">ציון כללי <bdi>{{ assessment().overallScore }}</bdi></p>
+<!-- שורת סיכום: ציון גדול + משפט אחד שמסביר אותו -->
+<div class="summary">
+  <div class="ring" [style.--p]="assessment().overallScore" role="img" [attr.aria-label]="'ציון התאמה ' + assessment().overallScore + ' מתוך 100'">
+    <strong><bdi>{{ assessment().overallScore }}</bdi></strong>
+    <span>מתוך 100</span>
+  </div>
+  <div class="verdict">
+    <h3>ציון התאמה כללי <gv-info-tip term="overallScore" /></h3>
+    <p>{{ verdict() }}</p>
+    @if (assessment().pendingReview) {
+      <span class="tag" title="ההערכה נוצרה על ידי ה-AI ועוד לא נבדקה על ידי סוכן אנושי">
+        <span class="material-symbols-rounded" aria-hidden="true">schedule</span>
+        טרם נבדק על ידי סוכן
+      </span>
+    } @else {
+      <span class="tag ok">
+        <span class="material-symbols-rounded" aria-hidden="true">verified</span>
+        נבדק על ידי סוכן
+      </span>
+    }
+  </div>
+</div>
 
-<h3>ציון לכל אפיק</h3>
-<ul class="scores">
+<!-- אפיקים: ציון + חלק בתמהיל בטבלה אחת -->
+<h3>האפיקים <gv-info-tip term="allocation" /></h3>
+<div class="channels">
   @for (channel of channels; track channel.key) {
-    <li>
-      <span>{{ channel.label }}</span>
+    <div class="channel">
+      <span class="name">{{ channel.label }} <gv-info-tip [term]="channel.key" /></span>
       <span class="track" aria-hidden="true"><span class="fill" [style.width.%]="score(channel.key)"></span></span>
-      <bdi>{{ score(channel.key) }}</bdi>
-    </li>
+      <span class="num">התאמה <bdi>{{ score(channel.key) }}</bdi></span>
+      <span class="share"><bdi>{{ share(channel.key) }}%</bdi> מהכסף</span>
+    </div>
   }
-</ul>
+</div>
 
-<h3>תמהיל</h3>
-<ul class="scores">
-  @for (channel of channels; track channel.key) {
-    <li>
-      <span>{{ channel.label }}</span>
-      <bdi>{{ share(channel.key) }}%</bdi>
-    </li>
-  }
-</ul>
-
-<h3>מסלולים</h3>
+<h3>מסלולים מומלצים <gv-info-tip term="fitScore" /></h3>
 @if (assessment().recommendedProducts.length === 0) {
   <p class="gv-muted">אין מסלולים להצגה.</p>
 } @else {
   <ul class="products">
     @for (product of assessment().recommendedProducts; track product.productId) {
       <li>
-        <strong>{{ product.name || 'מסלול' }}</strong>
-        <span>התאמה <bdi>{{ product.fitScore }}</bdi></span>
+        <div class="product-head">
+          <a [routerLink]="['/products', product.productId]">{{ product.name || 'מסלול' }}</a>
+          <span class="pill">התאמה <bdi>{{ product.fitScore }}</bdi></span>
+        </div>
         <p>{{ product.reason }}</p>
       </li>
     }
   </ul>
 }
 
-<h3>דגלי סיכון</h3>
-@if (assessment().riskFlags.length === 0) {
-  <p class="gv-muted">אין דגלי סיכון.</p>
-} @else {
+@if (assessment().riskFlags.length > 0) {
+  <h3>כדאי לשים לב <gv-info-tip term="riskFlags" /></h3>
   <ul class="flags">
     @for (flag of assessment().riskFlags; track flag.code + flag.text) {
       <li [attr.data-severity]="flag.severity">
-        <span>{{ severity(flag.severity) }}</span>
-        <p>{{ flag.text }}</p>
+        <span class="material-symbols-rounded" aria-hidden="true">{{ flag.severity === 'high' ? 'error' : flag.severity === 'info' ? 'info' : 'warning' }}</span>
+        <div>
+          <strong>{{ severity(flag.severity) }}</strong>
+          <p>{{ flag.text }}</p>
+        </div>
       </li>
     }
   </ul>
 }
 
-<h3>נימוק</h3>
-<p class="rationale">{{ assessment().rationale }}</p>
-
-<h3>מקורות</h3>
-@if (assessment().sources.length === 0) {
-  <p class="gv-muted">אין מקורות להצגה.</p>
-} @else {
-  <ul class="sources">
-    @for (source of assessment().sources; track source.title + (source.url ?? '')) {
-      <li>
-        <span>{{ sourceKind(source.type) }}</span>
-        @if (source.url) {
-          <a [href]="source.url" target="_blank" rel="noopener"><bdi>{{ source.title }}</bdi></a>
-        } @else {
-          <strong>{{ source.title }}</strong>
-        }
-        @if (source.excerpt) {
-          <p>{{ source.excerpt }}</p>
-        }
-      </li>
-    }
-  </ul>
-}
+<!-- הנימוק והמקורות מקופלים כברירת מחדל, כדי לא להעמיס -->
+<details class="more">
+  <summary>
+    <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+    למה? הנימוק המלא והמקורות (<bdi>{{ assessment().sources.length }}</bdi>)
+  </summary>
+  <p class="rationale">{{ assessment().rationale }}</p>
+  @if (assessment().sources.length > 0) {
+    <h3>מקורות <gv-info-tip term="sources" /></h3>
+    <ul class="sources">
+      @for (source of assessment().sources; track source.title + (source.url ?? '')) {
+        <li>
+          <span class="kind">{{ sourceKind(source.type) }}</span>
+          @if (source.url) {
+            <a [href]="source.url" target="_blank" rel="noopener"><bdi>{{ source.title }}</bdi></a>
+          } @else {
+            <strong>{{ source.title }}</strong>
+          }
+          @if (source.excerpt) {
+            <p>{{ source.excerpt }}</p>
+          }
+        </li>
+      }
+    </ul>
+  }
+</details>
 
 <gv-disclaimer />

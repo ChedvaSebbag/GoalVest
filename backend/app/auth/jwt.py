@@ -1,5 +1,9 @@
 """אתחול flask-jwt-extended ואזהרה אם JWT_SECRET אינו סוד אמיתי."""
 
+# JWT setup: access token 30 min (kept in memory on the client), refresh token 7 days with
+# rotation - every refresh issues a new pair and revokes the old jti (RevokedTokens, checked in
+# _blocked). Passwords use bcrypt (cost 12); login is rate limited to 5 attempts per 15 minutes.
+
 import sys
 from datetime import timedelta
 

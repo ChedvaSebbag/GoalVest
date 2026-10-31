@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, isDevMode, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -56,6 +56,20 @@ export class AuthPage {
     }
     return all.filter((item) => item.name.includes(query));
   });
+
+  /** חשבונות ה-seed מוצגים רק בפיתוח ורק על המחשב המקומי – לא בקישור שיתוף ולא ב-production */
+  protected readonly showDemo =
+    isDevMode() && ['localhost', '127.0.0.1'].includes(globalThis.location?.hostname ?? '');
+  protected readonly demoAccounts = [
+    { label: 'משקיעה לדוגמה', email: 'demo.investor1@goalvest.test' },
+    { label: 'סוכן – הראל', email: 'demo.agent.harel@goalvest.test' },
+    { label: 'סוכן – כלל', email: 'demo.agent.clal@goalvest.test' },
+    { label: 'סוכן – מגדל', email: 'demo.agent.migdal@goalvest.test' },
+  ];
+
+  protected fillDemo(email: string): void {
+    this.loginForm.setValue({ email, password: 'Demo1234' });
+  }
 
   protected readonly loginForm = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],

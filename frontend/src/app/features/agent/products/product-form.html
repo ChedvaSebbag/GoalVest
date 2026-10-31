@@ -1,11 +1,14 @@
-<section class="gv-page">
-  <a routerLink="/agent/products">חזרה למוצרים שלי</a>
-  <h1>{{ productId ? 'עריכת מוצר' : 'מוצר חדש' }}</h1>
-  @if (institutionName()) {
-    <p class="gv-muted">גוף: {{ institutionName() }}</p>
-  } @else if (!productId) {
-    <p class="gv-muted">המוצר ישויך לגוף שלך.</p>
-  }
+<section class="gv-page narrow">
+  <a class="gv-back" routerLink="/agent/products">
+    <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
+    חזרה למוצרים שלי
+  </a>
+  <header class="gv-page-head">
+    <div>
+      <h1>{{ productId ? 'עריכת מוצר' : 'מוצר חדש' }}</h1>
+      <p>{{ institutionName() ? 'גוף: ' + institutionName() : 'המוצר ישויך לגוף שלך.' }} כל האחוזים בשנה, למשל 0.7.</p>
+    </div>
+  </header>
 
   @if (failed()) {
     <article class="gv-card">
@@ -13,6 +16,7 @@
     </article>
   } @else {
     <form class="form gv-card" [formGroup]="form" (ngSubmit)="submit()">
+      <h2>פרטים בסיסיים</h2>
       <mat-form-field appearance="outline">
         <mat-label>סוג</mat-label>
         <mat-select formControlName="type">
@@ -37,6 +41,7 @@
           @if (fieldErrors()['symbol']) { <mat-error>{{ fieldErrors()['symbol'] }}</mat-error> }
         </mat-form-field>
       }
+      <h2>עלויות ותשואות (%)</h2>
       <div class="pair">
         <mat-form-field appearance="outline">
           <mat-label>דמי ניהול מהפקדה</mat-label>
@@ -71,8 +76,9 @@
           <input matInput formControlName="minDeposit" inputmode="decimal" />
         </mat-form-field>
       </div>
+      <h2>סיכון ונזילות</h2>
       <mat-form-field appearance="outline">
-        <mat-label>רמת סיכון</mat-label>
+        <mat-label>רמת סיכון (1 שמרני – 7 תנודתי)</mat-label>
         <mat-select formControlName="riskLevel">
           @for (level of levels; track level) {
             <mat-option [value]="level"><bdi>{{ level }}</bdi></mat-option>
@@ -95,8 +101,9 @@
         <mat-label>תנאי מס</mat-label>
         <textarea matInput rows="3" formControlName="taxNotes"></textarea>
       </mat-form-field>
+      <h2>תיאור</h2>
       <mat-form-field appearance="outline">
-        <mat-label>תיאור</mat-label>
+        <mat-label>תיאור קצר למשקיעים</mat-label>
         <textarea matInput rows="4" formControlName="description"></textarea>
       </mat-form-field>
       @if (message()) {
@@ -107,7 +114,7 @@
           {{ submitting() ? 'שומר…' : 'שמירה' }}
         </button>
         @if (productId && isActive()) {
-          <button mat-stroked-button type="button" (click)="deactivate()">השבת מוצר</button>
+          <button mat-button type="button" class="danger" (click)="deactivate()">השבתת המוצר</button>
         }
       </div>
     </form>

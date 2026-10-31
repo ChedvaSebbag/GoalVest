@@ -1,33 +1,38 @@
 <section class="gv-page">
-  <header class="head">
-    <h1>הצעות שקיבלתי</h1>
+  <header class="gv-page-head">
+    <div>
+      <h1>הצעות שקיבלתי</h1>
+      <p>הצעות שסוכנים שלחו לך על בסיס הערכת ה-AI. בכל הצעה אפשר לאשר או לדחות.</p>
+    </div>
   </header>
 
   @if (offers() === null) {
     <div class="gv-skeleton"></div>
   } @else if (failed()) {
-    <article class="gv-card">
-      <p class="gv-error" role="alert">לא הצלחנו לטעון את ההצעות.</p>
-      <button type="button" mat-stroked-button (click)="load()">נסה שוב</button>
+    <article class="gv-card gv-empty">
+      <span class="material-symbols-rounded" aria-hidden="true">cloud_off</span>
+      <h2>לא הצלחנו לטעון את ההצעות</h2>
+      <div class="gv-actions"><button type="button" mat-flat-button (click)="load()">נסה שוב</button></div>
     </article>
   } @else if (offers()?.length === 0) {
-    <article class="gv-card">
+    <article class="gv-card gv-empty">
+      <span class="material-symbols-rounded" aria-hidden="true">mark_email_unread</span>
       <h2>עדיין אין הצעות</h2>
-      <p class="gv-muted">כשסוכן ישלח הצעה היא תופיע כאן.</p>
-      <a mat-stroked-button routerLink="/investor">חזרה ליעדים</a>
+      <p>אחרי שה-AI מעריך יעד, סוכן מגוף מתאים בודק אותו ושולח הצעה. היא תופיע כאן ובפעמון ההתראות.</p>
+      <div class="gv-actions"><a mat-stroked-button routerLink="/investor">ליעדים שלי</a></div>
     </article>
   } @else {
     <div class="list">
       @for (offer of offers(); track offer.offerId) {
-        <article class="gv-card">
-          <div class="row">
+        <a class="gv-card offer" [routerLink]="['/investor/offers', offer.offerId]">
+          <span class="icon material-symbols-rounded" aria-hidden="true">mail</span>
+          <div class="body">
             <h2>{{ offer.goalTitle }}</h2>
-            <gv-status-chip [status]="offer.status" />
+            <span class="gv-muted">{{ offer.agentName }} · {{ offer.institutionName }} · <bdi>{{ formatDate(offer.createdAt) }}</bdi></span>
           </div>
-          <p>{{ offer.agentName }} · {{ offer.institutionName }}</p>
-          <p class="gv-muted"><bdi>{{ formatDate(offer.createdAt) }}</bdi></p>
-          <a mat-stroked-button [routerLink]="['/investor/offers', offer.offerId]">לפרטים</a>
-        </article>
+          <gv-status-chip [status]="offer.status" />
+          <span class="open">{{ offer.status === 'SENT' ? 'לצפייה ותשובה' : 'לפרטים' }} <span class="material-symbols-rounded" aria-hidden="true">chevron_left</span></span>
+        </a>
       }
     </div>
   }

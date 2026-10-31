@@ -1,24 +1,94 @@
-<mat-toolbar class="topbar">
-  <span class="brand">GoalVest</span>
-  <span class="tagline">השקעות מבוססות-מטרות</span>
-  <span class="spacer"></span>
-  <a routerLink="/system">מצב המערכת</a>
-  @if (user(); as current) {
-    @if (current.role === 'INVESTOR') {
-      <a routerLink="/investor" routerLinkActive="active">היעדים שלי</a>
-      <a routerLink="/investor/offers" routerLinkActive="active">הצעות</a>
-      <gv-notification-bell />
-    } @else if (current.role === 'AGENT') {
-      <a routerLink="/agent" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">דשבורד</a>
-      <a routerLink="/agent/products" routerLinkActive="active">המוצרים שלי</a>
-    }
-    <a routerLink="/products" routerLinkActive="active">השוואת מוצרים</a>
-    <button type="button" (click)="logout()">התנתקות</button>
-  }
-</mat-toolbar>
-<main>
-  <router-outlet />
-</main>
-<footer class="disclaimer">
-  המידע וההערכות במערכת נוצרו אוטומטית לצורכי המחשה ואינם מהווים ייעוץ השקעות.
-</footer>
+@if (user(); as current) {
+  <div class="shell" [class.menu-open]="menuOpen()">
+    <!-- תפריט צד: אייקון + שם לכל מסך, המסך הנוכחי מודגש -->
+    <aside class="sidebar" aria-label="תפריט ראשי">
+      <a class="brand" [routerLink]="home()" (click)="closeMenu()">
+        <span class="logo material-symbols-rounded" aria-hidden="true">savings</span>
+        <span>GoalVest</span>
+      </a>
+
+      @if (primaryAction(); as cta) {
+        <a mat-flat-button class="cta" [routerLink]="cta.link" (click)="closeMenu()">
+          <span class="material-symbols-rounded" aria-hidden="true">add</span>
+          {{ cta.label }}
+        </a>
+      }
+
+      <nav>
+        @for (item of navItems(); track item.link) {
+          <a
+            class="nav-item"
+            [routerLink]="item.link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+            (click)="closeMenu()"
+          >
+            <span class="material-symbols-rounded" aria-hidden="true">{{ item.icon }}</span>
+            <span>{{ item.label }}</span>
+          </a>
+        }
+      </nav>
+
+      <div class="sidebar-foot">
+        <a class="nav-item small" routerLink="/system" routerLinkActive="active" (click)="closeMenu()">
+          <span class="material-symbols-rounded" aria-hidden="true">monitor_heart</span>
+          <span>מצב המערכת</span>
+        </a>
+        <div class="me">
+          <span class="avatar" aria-hidden="true">{{ initials(current.fullName) }}</span>
+          <div class="who">
+            <strong>{{ current.fullName }}</strong>
+            <span>{{ roleLabel(current.role) }}</span>
+          </div>
+          <button type="button" class="logout" (click)="logout()" aria-label="התנתקות" title="התנתקות">
+            <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <div class="scrim" (click)="closeMenu()" aria-hidden="true"></div>
+
+    <div class="content">
+      <header class="topbar">
+        <button type="button" class="menu-btn" (click)="menuOpen.set(!menuOpen())" [attr.aria-expanded]="menuOpen()" aria-label="פתיחת תפריט">
+          <span class="material-symbols-rounded" aria-hidden="true">menu</span>
+        </button>
+        <span class="mobile-brand">GoalVest</span>
+        <span class="spacer"></span>
+        @if (current.role === 'INVESTOR') {
+          <gv-notification-bell />
+        }
+        <a class="help-btn" routerLink="/help" aria-label="עזרה" title="עזרה ומדריך">
+          <span class="material-symbols-rounded" aria-hidden="true">help</span>
+          <span class="label">עזרה</span>
+        </a>
+      </header>
+      <main>
+        <router-outlet />
+      </main>
+      <footer class="disclaimer">
+        המידע וההערכות במערכת נוצרו אוטומטית לצורכי המחשה ואינם מהווים ייעוץ השקעות.
+      </footer>
+    </div>
+  </div>
+} @else {
+  <!-- לפני התחברות: סרגל עליון פשוט -->
+  <header class="public-bar">
+    <a class="brand" routerLink="/auth/login">
+      <span class="logo material-symbols-rounded" aria-hidden="true">savings</span>
+      <span>GoalVest</span>
+    </a>
+    <span class="spacer"></span>
+    <a class="help-btn" routerLink="/help">
+      <span class="material-symbols-rounded" aria-hidden="true">help</span>
+      <span class="label">איך זה עובד?</span>
+    </a>
+  </header>
+  <main class="public-main">
+    <router-outlet />
+  </main>
+  <footer class="disclaimer">
+    המידע וההערכות במערכת נוצרו אוטומטית לצורכי המחשה ואינם מהווים ייעוץ השקעות.
+  </footer>
+}

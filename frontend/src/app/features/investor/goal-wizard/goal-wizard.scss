@@ -1,25 +1,92 @@
-h1, h2 { margin: 0 0 calc(var(--gv-space) * 2); color: var(--gv-primary); }
-.steps { display: flex; gap: calc(var(--gv-space) * 2); padding: 0; margin: 0 0 calc(var(--gv-space) * 2); list-style: none; }
-.steps li { color: var(--gv-text-muted); }
-.steps li.on { color: var(--gv-primary); font-weight: 700; }
-.notice { color: var(--gv-text); }
-.types, .choices { display: grid; gap: calc(var(--gv-space) * 1.5); margin-block-end: calc(var(--gv-space) * 2); }
-.choices.inline { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+h2 { margin: 0 0 4px; }
+.hint { display: block; margin: 0 0 calc(var(--gv-space) * 2); color: var(--gv-text-muted); font-size: 0.9rem; font-weight: 400; }
+label .hint { margin: 0; }
+
+// סטפר: מספר בעיגול + שם, קו מחבר
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gv-space);
+  list-style: none;
+  margin: 0 0 calc(var(--gv-space) * 3);
+  padding: 0;
+}
+.steps li {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-block-start: 10px;
+  border-block-start: 4px solid var(--gv-border);
+  color: var(--gv-text-muted);
+  font-size: 0.9rem;
+}
+.steps li.done { border-color: var(--gv-primary); }
+.steps li.on { border-color: var(--gv-primary); color: var(--gv-text); font-weight: 600; }
+.steps .num {
+  display: grid;
+  place-items: center;
+  inline-size: 26px;
+  block-size: 26px;
+  border-radius: 50%;
+  background: var(--gv-skeleton);
+  font-size: 0.8rem;
+}
+.steps .num .material-symbols-rounded { font-size: 16px; }
+.steps li.on .num, .steps li.done .num { background: var(--gv-primary); color: var(--gv-on-primary); }
+
+.notice {
+  padding: 12px 16px;
+  border-radius: var(--gv-radius-sm);
+  border: 1px solid color-mix(in srgb, var(--gv-warning) 30%, var(--gv-border));
+  background: color-mix(in srgb, var(--gv-warning) 6%, var(--gv-surface));
+}
+
+// כרטיסי בחירה
+.types {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(var(--gv-space) * 1.5);
+  margin-block-end: calc(var(--gv-space) * 3);
+}
+.types .choice { flex-direction: column; justify-content: center; text-align: center; min-block-size: 104px; gap: 8px; }
+.types .choice .material-symbols-rounded { font-size: 32px; color: var(--gv-primary); }
+.choices { display: grid; gap: var(--gv-space); margin-block-end: calc(var(--gv-space) * 3); }
+.choices.inline { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
 .choice {
-  text-align: start;
   display: flex;
   align-items: center;
-  gap: calc(var(--gv-space));
-  padding: calc(var(--gv-space) * 2);
-  border-radius: var(--gv-radius);
-  border: 1px solid var(--gv-text-muted);
+  gap: var(--gv-space);
+  padding: 14px 16px;
+  border-radius: var(--gv-radius-sm);
+  border: 1.5px solid var(--gv-border);
   background: var(--gv-surface);
   color: var(--gv-text);
   font: inherit;
+  font-weight: 500;
+  text-align: start;
   cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
 }
-.choice.on { border-color: var(--gv-primary); background: color-mix(in srgb, var(--gv-primary) 8%, white); }
-label { display: grid; gap: calc(var(--gv-space)); margin-block-end: calc(var(--gv-space) * 2); }
-label.check { display: flex; align-items: center; }
-input { font: inherit; padding: calc(var(--gv-space)); border-radius: var(--gv-radius); border: 1px solid var(--gv-text-muted); }
-input[type='checkbox'] { width: auto; }
+.choice:hover { border-color: color-mix(in srgb, var(--gv-primary) 50%, var(--gv-border)); }
+.choice.on { border-color: var(--gv-primary); background: var(--gv-primary-soft); color: var(--gv-primary); }
+
+label { display: grid; gap: 6px; margin-block-end: calc(var(--gv-space) * 2.5); font-weight: 500; }
+label.check { display: flex; align-items: center; gap: 10px; font-weight: 400; }
+form > p:not(.hint):not(.gv-error) { margin: 0 0 var(--gv-space); font-weight: 500; display: flex; align-items: center; gap: 4px; }
+input[type='number'], input[type='text'], input[type='date'] { inline-size: 100%; }
+
+.after {
+  margin-block: calc(var(--gv-space) * 2);
+  padding: 14px 16px;
+  border-radius: var(--gv-radius-sm);
+  background: var(--gv-bg);
+  font-size: 0.9rem;
+}
+.after ol { margin: 6px 0 0; padding-inline-start: 20px; line-height: 1.8; }
+
+.gv-actions { justify-content: space-between; padding-block-start: calc(var(--gv-space) * 2); border-block-start: 1px solid var(--gv-border); }
+
+@media (max-width: 600px) {
+  .types { grid-template-columns: repeat(2, 1fr); }
+  .steps .label { font-size: 0.75rem; }
+}

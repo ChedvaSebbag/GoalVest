@@ -116,6 +116,7 @@ stateDiagram-v2
     SUBMITTED --> CANCELLED: RequestCancelled
     AI_EVALUATED --> CANCELLED: RequestCancelled
     IN_REVIEW --> CANCELLED: RequestCancelled
+    FAILED --> CANCELLED: RequestCancelled (עריכת יעד / הגשה מחדש)
     ACCEPTED --> [*]
     CANCELLED --> [*]
 ```
@@ -123,6 +124,8 @@ stateDiagram-v2
 אישור או דחייה של הערכת ה-AI (FR-44) הם אירועים נפרדים (`AssessmentApproved` / `AssessmentRejected`) שלא משנים את הסטטוס הראשי. הם מתועדים ומשפיעים על התצוגה למשקיע ועל מדדי איכות ה-AI.
 
 `AssessmentAborted` מחזיר את הבקשה מ-`AI_PROCESSING` ל-`SUBMITTED` כשתשתית ההערכה לא זמינה (Ollama, Chroma או Tavily). ה-payload כולל `reason` ו-`attempt_not_counted: true`. האירוע לא נספר מתוך שלושת הניסיונות, ולא נכתב `AIAssessmentFailed`.
+
+בקשה במצב `FAILED` אפשר לבטל. כשהמשקיע שומר את היעד (גם בלי שינוי בשדות) הבקשה שנכשלה מבוטלת ונפתחת בקשה חדשה ב-`SUBMITTED`.
 
 ## 3.10 User Stories נבחרים עם קריטריוני קבלה
 

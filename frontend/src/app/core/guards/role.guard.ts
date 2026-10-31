@@ -1,3 +1,4 @@
+// Redirects a user with a different role to their own home page. UX only - the API enforces roles.
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { map } from 'rxjs';

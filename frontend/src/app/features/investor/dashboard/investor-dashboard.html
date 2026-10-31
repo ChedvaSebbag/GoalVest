@@ -1,90 +1,110 @@
-<section class="gv-page board">
-  <header class="head">
-    <h1>היעדים שלי</h1>
-    <a mat-flat-button routerLink="/investor/goals/new">יעד חדש</a>
+<section class="gv-page">
+  <header class="gv-page-head">
+    <div>
+      <h1>שלום{{ firstName() ? ', ' + firstName() : '' }}</h1>
+      <p>כאן רואים את כל היעדים שלך ואת הצעד הבא בכל אחד מהם.</p>
+    </div>
   </header>
-
-  <form class="search" (ngSubmit)="search()">
-    <label>
-      חיפוש מוצר
-      <input name="q" [(ngModel)]="query" />
-    </label>
-    <button type="submit" mat-stroked-button>חיפוש</button>
-  </form>
 
   @if (dashboard() === null) {
     <div class="gv-skeleton"></div>
     <div class="gv-skeleton"></div>
   } @else if (failed()) {
-    <article class="gv-card">
-      <p class="gv-error" role="alert">לא הצלחנו לטעון את הדשבורד.</p>
-      <button type="button" mat-stroked-button (click)="load()">נסה שוב</button>
+    <article class="gv-card gv-empty">
+      <span class="material-symbols-rounded" aria-hidden="true">cloud_off</span>
+      <h2>לא הצלחנו לטעון את הנתונים</h2>
+      <p>ייתכן שהשרת לא זמין כרגע.</p>
+      <div class="gv-actions"><button type="button" mat-flat-button (click)="load()">נסה שוב</button></div>
     </article>
   } @else if (dashboard(); as view) {
-    <div class="kpis">
-      <article class="gv-card kpi"><span>סך הון מתוכנן</span><strong><bdi>{{ view.plannedCapital | money }}</bdi></strong></article>
-      <article class="gv-card kpi"><span>יעדים פעילים</span><strong><bdi>{{ view.activeGoals }}</bdi></strong></article>
-      <article class="gv-card kpi"><span>הצעות שממתינות</span><strong><bdi>{{ view.pendingOffers }}</bdi></strong></article>
-    </div>
+    @if (nextStep(); as step) {
+      <gv-next-step [step]="step" />
+    }
 
-    @if (view.goals.length === 0) {
-      <article class="gv-card empty">
-        <h2>עדיין אין יעדים</h2>
-        <p class="gv-muted">אפשר להגדיר יעד ולהגיש אותו להערכה.</p>
-        <a mat-flat-button routerLink="/investor/goals/new">יעד חדש</a>
-      </article>
-    } @else {
-      <div class="grid">
+    @if (view.goals.length > 0) {
+      <div class="gv-kpis">
+        <article class="gv-card gv-kpi">
+          <span>סך הון מתוכנן <gv-info-tip term="plannedCapital" /></span>
+          <strong><bdi>{{ view.plannedCapital | money }}</bdi></strong>
+        </article>
+        <article class="gv-card gv-kpi">
+          <span>יעדים פעילים</span>
+          <strong><bdi>{{ view.activeGoals }}</bdi></strong>
+        </article>
+        <a class="gv-card gv-kpi link" routerLink="/investor/offers">
+          <span>הצעות שממתינות לך</span>
+          <strong><bdi>{{ view.pendingOffers }}</bdi></strong>
+        </a>
+      </div>
+
+      <h2>היעדים שלך</h2>
+      <div class="goals">
         @for (goal of view.goals; track goal.goalId) {
-          <article class="gv-card goal" [class.picked]="selectedId() === goal.goalId">
-            <div class="row">
-              <h2>{{ goal.title }}</h2>
+          <a class="gv-card goal" [routerLink]="['/investor/goals', goal.goalId]" [attr.aria-label]="'לפרטי היעד ' + goal.title">
+            <div class="goal-top">
+              <span class="type material-symbols-rounded" aria-hidden="true">{{ goalIcon(goal.type) }}</span>
+              <div class="goal-name">
+                <h3>{{ goal.title }}</h3>
+                <span class="gv-muted">{{ goalTypeLabel(goal.type) }} · עד <bdi>{{ formatDate(goal.targetDate) }}</bdi></span>
+              </div>
               <gv-status-chip [status]="statusOf(goal)" />
             </div>
-            <p class="gv-muted">{{ goalTypeLabel(goal.type) }}</p>
-            <p>סכום יעד <bdi>{{ goal.targetAmount | money }}</bdi></p>
-            <p>מועד יעד <bdi>{{ formatDate(goal.targetDate) }}</bdi></p>
+            <p class="amount"><bdi>{{ goal.targetAmount | money }}</bdi></p>
             <div class="progress" role="img" [attr.aria-label]="'התקדמות ' + goal.progress + ' אחוז'">
               <span [style.width.%]="goal.progress"></span>
             </div>
-            <p>התקדמות <bdi>{{ goal.progress }}%</bdi></p>
-            <div class="gv-actions">
-              <button type="button" mat-stroked-button (click)="choose(goal)">הצגת תמהיל</button>
-              <a mat-stroked-button [routerLink]="['/investor/goals', goal.goalId]">לפרטים</a>
+            <div class="goal-foot">
+              <span class="gv-muted"><bdi>{{ goal.progress }}%</bdi> מהיעד כבר בידיים</span>
+              <span class="open">לפרטים <span class="material-symbols-rounded" aria-hidden="true">chevron_left</span></span>
             </div>
-          </article>
+          </a>
         }
+        <a class="goal add" routerLink="/investor/goals/new">
+          <span class="material-symbols-rounded" aria-hidden="true">add_circle</span>
+          <strong>יעד נוסף</strong>
+          <span class="gv-muted">דירה, לימודים, פרישה…</span>
+        </a>
       </div>
 
-      <article class="gv-card mix">
-        <h2>תמהיל מומלץ</h2>
-        @if (selected(); as current) {
-        @if (current.assessment; as assessment) {
-          <div class="chart">
-            <canvas baseChart type="doughnut" [data]="donut()" [options]="donutOptions" aria-label="התפלגות התמהיל המומלץ"></canvas>
-          </div>
-          <h3>המסלולים המומלצים עבורך</h3>
-          @if (assessment.recommendedProducts.length === 0) {
-            <p class="gv-muted">אין מסלולים להצגה.</p>
-          } @else {
-            <table>
-              <thead><tr><th>מסלול</th><th>התאמה</th></tr></thead>
-              <tbody>
-                @for (product of assessment.recommendedProducts; track product.productId) {
-                  <tr>
-                    <td><a [routerLink]="['/products', product.productId]">{{ product.name || 'מסלול' }}</a></td>
-                    <td><bdi>{{ product.fitScore }}</bdi></td>
-                  </tr>
+      @if (assessedGoals().length > 0) {
+        <article class="gv-card mix">
+          <div class="mix-head">
+            <h2>תמהיל מומלץ <gv-info-tip term="allocation" /></h2>
+            @if (assessedGoals().length > 1) {
+              <select [ngModel]="selected()?.goalId" (ngModelChange)="selectedId.set($event)" aria-label="בחירת יעד להצגת התמהיל">
+                @for (goal of assessedGoals(); track goal.goalId) {
+                  <option [value]="goal.goalId">{{ goal.title }}</option>
                 }
-              </tbody>
-            </table>
+              </select>
+            } @else {
+              <span class="gv-muted">עבור "{{ selected()?.title }}"</span>
+            }
+          </div>
+          @if (selected()?.assessment; as assessment) {
+            <div class="mix-body">
+              <div class="chart">
+                <canvas baseChart type="doughnut" [data]="donut()" [options]="donutOptions" aria-label="התפלגות התמהיל המומלץ"></canvas>
+              </div>
+              <div class="mix-products">
+                <h3>מסלולים מומלצים</h3>
+                @if (assessment.recommendedProducts.length === 0) {
+                  <p class="gv-muted">אין מסלולים להצגה.</p>
+                } @else {
+                  <ul>
+                    @for (product of assessment.recommendedProducts; track product.productId) {
+                      <li>
+                        <a [routerLink]="['/products', product.productId]">{{ product.name || 'מסלול' }}</a>
+                        <span class="fit">התאמה <bdi>{{ product.fitScore }}</bdi></span>
+                      </li>
+                    }
+                  </ul>
+                }
+              </div>
+            </div>
+            <gv-disclaimer />
           }
-          <gv-disclaimer />
-        } @else {
-          <p class="gv-muted">עדיין אין תמהיל מומלץ ליעד שנבחר.</p>
-        }
-        }
-      </article>
+        </article>
+      }
     }
   }
 </section>

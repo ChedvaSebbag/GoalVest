@@ -54,7 +54,7 @@ flowchart TB
 | Worker | Python, APScheduler | הטמעת מסמכים ל-ChromaDB, שליחת התראות מייל לפי אירועים, Job התראות מחיר |
 | goalvest-tools | MCP Python SDK (FastMCP), תעבורת stdio | Tools מותאמים: מס, תנודתיות, תחזית, דמי ניהול |
 | Ollama | Docker image `ollama/ollama` | LLM (למשל `qwen2.5:7b`) ומודל הטמעה `bge-m3` |
-| ChromaDB | Docker image `chromadb/chroma` | אחסון וקטורים וחיפוש סמנטי |
+| ChromaDB | `chroma run` מתוך ה-venv (ברירת מחדל ב-`dev.sh`), או Docker image `chromadb/chroma` | אחסון וקטורים וחיפוש סמנטי |
 | Somee.com | MS SQL Server | Event Store וטבלאות קריאה |
 
 ## 6.3 MVC בצד השרת

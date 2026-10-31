@@ -1,5 +1,5 @@
 .page { max-width: 720px; margin: calc(var(--gv-space) * 4) auto; padding-inline: calc(var(--gv-space) * 2); display: grid; gap: calc(var(--gv-space) * 1.5); }
-.page-head h1 { margin: 0; color: var(--gv-primary); font-weight: 700; }
+.page-head h1 { margin: 0; font-weight: 700; }
 .muted { color: var(--gv-text-muted); font-size: 0.9rem; }
 .row { display: flex; flex-direction: row; align-items: center; gap: calc(var(--gv-space) * 2); padding: calc(var(--gv-space) * 2); border-radius: var(--gv-radius); background: var(--gv-surface); }
 .txt { display: grid; gap: 2px; flex: 1; }

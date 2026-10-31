@@ -1,28 +1,42 @@
 @use '@angular/material' as mat;
 
-// ---- Design tokens (docs/05-screens-and-ux.md §5.5) ----
+// =====================================================================
+//  GoalVest Design System v2 – "נקי ורגוע" (docs/05-screens-and-ux.md §5.5)
+//  צבע ראשי אחד לפעולות, הרבה רווח לבן, כרטיסים לבנים על רקע בהיר.
+// =====================================================================
 :root {
-  --gv-primary: #0f4c5c;
-  --gv-accent: #e3a33b;
-  --gv-success: #2e7d32;
-  --gv-error: #c62828;
-  --gv-warning: #ed6c02;
-  --gv-bg: #f7f9fa;
+  // צבעים
+  --gv-primary: #0f766e;          // טורקיז עמוק – כפתור ראשי, קישורים, הדגשה
+  --gv-primary-hover: #115e59;
+  --gv-primary-soft: #e7f5f3;     // רקע לפריט פעיל / תגיות
+  --gv-accent: #f59e0b;           // הדגשה משנית (מעט מאוד)
+  --gv-success: #15803d;
+  --gv-error: #b91c1c;
+  --gv-warning: #c2410c;
+  --gv-bg: #f5f7fa;
   --gv-surface: #ffffff;
-  --gv-text: #1c2a2f;
-  --gv-text-muted: #5b6b70;
-  --gv-radius: 12px;
-  --gv-space: 8px;
-  --gv-shadow: 0 1px 3px rgba(15, 76, 92, 0.12);
+  --gv-border: #e3e8ef;
+  --gv-text: #0f172a;
+  --gv-text-muted: #64748b;
   --gv-on-primary: #ffffff;
-  --gv-status-submitted: #5b6b70;
-  --gv-status-processing: #1565c0;
-  --gv-status-evaluated: #6a1b9a;
-  --gv-status-review: #ed6c02;
-  --gv-status-offer: #0277bd;
-  --gv-status-accepted: #2e7d32;
-  --gv-status-cancelled: #c62828;
-  --gv-skeleton: #e6eef0;
+  --gv-skeleton: #eef2f6;
+
+  // סטטוסים (תמיד עם טקסט, הצבע לא הנושא היחיד)
+  --gv-status-submitted: #64748b;
+  --gv-status-processing: #2563eb;
+  --gv-status-evaluated: #7c3aed;
+  --gv-status-review: #c2410c;
+  --gv-status-offer: #0369a1;
+  --gv-status-accepted: #15803d;
+  --gv-status-cancelled: #b91c1c;
+
+  // צורה ורווחים
+  --gv-radius: 14px;
+  --gv-radius-sm: 10px;
+  --gv-space: 8px;
+  --gv-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 2px 8px rgba(15, 23, 42, 0.05);
+  --gv-shadow-lg: 0 8px 30px rgba(15, 23, 42, 0.12);
+  --gv-sidebar: 248px;
 }
 
 html {
@@ -32,48 +46,236 @@ html {
     typography: Heebo,
     density: 0,
   ));
+
+  // Angular Material משתמש בצבעים שלנו
+  --mat-sys-primary: var(--gv-primary);
+  --mat-sys-on-primary: var(--gv-on-primary);
+  --mat-sys-surface: var(--gv-surface);
+  --mat-sys-outline: var(--gv-border);
+
+  // כפתור ראשי (mat-flat-button): מלא, בולט
+  --mat-button-filled-container-color: var(--gv-primary);
+  --mat-button-filled-label-text-color: var(--gv-on-primary);
+  --mat-button-filled-container-shape: var(--gv-radius-sm);
+  --mat-button-filled-container-height: 42px;
+  --mat-button-filled-horizontal-padding: 20px;
+  --mat-button-filled-label-text-weight: 600;
+  // כפתור משני (mat-stroked-button): מסגרת אפורה, טקסט כהה
+  --mat-button-outlined-outline-color: var(--gv-border);
+  --mat-button-outlined-label-text-color: var(--gv-text);
+  --mat-button-outlined-container-shape: var(--gv-radius-sm);
+  --mat-button-outlined-container-height: 42px;
+  --mat-button-outlined-label-text-weight: 500;
+  // כפתור טקסט (mat-button): לפעולות שוליות
+  --mat-button-text-label-text-color: var(--gv-primary);
+  --mat-button-text-container-shape: var(--gv-radius-sm);
+  --mat-button-text-container-height: 42px;
 }
 
 html, body { height: 100%; }
 body {
   margin: 0;
   font-family: Heebo, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
   background: var(--gv-bg);
   color: var(--gv-text);
+  -webkit-font-smoothing: antialiased;
 }
 
-.material-symbols-rounded { font-family: 'Material Symbols Rounded'; }
+h1, h2, h3 { color: var(--gv-text); line-height: 1.3; }
+h1 { font-size: 1.6rem; font-weight: 700; margin: 0; }
+h2 { font-size: 1.15rem; font-weight: 600; margin: 0 0 calc(var(--gv-space) * 1.5); }
+h3 { font-size: 1rem; font-weight: 600; margin: 0 0 var(--gv-space); }
+p { margin: 0 0 var(--gv-space); }
+a { color: var(--gv-primary); }
 
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded';
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  display: inline-block;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  font-feature-settings: 'liga';
+  overflow: hidden;
+  inline-size: 1em;     // לא "מתפרש" לרוחב לפני שהפונט נטען
+}
+
+// ---- פריסת עמוד ----
 .gv-page {
-  max-width: 880px;
+  max-width: 1080px;
   margin-inline: auto;
-  padding: calc(var(--gv-space) * 3) calc(var(--gv-space) * 2);
+  padding: calc(var(--gv-space) * 4) calc(var(--gv-space) * 3);
 }
+.gv-page.narrow { max-width: 760px; }
+
+// כותרת עמוד אחידה: כותרת + תיאור קצר בצד אחד, פעולה ראשית בצד השני
+.gv-page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: calc(var(--gv-space) * 2);
+  margin-block-end: calc(var(--gv-space) * 3);
+}
+.gv-page-head p { margin: 4px 0 0; color: var(--gv-text-muted); }
 
 .gv-card {
   background: var(--gv-surface);
+  border: 1px solid var(--gv-border);
   border-radius: var(--gv-radius);
   box-shadow: var(--gv-shadow);
   padding: calc(var(--gv-space) * 3);
 }
+.gv-card + .gv-card { margin-block-start: calc(var(--gv-space) * 2); }
 
 .gv-muted { color: var(--gv-text-muted); }
-
-.gv-error {
-  color: var(--gv-error);
-  margin: 0;
-}
+.gv-error { color: var(--gv-error); margin: 0; }
 
 .gv-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: calc(var(--gv-space) * 1.5);
   margin-block-start: calc(var(--gv-space) * 2);
 }
 
 .gv-skeleton {
-  height: calc(var(--gv-space) * 8);
+  height: calc(var(--gv-space) * 10);
   border-radius: var(--gv-radius);
-  background: var(--gv-skeleton);
+  background: linear-gradient(90deg, var(--gv-skeleton) 0%, #f8fafc 50%, var(--gv-skeleton) 100%);
+  background-size: 200% 100%;
+  animation: gv-shimmer 1.4s ease-in-out infinite;
   margin-block-end: calc(var(--gv-space) * 2);
 }
+@keyframes gv-shimmer { to { background-position: -200% 0; } }
+
+// מצב ריק אחיד: אייקון, כותרת, משפט, כפתור
+.gv-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--gv-space);
+  padding: calc(var(--gv-space) * 5) calc(var(--gv-space) * 3);
+}
+.gv-empty > .material-symbols-rounded {
+  font-size: 40px;
+  color: var(--gv-primary);
+  background: var(--gv-primary-soft);
+  border-radius: 50%;
+  padding: 14px;
+  inline-size: auto;
+}
+.gv-empty p { color: var(--gv-text-muted); max-inline-size: 440px; margin: 0; }
+.gv-empty .gv-actions { justify-content: center; }
+
+// כרטיסי מדדים
+.gv-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: calc(var(--gv-space) * 2);
+  margin-block-end: calc(var(--gv-space) * 3);
+}
+.gv-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: calc(var(--gv-space) * 2.5);
+}
+.gv-kpi > span:first-child { display: inline-flex; align-items: center; color: var(--gv-text-muted); font-size: 0.9rem; }
+.gv-kpi strong { font-size: 1.7rem; font-weight: 700; letter-spacing: -0.5px; }
+
+// ---- טפסים: שדות אחידים בכל המסכים ----
+input:not([type='checkbox']):not([type='radio']):not([type='file']):not(.mat-mdc-input-element),
+select,
+textarea {
+  font: inherit;
+  color: var(--gv-text);
+  background: var(--gv-surface);
+  border: 1px solid var(--gv-border);
+  border-radius: var(--gv-radius-sm);
+  padding: 10px 12px;
+  min-block-size: 42px;
+  box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input:not([type='checkbox']):not([type='radio']):not(.mat-mdc-input-element):focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--gv-primary);
+  box-shadow: 0 0 0 3px var(--gv-primary-soft);
+}
+input[type='checkbox'] { accent-color: var(--gv-primary); inline-size: 18px; block-size: 18px; }
+textarea { min-block-size: 96px; resize: vertical; }
+
+// ---- טבלאות ----
+.gv-table-wrap { overflow-x: auto; border: 1px solid var(--gv-border); border-radius: var(--gv-radius); background: var(--gv-surface); }
+table.gv-table { inline-size: 100%; border-collapse: collapse; }
+.gv-table th {
+  text-align: start;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--gv-text-muted);
+  background: #f8fafc;
+  padding: 12px 14px;
+  border-block-end: 1px solid var(--gv-border);
+  white-space: nowrap;
+}
+.gv-table td { padding: 14px; border-block-end: 1px solid var(--gv-border); vertical-align: middle; }
+.gv-table tr:last-child td { border-block-end: 0; }
+.gv-table tbody tr:hover { background: #f8fafc; }
+
+// ---- Tooltip של מילון המונחים (gv-info-tip) ----
+.gv-tooltip .mdc-tooltip__surface {
+  font-family: Heebo, Arial, sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  max-inline-size: 280px;
+  text-align: start;
+}
+
+// ---- מיקוד מקלדת נראה ----
+:focus-visible { outline: 2px solid var(--gv-primary); outline-offset: 2px; }
+
+@media (max-width: 700px) {
+  .gv-page { padding: calc(var(--gv-space) * 2.5) calc(var(--gv-space) * 2); }
+  h1 { font-size: 1.35rem; }
+}
+
+// כרטיסים בתוך Grid לא מקבלים רווח עליון
+.gv-kpis > *, .gv-grid > * { margin: 0 !important; }
+
+// ---- חלונות דו-שיח (<dialog>) ----
+dialog {
+  border: 0;
+  border-radius: var(--gv-radius);
+  box-shadow: var(--gv-shadow-lg);
+  padding: calc(var(--gv-space) * 3);
+  inline-size: min(30rem, calc(100% - 2rem));
+  color: var(--gv-text);
+}
+dialog::backdrop { background: rgba(15, 23, 42, 0.4); }
+dialog h2, dialog h3 { margin-block-start: 0; }
+dialog label { display: flex; flex-direction: column; gap: 6px; margin-block: calc(var(--gv-space) * 1.5); font-weight: 500; }
+dialog .gv-actions { justify-content: flex-start; }
+
+// ---- כפתור עם אייקון ----
+.mat-mdc-button-base .material-symbols-rounded { font-size: 18px; vertical-align: middle; margin-inline-end: 4px; }
+
+// ---- קישור חזרה ----
+.gv-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-block-end: calc(var(--gv-space) * 2);
+  color: var(--gv-text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.gv-back:hover { color: var(--gv-primary); }
+.gv-back .material-symbols-rounded { font-size: 18px; }

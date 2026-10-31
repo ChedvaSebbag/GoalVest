@@ -31,6 +31,15 @@
               }
             ],
             "styles": [
+              "node_modules/material-symbols/rounded.css",
+              "node_modules/@fontsource/heebo/hebrew-400.css",
+              "node_modules/@fontsource/heebo/hebrew-500.css",
+              "node_modules/@fontsource/heebo/hebrew-600.css",
+              "node_modules/@fontsource/heebo/hebrew-700.css",
+              "node_modules/@fontsource/heebo/latin-400.css",
+              "node_modules/@fontsource/heebo/latin-500.css",
+              "node_modules/@fontsource/heebo/latin-600.css",
+              "node_modules/@fontsource/heebo/latin-700.css",
               "src/styles.scss"
             ]
           },
@@ -39,13 +48,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "700kB",
+                  "maximumError": "1.5MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "6kB",
+                  "maximumError": "10kB"
                 }
               ],
               "outputHashing": "all"
@@ -70,7 +79,10 @@
           },
           "defaultConfiguration": "development",
           "options": {
-            "proxyConfig": "proxy.conf.json"
+            "proxyConfig": "proxy.conf.json",
+            "allowedHosts": [
+              ".trycloudflare.com"
+            ]
           }
         },
         "test": {

@@ -1,3 +1,4 @@
+// Query side of CQRS on the client: GET calls only, returning view-ready data built from rm_* tables.
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';

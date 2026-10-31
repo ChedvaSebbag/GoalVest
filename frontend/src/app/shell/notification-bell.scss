@@ -1,15 +1,18 @@
 .bell { position: relative; }
-button { color: var(--gv-on-primary); background: transparent; border: 0; font: inherit; cursor: pointer; }
-.bell > button { position: relative; display: inline-flex; align-items: center; }
+button { color: var(--gv-text-muted); background: transparent; border: 0; font: inherit; cursor: pointer; }
+.bell > button { position: relative; display: grid; place-items: center; inline-size: 40px; block-size: 40px; border-radius: var(--gv-radius-sm); }
+.bell > button:hover { background: var(--gv-surface); color: var(--gv-primary); }
+.bell > button .material-symbols-rounded { font-size: 22px; }
 .badge {
   position: absolute;
-  inset-block-start: -4px;
-  inset-inline-end: -8px;
+  inset-block-start: 2px;
+  inset-inline-end: 2px;
   min-width: 1.1rem;
   padding-inline: 4px;
   border-radius: 999px;
-  background: var(--gv-accent);
-  color: var(--gv-text);
+  background: var(--gv-error);
+  color: var(--gv-on-primary);
+  font-weight: 700;
   font-size: 0.75rem;
 }
 .panel {
@@ -22,11 +25,14 @@ button { color: var(--gv-on-primary); background: transparent; border: 0; font: 
   background: var(--gv-surface);
   color: var(--gv-text);
   border-radius: var(--gv-radius);
-  box-shadow: var(--gv-shadow);
-  padding: calc(var(--gv-space) * 2);
-  z-index: 2;
+  border: 1px solid var(--gv-border);
+  box-shadow: var(--gv-shadow-lg);
+  padding: var(--gv-space);
+  z-index: 30;
 }
 ul { list-style: none; margin: 0; padding: 0; }
-li + li { border-block-start: 1px solid var(--gv-skeleton); }
-.panel button { color: var(--gv-text); text-align: start; width: 100%; padding-block: var(--gv-space); }
-.panel span, .panel bdi { display: block; color: var(--gv-text-muted); }
+li + li { border-block-start: 1px solid var(--gv-border); }
+.panel button { color: var(--gv-text); text-align: start; width: 100%; padding: 10px; border-radius: var(--gv-radius-sm); }
+.panel li button:hover { background: var(--gv-bg); }
+.panel > p { padding: var(--gv-space); margin: 0; color: var(--gv-text-muted); }
+.panel span, .panel bdi { display: block; color: var(--gv-text-muted); font-size: 0.85rem; }

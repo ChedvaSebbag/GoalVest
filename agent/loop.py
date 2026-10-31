@@ -1,5 +1,12 @@
 """נעילה, הערכה ושחרור. כל שינוי מצב נכתב כאירוע."""
 
+# Agent worker loop (separate process: python -m agent). Every AGENT_POLL_SECONDS (20s) it takes up
+# to 3 SUBMITTED requests. StartAssessment acts as a lock (status -> AI_PROCESSING); a concurrent
+# claim raises ConcurrencyError and the request is skipped. Outcomes are written as commands/events:
+# success -> CompleteAssessment, failure -> FailAssessment (counted, 3 -> FAILED),
+# infrastructure down (Ollama/Chroma) -> AbortAssessment (not counted, back to the queue).
+# Requests stuck in AI_PROCESSING for more than 10 minutes are released.
+
 import logging
 from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4

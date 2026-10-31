@@ -1,0 +1,136 @@
+<section class="gv-page help">
+  <header class="gv-page-head">
+    <div>
+      <h1>מרכז העזרה</h1>
+      <p>איך GoalVest עובד, מה עושים בכל שלב ומה אומר כל מונח.</p>
+    </div>
+    @if (role()) {
+      <button type="button" mat-stroked-button (click)="replayTour()">
+        <span class="material-symbols-rounded" aria-hidden="true">play_circle</span>
+        הצגת סיור ההיכרות
+      </button>
+    }
+  </header>
+
+  <article class="gv-card flow" aria-labelledby="flow-title">
+    <h2 id="flow-title">איך GoalVest עובד</h2>
+    <ol class="flow-steps">
+      <li>
+        <span class="material-symbols-rounded" aria-hidden="true">flag</span>
+        <strong>משקיע מגדיר יעד</strong>
+        <span class="gv-muted">סכום, מועד והעדפות</span>
+      </li>
+      <li>
+        <span class="material-symbols-rounded" aria-hidden="true">smart_toy</span>
+        <strong>סוכן AI מעריך</strong>
+        <span class="gv-muted">חוקים, מסמכי פוליסה ונתוני שוק</span>
+      </li>
+      <li>
+        <span class="material-symbols-rounded" aria-hidden="true">support_agent</span>
+        <strong>סוכן אנושי בודק</strong>
+        <span class="gv-muted">לוקח ליד ומאשר את ההערכה</span>
+      </li>
+      <li>
+        <span class="material-symbols-rounded" aria-hidden="true">mail</span>
+        <strong>נשלחת הצעה</strong>
+        <span class="gv-muted">עד שלושה מוצרים באחוזים</span>
+      </li>
+      <li>
+        <span class="material-symbols-rounded" aria-hidden="true">task_alt</span>
+        <strong>המשקיע מחליט</strong>
+        <span class="gv-muted">אישור או דחייה</span>
+      </li>
+    </ol>
+  </article>
+
+  <mat-tab-group [selectedIndex]="tab()" (selectedIndexChange)="tab.set($event)" mat-stretch-tabs="false" animationDuration="0ms">
+    <mat-tab label="מדריך למשקיע">
+      <ol class="guide">
+        @for (step of guides.INVESTOR; track step.title; let i = $index) {
+          <li class="gv-card">
+            <span class="num"><bdi>{{ i + 1 }}</bdi></span>
+            <span class="material-symbols-rounded icon" aria-hidden="true">{{ step.icon }}</span>
+            <div>
+              <h3>{{ step.title }}</h3>
+              <p>{{ step.text }}</p>
+              @if (step.link && canFollow('INVESTOR')) {
+                <a mat-stroked-button [routerLink]="step.link">{{ step.linkLabel }}</a>
+              }
+            </div>
+          </li>
+        }
+      </ol>
+    </mat-tab>
+
+    <mat-tab label="מדריך לסוכן">
+      <ol class="guide">
+        @for (step of guides.AGENT; track step.title; let i = $index) {
+          <li class="gv-card">
+            <span class="num"><bdi>{{ i + 1 }}</bdi></span>
+            <span class="material-symbols-rounded icon" aria-hidden="true">{{ step.icon }}</span>
+            <div>
+              <h3>{{ step.title }}</h3>
+              <p>{{ step.text }}</p>
+              @if (step.link && canFollow('AGENT')) {
+                <a mat-stroked-button [routerLink]="step.link">{{ step.linkLabel }}</a>
+              }
+            </div>
+          </li>
+        }
+      </ol>
+    </mat-tab>
+
+    <mat-tab label="מה אומר כל סטטוס">
+      <div class="gv-card table-wrap">
+        <table>
+          <thead>
+            <tr><th>סטטוס</th><th>מה קורה עכשיו</th><th>מי צריך לפעול</th></tr>
+          </thead>
+          <tbody>
+            @for (item of statuses; track item.code) {
+              <tr>
+                <td><span class="status" [attr.data-status]="item.code">{{ item.label }}</span></td>
+                <td>{{ role() === 'AGENT' ? item.agent : item.investor }}</td>
+                <td>{{ item.owner }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="מילון מונחים">
+      <div class="gv-card">
+        <label class="search">
+          חיפוש מונח
+          <input type="search" [value]="filter()" (input)="filter.set($any($event.target).value)" placeholder="למשל: דמי ניהול" />
+        </label>
+        @if (filteredGlossary().length === 0) {
+          <p class="gv-muted">לא נמצא מונח מתאים.</p>
+        }
+        <dl class="glossary">
+          @for (entry of filteredGlossary(); track entry.term) {
+            <div>
+              <dt>{{ entry.term }}</dt>
+              <dd>{{ entry.text }}</dd>
+            </div>
+          }
+        </dl>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="שאלות נפוצות">
+      <mat-accordion class="faq">
+        @for (item of faq; track item.q) {
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>{{ item.q }}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <p>{{ item.a }}</p>
+          </mat-expansion-panel>
+        }
+      </mat-accordion>
+    </mat-tab>
+  </mat-tab-group>
+
+</section>

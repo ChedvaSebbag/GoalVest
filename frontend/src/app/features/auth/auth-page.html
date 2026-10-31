@@ -1,7 +1,12 @@
 <section class="auth-page">
   <mat-card class="auth-card" appearance="outlined">
-    <h1>GoalVest</h1>
-    <p class="muted">השקעות מבוססות-מטרות</p>
+    <h1>ברוכים הבאים ל-GoalVest</h1>
+    <p class="muted">השקעות שמתחילות מהמטרה שלך</p>
+    <ul class="intro">
+      <li><span class="material-symbols-rounded" aria-hidden="true">flag</span>מגדירים מטרה כספית: דירה, לימודים, פרישה</li>
+      <li><span class="material-symbols-rounded" aria-hidden="true">smart_toy</span>סוכן AI מעריך אילו אפיקי השקעה מתאימים</li>
+      <li><span class="material-symbols-rounded" aria-hidden="true">handshake</span>סוכן מגוף פיננסי שולח הצעה מותאמת</li>
+    </ul>
 
     <mat-tab-group [selectedIndex]="tabIndex()" (selectedIndexChange)="onTab($event)">
       <mat-tab label="התחברות">
@@ -34,6 +39,21 @@
           <button mat-flat-button type="submit" [disabled]="submitting()">
             {{ submitting() ? 'מתחבר…' : 'התחברות' }}
           </button>
+          <p class="muted small">אין לך חשבון? עוברים ללשונית "הרשמה".</p>
+
+          @if (showDemo) {
+            <details class="demo">
+              <summary>חשבונות הדגמה (סביבת פיתוח)</summary>
+              <p class="muted small">לחיצה ממלאת את הטופס. הסיסמה לכל החשבונות היא <bdi>Demo1234</bdi>.</p>
+              <div class="demo-list">
+                @for (account of demoAccounts; track account.email) {
+                  <button type="button" mat-stroked-button (click)="fillDemo(account.email)">
+                    {{ account.label }}
+                  </button>
+                }
+              </div>
+            </details>
+          }
         </form>
       </mat-tab>
 

@@ -1,41 +1,55 @@
 <section class="gv-page">
-  <a routerLink="/investor/offers">חזרה להצעות</a>
+  <a class="gv-back" routerLink="/investor/offers">
+    <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
+    חזרה להצעות
+  </a>
 
   @if (offer() === null && !failed()) {
     <div class="gv-skeleton"></div>
   } @else if (failed() || offer() === null) {
-    <article class="gv-card">
-      <p class="gv-error" role="alert">לא הצלחנו לטעון את ההצעה.</p>
-      <button type="button" mat-stroked-button (click)="load()">נסה שוב</button>
+    <article class="gv-card gv-empty">
+      <span class="material-symbols-rounded" aria-hidden="true">cloud_off</span>
+      <h2>לא הצלחנו לטעון את ההצעה</h2>
+      <div class="gv-actions"><button type="button" mat-flat-button (click)="load()">נסה שוב</button></div>
     </article>
   } @else if (offer(); as item) {
-    <header class="head">
-      <h1>{{ item.goalTitle }}</h1>
+    <header class="gv-page-head">
+      <div>
+        <h1>הצעה עבור "{{ item.goalTitle }}"</h1>
+        <p>מאת {{ item.agentName }} · {{ item.institutionName }} · <bdi>{{ formatDate(item.createdAt) }}</bdi></p>
+      </div>
       <gv-status-chip [status]="item.status" />
     </header>
     <article class="gv-card">
-      <p>{{ item.agentName }} · {{ item.institutionName }}</p>
-      <p class="gv-muted"><bdi>{{ formatDate(item.createdAt) }}</bdi></p>
-      <p>{{ item.message }}</p>
-      <table>
-        <caption class="gv-muted">תמהיל ההצעה</caption>
-        <thead><tr><th>מוצר</th><th>אחוז</th></tr></thead>
-        <tbody>
-          @for (row of item.items; track row.productId) {
-            <tr>
-              <td><a [routerLink]="['/products', row.productId]">{{ row.name || 'מסלול' }}</a></td>
-              <td><bdi>{{ row.percent }}%</bdi></td>
-            </tr>
-          }
-        </tbody>
-      </table>
+      @if (item.message) {
+        <blockquote class="message">
+          <span class="material-symbols-rounded" aria-hidden="true">format_quote</span>
+          <p>{{ item.message }}</p>
+        </blockquote>
+      }
+      <h2>מה מוצע</h2>
+      <ul class="mix">
+        @for (row of item.items; track row.productId) {
+          <li>
+            <a [routerLink]="['/products', row.productId]">{{ row.name || 'מסלול' }}</a>
+            <span class="track" aria-hidden="true"><span class="fill" [style.inline-size.%]="row.percent"></span></span>
+            <strong><bdi>{{ row.percent }}%</bdi></strong>
+          </li>
+        }
+      </ul>
       @if (message()) {
         <p class="gv-error" role="alert">{{ message() }}</p>
       }
       @if (item.status === 'SENT') {
-        <div class="gv-actions">
-          <button type="button" mat-flat-button [disabled]="busy()" (click)="accept()">קבלת ההצעה</button>
-          <button type="button" mat-stroked-button (click)="declineDialog.showModal()">דחיית ההצעה</button>
+        <div class="decide">
+          <p>מה דעתך? אחרי האישור הסוכן ייצור איתך קשר להשלמת ההצטרפות.</p>
+          <div class="gv-actions">
+            <button type="button" mat-flat-button [disabled]="busy()" (click)="accept()">
+              <span class="material-symbols-rounded" aria-hidden="true">check</span>
+              אישור ההצעה
+            </button>
+            <button type="button" mat-stroked-button (click)="declineDialog.showModal()">דחייה</button>
+          </div>
         </div>
       }
       <gv-disclaimer />
@@ -44,7 +58,8 @@
     <dialog #declineDialog>
       <form method="dialog">
         <h2>דחיית ההצעה</h2>
-        <label>סיבה <textarea name="reason" [(ngModel)]="reason"></textarea></label>
+        <p class="gv-muted">אפשר לכתוב לסוכן למה ההצעה לא מתאימה. הבקשה חוזרת אליו, והוא יכול לשלוח הצעה אחרת.</p>
+        <label>סיבה (לא חובה) <textarea name="reason" [(ngModel)]="reason"></textarea></label>
         <div class="gv-actions">
           <button type="button" mat-flat-button [disabled]="busy()" (click)="decline(declineDialog)">דחייה</button>
           <button type="submit" mat-stroked-button>ביטול</button>

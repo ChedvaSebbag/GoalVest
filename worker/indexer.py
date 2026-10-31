@@ -1,5 +1,10 @@
 """Indexer: קורא ProductDocumentUploaded, מטמיע ב-Chroma, ורושם אירוע עם ה-checkpoint באותה טרנזקציה."""
 
+# Indexer worker (python -m worker.indexer): reads new ProductDocumentUploaded events by
+# global_position, extracts text, splits it into chunks (800 chars, 120 overlap), embeds them and
+# upserts into ChromaDB. ConsumerCheckpoints stores the last processed position, so a crash resumes
+# without gaps or duplicates. Side effects run here, never in projectors.
+
 import argparse
 import logging
 import time

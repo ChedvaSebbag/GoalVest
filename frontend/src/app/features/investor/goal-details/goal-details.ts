@@ -18,12 +18,13 @@ import {
   optionLabel,
 } from '../../../core/investor/investor.models';
 import { MoneyPipe } from '../../../shared/money.pipe';
-import { StatusChip } from '../../../shared/status-chip';
+import { InfoTip } from '../../../shared/info-tip';
+import { RequestJourney } from '../../../shared/request-journey';
 import { AssessmentCard } from './assessment-card';
 
 @Component({
   selector: 'gv-goal-details',
-  imports: [RouterLink, MatButtonModule, MoneyPipe, StatusChip, AssessmentCard],
+  imports: [RouterLink, MatButtonModule, MoneyPipe, AssessmentCard, InfoTip, RequestJourney],
   templateUrl: './goal-details.html',
   styleUrl: './goal-details.scss',
 })

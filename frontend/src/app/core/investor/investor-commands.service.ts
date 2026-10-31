@@ -1,3 +1,6 @@
+// Command side of CQRS on the client: write calls only (POST/PUT) returning {id, version}.
+// Each call sends a fresh Idempotency-Key so a double click cannot create duplicates.
+// Reads live in investor-queries.service.ts.
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';

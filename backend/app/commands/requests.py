@@ -1,5 +1,10 @@
 """הגשת בקשה וביטול. בקשה פעילה אחת ליעד, ורק אחרי שאלון סיכון."""
 
+# Handler flow (submit): load the goal and check ownership (404 otherwise) -> check rules
+# (active goal, risk profile present, no active request) -> InvestmentRequest.submit() records
+# InvestmentRequestSubmitted with a snapshot of the goal -> save() appends to the event store
+# (projections run in the same transaction) -> return {id, version}.
+
 from dataclasses import dataclass
 from uuid import UUID
 
