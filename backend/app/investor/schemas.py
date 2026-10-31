@@ -148,6 +148,28 @@ class SubmitBody(BaseModel):
     consent_share_contact: bool = Field(alias="consentShareContact")
 
 
+class NoteBody(BaseModel):
+    note: str = ""
+
+
+class ReasonBody(BaseModel):
+    reason: str = ""
+
+
+class OfferItemBody(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    product_id: UUID = Field(alias="productId")
+    percent: int
+
+
+class OfferBody(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    items: list[OfferItemBody] = Field(min_length=1, max_length=3)
+    message: str = ""
+
+
 class CancelBody(BaseModel):
     reason: str = ""
 

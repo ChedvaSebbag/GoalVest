@@ -83,8 +83,9 @@ CREATE TABLE ConsumerCheckpoints (       -- למעקב של ה-Worker וה-Agent
 | `AlertThresholdChanged` | Portfolio | percent | API |
 | `PriceAlertTriggered` | Portfolio | symbol, change_pct, price, trading_date | Worker |
 | `NotificationSent` | (לפי הקשר) | channel (email / in_app), template, recipient_user_id, related_event_id | Worker |
+| `NotificationRead` | Notification | user_id | API |
 
-סטטוסי `InvestmentRequest`: `SUBMITTED`, `AI_PROCESSING`, `AI_EVALUATED`, `IN_REVIEW`, `FAILED`, `CANCELLED`. ביטול מותר מ-`SUBMITTED`, `AI_EVALUATED` ו-`IN_REVIEW` (03 §3.9). עריכה או ארכוב כשהבקשה ב-`AI_PROCESSING` נדחים בקוד `REQUEST_IN_PROCESSING`. `AssessmentStarted` מעביר ל-`AI_PROCESSING`, `AIAssessmentCompleted` ל-`AI_EVALUATED`, ו-`AIAssessmentFailed` חוזר ל-`SUBMITTED` עד הניסיון השלישי ואז ל-`FAILED`. `AssessmentAborted` חוזר ל-`SUBMITTED` בלי לצרוך ניסיון (03 §3.9). `LeadClaimed` עדיין לא נכתב כאן.
+סטטוסי `InvestmentRequest`: `SUBMITTED`, `AI_PROCESSING`, `AI_EVALUATED`, `IN_REVIEW`, `REEVALUATION_REQUESTED`, `OFFER_SENT`, `ACCEPTED`, `FAILED`, `CANCELLED`. ביטול מותר מ-`SUBMITTED`, `AI_EVALUATED` ו-`IN_REVIEW` (03 §3.9). עריכה או ארכוב כשהבקשה ב-`AI_PROCESSING` נדחים בקוד `REQUEST_IN_PROCESSING`. `AssessmentStarted` מעביר ל-`AI_PROCESSING` גם מ-`REEVALUATION_REQUESTED`. `AIAssessmentCompleted` מעביר ל-`AI_EVALUATED` ומנקה שיוך סוכן, כדי שאפשר לקחת את הליד מחדש. `AIAssessmentFailed` חוזר ל-`SUBMITTED` עד הניסיון השלישי ואז ל-`FAILED`. `AssessmentAborted` חוזר ל-`SUBMITTED` בלי לצרוך ניסיון (03 §3.9). `LeadClaimed` מעביר ל-`IN_REVIEW`. `AssessmentApproved` ו-`AssessmentRejected` לא משנים את הסטטוס. `ReevaluationRequested` מעביר ל-`REEVALUATION_REQUESTED` ומחזיר את הבקשה לתור הסוכן. `OfferSent` מעביר ל-`OFFER_SENT`, `OfferAccepted` ל-`ACCEPTED`, ו-`OfferDeclined` מחזיר ל-`IN_REVIEW` אצל אותו סוכן.
 
 דוגמת payload:
 
@@ -117,16 +118,16 @@ CREATE TABLE ConsumerCheckpoints (       -- למעקב של ה-Worker וה-Agent
 | `rm_users` | user_id, email (unique, אחרי `strip().lower()`), full_name, phone, role, institution_id, status, password_hash | התחברות, הרשאות |
 | `rm_investor_profiles` | user_id, risk_score, risk_label, birth_year, … | שאלון, דשבורד |
 | `rm_goals` | goal_id, investor_id, type, title, amounts, target_date, active_request_id, status | S7, S8 |
-| `rm_requests` | request_id, goal_id, investor_id, status, overall_score, claimed_by, institution_id, assessment_review (approved/rejected/null), retry_at, created_at, updated_at | תור הסוכן, S8 |
+| `rm_requests` | request_id, goal_id, investor_id, status, overall_score, claimed_by, institution_id, assessment_review (approved/rejected/null), assessment_note, retry_at, created_at, updated_at | תור הסוכן, S8 |
 | `rm_assessments` | request_id, attempt, json מלא של ההערכה, created_at | S8, S15 |
-| `rm_leads` | request_id, institution_id (שורה לכל גוף רלוונטי), investor_display_name, goal_type, amount, horizon_years, risk_label, ai_score, status, is_new | S14 טבלת לידים |
-| `rm_agent_kpis` | institution_id, count_by_status (עמודה לכל סטטוס), offers_sent, offers_accepted, avg_ai_score | S14 KPI |
+| `rm_leads` | request_id + institution_id (שורה לכל גוף שיש לו מוצר בהמלצה), investor_id, investor_display_name, goal_type, goal_title, amount, horizon_years, risk_label, ai_score, status, is_new, created_at | S14 טבלת לידים |
+| `rm_agent_kpis` | institution_id, evaluated_count, in_review_count, offer_sent_count, offers_sent, offers_accepted, avg_ai_score | S14 KPI |
 | `rm_agent_product_interest` | product_id, institution_id, recommended_count, offers_count, accepted_count | S14 גרף "מתעניינים לפי מוצר" (FR-42) |
 | `rm_products` | product_id, type, name, institution_id, institution_name, track, symbol, fee_deposit, fee_assets, return_1y/3y/5y, std_dev, risk_level, liquidity, liquidity_terms, tax_notes, min_deposit, description, is_active, search_text, updated_at | S9, S10, S16 |
 | `rm_product_documents` | document_id, product_id, file_name, stored_name, doc_type, storage_path, sha256, size_bytes, index_status, chunks_count, uploaded_at | S10, S17 |
-| `rm_offers` | offer_id, request_id, investor_id, agent_id, items_json, message, status | S12 |
+| `rm_offers` | offer_id, request_id, investor_id, agent_id, institution_id, items_json, message, status (`SENT` / `ACCEPTED` / `DECLINED`), created_at | S12 |
 | `rm_holdings` | user_id, symbol, quantity, buy_price | S13 |
-| `rm_notifications` | notification_id, user_id, title, body, link, is_read, created_at | S18 |
+| `rm_notifications` | notification_id, user_id, title, body, link, is_read, created_at | S18. נוצרת מהשלכת `OfferSent`; `NotificationRead` מסמן אותה כנקראה. מייל נשאר ל-Worker |
 | `rm_request_timeline` | request_id, global_position, event_type, actor, display_text, occurred_at | S8, S15 |
 
 `license_no` נשמר ב-payload של `UserRegistered` ואינו עמודה ב-`rm_users`.

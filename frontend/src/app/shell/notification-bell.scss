@@ -1,0 +1,32 @@
+.bell { position: relative; }
+button { color: var(--gv-on-primary); background: transparent; border: 0; font: inherit; cursor: pointer; }
+.bell > button { position: relative; display: inline-flex; align-items: center; }
+.badge {
+  position: absolute;
+  inset-block-start: -4px;
+  inset-inline-end: -8px;
+  min-width: 1.1rem;
+  padding-inline: 4px;
+  border-radius: 999px;
+  background: var(--gv-accent);
+  color: var(--gv-text);
+  font-size: 0.75rem;
+}
+.panel {
+  position: absolute;
+  inset-inline-end: 0;
+  inset-block-start: calc(100% + var(--gv-space));
+  width: min(22rem, 80vw);
+  max-height: 24rem;
+  overflow: auto;
+  background: var(--gv-surface);
+  color: var(--gv-text);
+  border-radius: var(--gv-radius);
+  box-shadow: var(--gv-shadow);
+  padding: calc(var(--gv-space) * 2);
+  z-index: 2;
+}
+ul { list-style: none; margin: 0; padding: 0; }
+li + li { border-block-start: 1px solid var(--gv-skeleton); }
+.panel button { color: var(--gv-text); text-align: start; width: 100%; padding-block: var(--gv-space); }
+.panel span, .panel bdi { display: block; color: var(--gv-text-muted); }

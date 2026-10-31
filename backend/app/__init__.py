@@ -26,9 +26,11 @@ def create_app(config: type[Config] = Config) -> Flask:
         return error_response(429, "RATE_LIMITED", "יותר מדי ניסיונות התחברות. נסו שוב בעוד מספר דקות.")
 
     # Controllers (MVC) – Blueprint לכל אזור. נוספים לפי docs/08-api-spec.md
+    from .controllers.agent_leads import agent_leads_bp
     from .controllers.auth import auth_bp
     from .controllers.health import health_bp
     from .controllers.investor import investor_bp
+    from .controllers.notifications import notifications_bp
     from .controllers.products import products_bp
     from .controllers.requests import requests_bp
 
@@ -37,4 +39,6 @@ def create_app(config: type[Config] = Config) -> Flask:
     app.register_blueprint(investor_bp, url_prefix="/api")
     app.register_blueprint(requests_bp, url_prefix="/api")
     app.register_blueprint(products_bp, url_prefix="/api")
+    app.register_blueprint(agent_leads_bp, url_prefix="/api")
+    app.register_blueprint(notifications_bp, url_prefix="/api")
     return app

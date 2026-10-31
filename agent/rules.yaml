@@ -18,3 +18,6 @@ inflation_text: "טווח ארוך ופרופיל סולידי. כדאי לשק�
 liquidity_text: "צוין צורך בנזילות לפני היעד. מתאים יותר שוק ההון ואפיקים נזילים."
 excluded_text: "האפיק סומן כלא רצוי, ולכן הציון והאחוז הם 0."
 retirement_text: "יעד פרישה שמגיע לגיל הקצבה. כדאי לשקול גמל להשקעה, לפי כללי המס של המערכת."
+optimistic_annual_rate: "0.08"
+goal_unrealistic_ratio: "0.70"
+goal_unrealistic_text: "בתרחיש האופטימי ({rate} בשנה, כולל הפקדות חודשיות) התחזית היא {forecast} ₪, והיא נמוכה מ-{percent} מסכום היעד {target} ₪."

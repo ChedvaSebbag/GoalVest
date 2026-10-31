@@ -28,6 +28,18 @@ export class InvestorCommandsService {
     return this.http.post<CommandResult>('/api/requests', { goalId, consentShareContact }, { headers: this.key() });
   }
 
+  acceptOffer(offerId: string): Observable<CommandResult> {
+    return this.http.post<CommandResult>(`/api/investor/offers/${offerId}/accept`, {}, { headers: this.key() });
+  }
+
+  declineOffer(offerId: string, reason: string): Observable<CommandResult> {
+    return this.http.post<CommandResult>(
+      `/api/investor/offers/${offerId}/decline`,
+      { reason },
+      { headers: this.key() },
+    );
+  }
+
   cancelRequest(requestId: string, reason: string): Observable<CommandResult> {
     return this.http.post<CommandResult>(`/api/requests/${requestId}/cancel`, { reason }, { headers: this.key() });
   }

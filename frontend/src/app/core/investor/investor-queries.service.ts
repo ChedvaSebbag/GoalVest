@@ -5,7 +5,9 @@ import {
   GoalDetails,
   GoalSummary,
   InstitutionOption,
+  InvestorDashboard,
   InvestorProfileView,
+  OfferView,
   TimelineItem,
 } from './investor.models';
 
@@ -20,6 +22,18 @@ export class InvestorQueriesService {
 
   goals(): Observable<{ items: GoalSummary[] }> {
     return this.http.get<{ items: GoalSummary[] }>('/api/investor/goals');
+  }
+
+  dashboard(): Observable<InvestorDashboard> {
+    return this.http.get<InvestorDashboard>('/api/investor/dashboard');
+  }
+
+  offers(): Observable<{ items: OfferView[] }> {
+    return this.http.get<{ items: OfferView[] }>('/api/investor/offers');
+  }
+
+  offer(offerId: string): Observable<OfferView> {
+    return this.http.get<OfferView>(`/api/investor/offers/${offerId}`);
   }
 
   goal(goalId: string): Observable<GoalDetails> {

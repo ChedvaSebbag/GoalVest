@@ -24,3 +24,4 @@ chroma_data/
 .DS_Store
 .idea/
 *.egg-info/
+logs/

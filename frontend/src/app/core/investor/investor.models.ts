@@ -62,6 +62,8 @@ export interface AssessmentView {
   riskFlags: AssessmentFlag[];
   sources: AssessmentSource[];
   pendingReview: boolean;
+  model?: string | null;
+  durationMs?: number | null;
 }
 
 export interface GoalDetails extends GoalSummary {
@@ -73,6 +75,37 @@ export interface GoalDetails extends GoalSummary {
   preferredChannels: string[];
   preferredInstitutions: string[];
   assessment: AssessmentView | null;
+}
+
+export interface InvestorDashboardGoal extends GoalSummary {
+  initialAmount: string;
+  progress: string;
+  assessment: AssessmentView | null;
+}
+
+export interface InvestorDashboard {
+  plannedCapital: string;
+  activeGoals: number;
+  pendingOffers: number;
+  goals: InvestorDashboardGoal[];
+}
+
+export interface OfferItem {
+  productId: string;
+  name: string;
+  percent: number;
+}
+
+export interface OfferView {
+  offerId: string;
+  requestId: string;
+  status: string;
+  message: string;
+  createdAt: string;
+  agentName: string;
+  institutionName: string;
+  goalTitle: string;
+  items: OfferItem[];
 }
 
 export interface TimelineItem {
@@ -143,7 +176,10 @@ export const STATUS_LABELS: Record<string, string> = {
   AI_PROCESSING: 'בעיבוד',
   AI_EVALUATED: 'הוערכה',
   IN_REVIEW: 'בבדיקת סוכן',
+  REEVALUATION_REQUESTED: 'ממתין להערכה מחדש',
   OFFER_SENT: 'נשלחה הצעה',
+  SENT: 'ממתינה',
+  DECLINED: 'נדחתה',
   ACCEPTED: 'התקבלה',
   CANCELLED: 'בוטלה',
   FAILED: 'נכשלה',

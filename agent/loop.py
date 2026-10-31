@@ -11,7 +11,7 @@ from app.commands.assessments import (
     FailAssessment,
     StartAssessment,
 )
-from app.queries.assessments import pending_requests, request_for_assessment, stuck_requests
+from app.queries.assessments import QUEUED_STATUSES, pending_requests, request_for_assessment, stuck_requests
 from goalvest_core import BusinessRuleViolation, ConcurrencyError
 from sqlalchemy.orm import Session
 
@@ -42,7 +42,7 @@ def process_request(
     now: datetime,
     report=None,
 ) -> tuple[str, Outcome | None]:
-    if row["status"] != "SUBMITTED":
+    if row["status"] not in QUEUED_STATUSES:
         return "skipped", None
     bus = build_command_bus(session, build_dispatcher())
     try:
@@ -89,7 +89,7 @@ def run_request(session: Session, request_id: UUID, services_for, *, now: dateti
     row = request_for_assessment(session, request_id)
     if row is None:
         return "missing", None
-    if row["status"] != "SUBMITTED":
+    if row["status"] not in QUEUED_STATUSES:
         return "skipped", None
     services = services_for(row["snapshot"])
     return process_request(session, row, services, now=now, report=report)

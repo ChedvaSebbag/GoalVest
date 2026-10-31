@@ -1,0 +1,32 @@
+<div class="bell">
+  <button type="button" aria-label="התראות" [attr.aria-expanded]="open()" (click)="toggle()">
+    <span class="material-symbols-rounded" aria-hidden="true">notifications</span>
+    @if (count() > 0) {
+      <bdi class="badge">{{ count() }}</bdi>
+    }
+  </button>
+  @if (open()) {
+    <div class="panel" role="region" aria-label="רשימת התראות">
+      @if (items() === null) {
+        <p>טוען…</p>
+      } @else if (failed()) {
+        <p>לא הצלחנו לטעון את ההתראות.</p>
+        <button type="button" (click)="load()">נסה שוב</button>
+      } @else if (items()?.length === 0) {
+        <p>אין התראות.</p>
+      } @else {
+        <ul>
+          @for (item of items(); track item.id) {
+            <li>
+              <button type="button" (click)="openItem(item)" [attr.aria-label]="item.title">
+                <strong>{{ item.title }}</strong>
+                <span>{{ item.body }}</span>
+                <bdi>{{ formatDate(item.createdAt) }}</bdi>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+</div>

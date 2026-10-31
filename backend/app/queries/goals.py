@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.infrastructure.serialization import loads
 from app.infrastructure.tables import rm_goals, rm_requests
 from app.queries.assessments import assessment_view
+from app.queries.offers import pending_offer_count
 
 
 def find_active_request(session: Session, goal_id: UUID):
@@ -64,6 +65,45 @@ def get_goal(session: Session, goal_id: UUID, investor_id: UUID) -> dict | None:
         ).scalar_one_or_none()
         summary["assessment"] = assessment_view(session, UUID(request_id), review)
     return summary
+
+
+def investor_dashboard(session: Session, investor_id: UUID) -> dict:
+    rows = session.execute(
+        sa.select(rm_goals)
+        .where(rm_goals.c.investor_id == investor_id, rm_goals.c.status == "ACTIVE")
+        .order_by(rm_goals.c.updated_at.desc())
+    ).mappings()
+    goals = []
+    planned = Decimal(0)
+    for row in rows:
+        planned += Decimal(row["target_amount"])
+        summary = _summary(session, row)
+        target = Decimal(row["target_amount"])
+        progress = Decimal(0)
+        if target > 0:
+            progress = (Decimal(row["initial_amount"]) / target * Decimal(100)).quantize(Decimal("0.1"))
+            if progress > Decimal(100):
+                progress = Decimal("100.0")
+        assessment = None
+        if summary["activeRequestId"] is not None:
+            review = session.execute(
+                sa.select(rm_requests.c.assessment_review).where(
+                    rm_requests.c.request_id == UUID(summary["activeRequestId"])
+                )
+            ).scalar_one_or_none()
+            assessment = assessment_view(session, UUID(summary["activeRequestId"]), review)
+        summary.update({
+            "initialAmount": _money(row["initial_amount"]),
+            "progress": format(progress, "f"),
+            "assessment": assessment,
+        })
+        goals.append(summary)
+    return {
+        "plannedCapital": _money(planned),
+        "activeGoals": len(goals),
+        "pendingOffers": pending_offer_count(session, investor_id),
+        "goals": goals,
+    }
 
 
 def _summary(session: Session, row) -> dict:

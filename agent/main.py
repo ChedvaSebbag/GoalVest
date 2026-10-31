@@ -9,7 +9,7 @@ from uuid import UUID
 
 from app.config import Config
 from app.infrastructure.db import get_engine
-from app.queries.assessments import request_for_assessment
+from app.queries.assessments import QUEUED_STATUSES, request_for_assessment
 from sqlalchemy.orm import Session
 
 from agent.loop import clock, process_batch, run_request
@@ -44,7 +44,7 @@ def _once(request_id: UUID, mode: str, verbose: bool) -> int:
         if row is None:
             print("הבקשה לא נמצאה")
             return 1
-        if row["status"] != "SUBMITTED":
+        if row["status"] not in QUEUED_STATUSES:
             print(f"הבקשה בסטטוס {row['status']} ולא בתור")
             return 1
         report = print_step if verbose else None

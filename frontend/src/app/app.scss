@@ -9,5 +9,6 @@
 .tagline { font-size: 0.9rem; opacity: 0.8; font-weight: 400; }
 .spacer { flex: 1; }
 a, button { color: var(--gv-on-primary); background: transparent; border: 0; font: inherit; cursor: pointer; text-decoration: none; }
+.topbar a.active { text-decoration: underline; text-underline-offset: 4px; }
 main { min-height: calc(100vh - 120px); }
 .disclaimer { text-align: center; font-size: 0.8rem; color: var(--gv-text-muted); padding: calc(var(--gv-space) * 2); }
